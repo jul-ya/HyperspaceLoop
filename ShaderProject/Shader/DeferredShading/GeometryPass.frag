@@ -13,8 +13,8 @@ uniform sampler2D gColorMap;
 
 void main() 
 { 
-    WorldPosOut = WorldPos0; 
-    DiffuseOut = texture(gColorMap, TexCoord0).xyz; 
-    NormalOut = normalize(Normal0); 
-    TexCoordOut = vec3(TexCoord0, 0.0); 
+    WorldPosOut = PositionWorld; 
+    DiffuseOut = texture(gColorMap, UV).xyz; 
+    NormalOut = normalize(Normal); 
+    TexCoordOut = vec3(UV, 0.0); 
 }
