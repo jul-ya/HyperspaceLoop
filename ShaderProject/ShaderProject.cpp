@@ -77,7 +77,7 @@ Model* lightSphere6;
 GBuffer* gBuffer;
 
 //PointLight
-PointLight* lightPosition;
+PointLight* pointLight;
 
 
 // Refractive models
