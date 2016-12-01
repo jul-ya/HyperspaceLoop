@@ -8,6 +8,8 @@
 #include <iostream>
 #include "Shader.h"
 #include "Model.h"
+#include "GBuffer.h"
+#include "PointLight.h"
 #include "Camera.h"
 #include "Skybox.h"
 #include "FrameBuffer.h"
@@ -37,9 +39,7 @@ void handleMovement();
 // Function definition
 int render();
 void renderSingleModel(Model currentModel);
-void renderSingleRefractiveModel(Model currentModel);
 void renderSkybox();
-void renderRefractive();
 void destroy();
 void initFrameBuffer();
 void printControls();
@@ -66,11 +66,19 @@ Shader* refractiveShader;
 
 // Models
 vector<Model> models;
-Model* birdmanModel;
-Model* fatmanModel;
-Model* lightModel;
-Model* modelFloor;
-Model* modelPlane;
+Model* lightSphere1;
+Model* lightSphere2;
+Model* lightSphere3;
+Model* lightSphere4;
+Model* lightSphere5;
+Model* lightSphere6;
+
+//GBuffer
+GBuffer* gBuffer;
+
+//PointLight
+PointLight* lightPosition;
+
 
 // Refractive models
 vector<Model> refractiveModels;
@@ -80,7 +88,7 @@ Model* teapot;
 Skybox* skybox;
 
 // Framebuffer
-FrameBuffer* frameBuffer;
+//FrameBuffer* frameBuffer;
 
 // Light direction
 glm::vec3* lightPosition = new glm::vec3(3.0f, 2.0f, 2.0f);
@@ -169,8 +177,20 @@ void initCallbacks()
 */
 void initFrameBuffer()
 {
-	frameBuffer = new FrameBuffer(WIDTH, HEIGHT);
+	//frameBuffer = new FrameBuffer(WIDTH, HEIGHT);
 }
+
+
+/**
+* Inits the GBuffer object	
+*/
+void initGBuffer() {
+	gBuffer = new GBuffer();
+	if (!gBuffer->Init(WIDTH, HEIGHT)) {
+		printf("GBuffer init failed");
+	}
+}
+
 
 /**
 * Initializes the shaders.
@@ -191,40 +211,35 @@ void initShader()
 */
 void loadModels()
 {
-	birdmanModel = new Model("../ShaderProject/Model/Birdman/Birdman.obj", testShader);
-	birdmanModel->position = new glm::vec3(0, 0, 0);
-	birdmanModel->material.color = glm::vec3(1, 1, 1);
-	birdmanModel->material.shininess = 4;
-	birdmanModel->material.specularStrength = 10;
-	models.push_back(*birdmanModel);
+	lightSphere1 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere1->position = new glm::vec3(0, 0, 0);
+	lightSphere1->material.color = glm::vec3(1, 1, 1);
+	models.push_back(*lightSphere1);
 
-	fatmanModel = new Model("../ShaderProject/Model/Fatman/Fatman.obj", reflectionTextureShader);
-	fatmanModel->position = new glm::vec3(-2, 0, 0);
-	fatmanModel->material.color = glm::vec3(1, 1, 1);
-	models.push_back(*fatmanModel);
+	lightSphere2 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere2->position = new glm::vec3(2, 0, 0);
+	lightSphere2->material.color = glm::vec3(1, 1, 1);
+	models.push_back(*lightSphere2);
 
-	lightModel = new Model("../ShaderProject/Model/Light/Light.obj", reflectionNoTextureShader);
-	lightModel->position = lightPosition;
-	lightModel->scale = glm::vec3(0.01, 0.01, 0.01);
-	lightModel->material.color = glm::vec3(0.866, 0.827, 0.450);
-	models.push_back(*lightModel);
+	lightSphere3 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere3->position = new glm::vec3(4, 0, 0);
+	lightSphere3->material.color = glm::vec3(1, 1, 1);
+	models.push_back(*lightSphere3);
 
-	modelFloor = new Model("../ShaderProject/Model/Floor/Floor.obj", testShader);
-	modelFloor->position = new glm::vec3(0, -0.5, 0);
-	models.push_back(*modelFloor);
+	lightSphere4 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere4->position = new glm::vec3(6, 0, 0);
+	lightSphere4->material.color = glm::vec3(1, 1, 1);
+	models.push_back(*lightSphere4);
 
-	teapot = new Model("../ShaderProject/Model/Teapot/Teapot.obj", refractiveShader);
-	teapot->position = new glm::vec3(-3, 0, 1.5);
-	teapot->scale = glm::vec3(0.01, 0.01, 0.01);
-	teapot->material.shininess = 16;
-	teapot->material.specularStrength = 2;
-	teapot->material.color = glm::vec3(1, 1, 1);
-	refractiveModels.push_back(*teapot);
+	lightSphere5 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere5->position = new glm::vec3(8, 0, 0);
+	lightSphere5->material.color = glm::vec3(1, 1, 1);
+	models.push_back(*lightSphere5);
 
-	modelPlane = new Model("../ShaderProject/Model/Plane/Plane.obj", refractiveShader);
-	modelPlane->position = new glm::vec3(2.0, 0, 3);
-	modelPlane->scale = glm::vec3(0.05, 0.05, 0.05);
-	refractiveModels.push_back(*modelPlane);
+	lightSphere6 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere6->position = new glm::vec3(10, 0, 0);
+	lightSphere6->material.color = glm::vec3(1, 1, 1);
+	models.push_back(*lightSphere6);
 
 	skybox = new Skybox(skyboxShader);
 }
@@ -242,6 +257,71 @@ void printControls()
 	cout << "Refraction/Color Blending: N/M" << endl;
 	cout << "Chromatic Dispersion: C/V" << endl;
 }
+
+void geometryPass() {
+	gBuffer->BindForReading();
+
+	glDepthMask(GL_TRUE);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
+
+	glDisable(GL_BLEND);
+
+	render();
+
+	glDepthMask(GL_FALSE);
+
+	glDisable(GL_DEPTH_TEST);
+}
+
+void beginLightPasses()
+{
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	gBuffer->BindForReading();
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+
+
+void lightPass() {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	gBuffer->BindForReading();
+
+	GLsizei HalfWidth = (GLsizei)(WIDTH / 2.0f);
+	GLsizei HalfHeight = (GLsizei)(HEIGHT / 2.0f);
+
+	gBuffer->SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_POSITION);
+	glBlitFramebuffer(0, 0, WIDTH, HEIGHT,
+		0, 0, HalfWidth, HalfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	gBuffer->SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_DIFFUSE);
+	glBlitFramebuffer(0, 0, WIDTH, HEIGHT,
+		0, HalfHeight, HalfWidth, HEIGHT, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	gBuffer->SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_NORMAL);
+	glBlitFramebuffer(0, 0, WIDTH, HEIGHT,
+		HalfWidth, HalfHeight, WIDTH, HEIGHT, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	gBuffer->SetReadBuffer(GBuffer::GBUFFER_TEXTURE_TYPE_TEXCOORD);
+	glBlitFramebuffer(0, 0, WIDTH, HEIGHT,
+		HalfWidth, 0, WIDTH, HalfHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+}
+
+
+void renderSceneDS() {
+	geometryPass();
+	beginLightPasses();
+	lightPass();
+}
+
+
 
 /**
 * Game Loop
@@ -263,39 +343,35 @@ void update()
 		
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
-
-		//===================Bind Framebuffer and draw objects=========================
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		frameBuffer->bindFrameBuffer();
-
+				
 		// Back face culling
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
 		glFrontFace(GL_CCW);
 
 		// Rendering things
-		render();
+		//render();
+
+		renderSceneDS();
 
 		// Render Skybox
 		renderSkybox();
-
-		// Unbind Framebuffer
-		frameBuffer->unbindFrameBuffer();
-		//=============================================================================
+			
 
 		//==============Draw Framebuffer=================
-		frameBuffer->drawFrameBuffer();
+		//frameBuffer->drawFrameBuffer();
 		glEnable(GL_DEPTH_TEST);
 		//===============================================
 
-		//=============Draw Refractive objects===========
-		renderRefractive();
-		//===============================================
+	
 
 		// Double buffering
 		glfwSwapBuffers(window);
 	}
 }
+
+
+
 
 /**
 *	Main function
@@ -327,13 +403,16 @@ int main()
 	initCallbacks();
 
 	// Init Framebuffer
-	initFrameBuffer();
+	//initFrameBuffer();
+
+	// Init GBuffer
+	initGBuffer();
 
 	// Game Loop
 	update();
 
 	// Clear Framebuffers
-	glDeleteFramebuffers(1, &frameBuffer->framebuffer);
+	//glDeleteFramebuffers(1, &frameBuffer->framebuffer);
 
 	// Terminate and clean
 	glfwTerminate();
@@ -358,17 +437,7 @@ void renderSkybox()
 	glDepthFunc(GL_LESS);
 }
 
-/**
-* Renders all refractive models.
-*/
-void renderRefractive()
-{
-	for (int i = 0; i < refractiveModels.size(); i++)
-	{
-		Model* currentModel = &refractiveModels[i];
-		renderSingleRefractiveModel(*currentModel);
-	}
-}
+
 
 /**
 * Main render method.
@@ -406,72 +475,6 @@ void renderSingleModel(Model currentModel)
 	glm::mat4 view = camera.GetViewMatrix();
 	glUniformMatrix4fv(glGetUniformLocation(currentModel.shader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(currentModel.shader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
-	// Light
-	glUniform3f(glGetUniformLocation(currentModel.shader->Program, "lightPositionWorld"), lightPosition->x, lightPosition->y, lightPosition->z);
-
-	// Camera position
-	glUniform3f(glGetUniformLocation(currentModel.shader->Program, "viewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
-
-	// Blinn phong
-	glUniform1i(glGetUniformLocation(currentModel.shader->Program, "blinn"), blinn);
-
-	// Light radius
-	glUniform1f(glGetUniformLocation(currentModel.shader->Program, "lightRadius"), lightRadius);
-
-	// Fill material struct
-	glUniform3f(glGetUniformLocation(currentModel.shader->Program, "material.color"), currentModel.material.color.x, currentModel.material.color.y, currentModel.material.color.z);
-	glUniform1f(glGetUniformLocation(currentModel.shader->Program, "material.specularStrength"), currentModel.material.specularStrength);
-	glUniform1f(glGetUniformLocation(currentModel.shader->Program, "material.shininess"), currentModel.material.shininess);
-
-	// Draw the loaded model
-	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(currentModel.position->x, currentModel.position->y, currentModel.position->z)); // Translate it down a bit so it's at the center of the scene
-	model = glm::scale(model, glm::vec3(currentModel.scale.x, currentModel.scale.y, currentModel.scale.z));	// It's a bit too big for our scene, so scale it down
-	glUniformMatrix4fv(glGetUniformLocation(currentModel.shader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-
-	currentModel.Draw(*currentModel.shader);
-}
-
-/**
-* Renders a single refractive model (With Framebuffer).
-*/
-void renderSingleRefractiveModel(Model currentModel)
-{
-	currentModel.shader->Use();
-
-	// Activate the proper texture unity --> Cubemap Unit 10!
-	glActiveTexture(GL_TEXTURE10);
-
-	// Set Skybox in shader
-	glUniform1i(glGetUniformLocation(currentModel.shader->Program, "skybox"), 10);
-
-	// Bind cubemap
-	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemapTexture);
-
-	// Bind Framebuffer texture. (Framebuffer Unity 11)
-	glActiveTexture(GL_TEXTURE11);
-	glUniform1i(glGetUniformLocation(currentModel.shader->Program, "framebuffer"), 11);
-	glBindTexture(GL_TEXTURE_2D, frameBuffer->textureColorbuffer);
-
-	// Transformation matrices
-	glm::mat4 projection = glm::perspective(camera.Zoom, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
-	glm::mat4 view = camera.GetViewMatrix();
-	glUniformMatrix4fv(glGetUniformLocation(currentModel.shader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(currentModel.shader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
-	// Screen dimensions
-	glUniform1f(glGetUniformLocation(currentModel.shader->Program, "width"), WIDTH);
-	glUniform1f(glGetUniformLocation(currentModel.shader->Program, "height"), HEIGHT);
-
-	// Refraction strength
-	glUniform1f(glGetUniformLocation(currentModel.shader->Program, "refractionStrength"), refractionStrength);
-
-	// Chromatic dispersion
-	glUniform1f(glGetUniformLocation(currentModel.shader->Program, "chromaticDispersion"), chromaticDispersion);
-
-	// Refraction Diffuse blending
-	glUniform1f(glGetUniformLocation(currentModel.shader->Program, "refractionBlending"), refractionBlending);
 
 	// Light
 	glUniform3f(glGetUniformLocation(currentModel.shader->Program, "lightPositionWorld"), lightPosition->x, lightPosition->y, lightPosition->z);
@@ -573,12 +576,16 @@ void destroy()
 	delete reflectionNoTextureShader;
 	delete reflectionTextureShader;
 	delete lightPosition;
-	delete frameBuffer;
+	//delete frameBuffer;
+	delete gBuffer;
 
-	delete birdmanModel;
-	delete fatmanModel;
-	delete lightModel;
-	delete modelFloor;
+	delete lightSphere1;
+	delete lightSphere2;
+	delete lightSphere3;
+	delete lightSphere4;
+	delete lightSphere5;
+	delete lightSphere6;
+
 	delete teapot;
 	delete skybox;
 }
