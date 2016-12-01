@@ -17,4 +17,6 @@ void main()
     DiffuseOut = texture(gColorMap, UV).xyz; 
     NormalOut = normalize(Normal); 
     TexCoordOut = vec3(UV, 0.0); 
+
+	gl_FragColor = vec4(1.0,1.0,1.0,1.0);
 }

@@ -63,6 +63,7 @@ Shader* skyboxShader;
 Shader* reflectionNoTextureShader;
 Shader* reflectionTextureShader;
 Shader* refractiveShader;
+Shader* geometryShader;
 
 // Models
 vector<Model> models;
@@ -204,6 +205,7 @@ void initShader()
 	reflectionNoTextureShader = new Shader("../ShaderProject/Shader/Standard.vert", "../ShaderProject/Shader/StandardNoTextureReflection.frag");
 	reflectionTextureShader = new Shader("../ShaderProject/Shader/Standard.vert", "../ShaderProject/Shader/StandardTextureReflection.frag");
 	refractiveShader = new Shader("../ShaderProject/Shader/Refraction/Refraction.vert", "../ShaderProject/Shader/Refraction/Refraction.frag");
+	geometryShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/DeferredShading/GeometryPass.frag");
 }
 
 /**
@@ -211,32 +213,32 @@ void initShader()
 */
 void loadModels()
 {
-	lightSphere1 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere1 = new Model("../ShaderProject/Model/Star/Star.obj", geometryShader);
 	lightSphere1->position = new glm::vec3(0, 0, 0);
 	lightSphere1->material.color = glm::vec3(1, 1, 1);
 	models.push_back(*lightSphere1);
 
-	lightSphere2 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere2 = new Model("../ShaderProject/Model/Star/Star.obj", geometryShader);
 	lightSphere2->position = new glm::vec3(2, 0, 0);
 	lightSphere2->material.color = glm::vec3(1, 1, 1);
 	models.push_back(*lightSphere2);
 
-	lightSphere3 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere3 = new Model("../ShaderProject/Model/Star/Star.obj", geometryShader);
 	lightSphere3->position = new glm::vec3(4, 0, 0);
 	lightSphere3->material.color = glm::vec3(1, 1, 1);
 	models.push_back(*lightSphere3);
 
-	lightSphere4 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere4 = new Model("../ShaderProject/Model/Star/Star.obj", geometryShader);
 	lightSphere4->position = new glm::vec3(6, 0, 0);
 	lightSphere4->material.color = glm::vec3(1, 1, 1);
 	models.push_back(*lightSphere4);
 
-	lightSphere5 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere5 = new Model("../ShaderProject/Model/Star/Star.obj", geometryShader);
 	lightSphere5->position = new glm::vec3(8, 0, 0);
 	lightSphere5->material.color = glm::vec3(1, 1, 1);
 	models.push_back(*lightSphere5);
 
-	lightSphere6 = new Model("../ShaderProject/Model/Star/Star.obj", testShaderNoTexture);
+	lightSphere6 = new Model("../ShaderProject/Model/Star/Star.obj", geometryShader);
 	lightSphere6->position = new glm::vec3(10, 0, 0);
 	lightSphere6->material.color = glm::vec3(1, 1, 1);
 	models.push_back(*lightSphere6);
@@ -341,7 +343,7 @@ void update()
 		// Update movement
 		handleMovement();
 		
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
 				
 		// Back face culling
