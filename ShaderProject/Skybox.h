@@ -28,12 +28,12 @@ public:
 
 		// Assign faces
 		vector<const GLchar*> faces;
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Clouded/right.jpg");
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Clouded/left.jpg");
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Clouded/top.jpg");
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Clouded/bottom.jpg");
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Clouded/back.jpg");
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Clouded/front.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/right.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/left.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/top.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/bottom.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/back.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/front.jpg");
 		cubemapTexture = loadCubemap(faces);
 	}
 		
