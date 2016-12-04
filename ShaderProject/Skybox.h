@@ -20,9 +20,7 @@ public:
 	Skybox(Shader* shader)
 	{
 		skyboxModel = new Model("../ShaderProject/Model/Skybox/Skybox.obj", shader);
-		skyboxModel->position = new glm::vec3(0, 0, 0);
-		skyboxModel->material.color = glm::vec3(1.0, 1.0, 1.0);
-
+		
 		// Assign shader
 		this->shader = shader;
 
@@ -74,13 +72,6 @@ public:
 	*/
 	void Draw()
 	{
-		Mesh* mesh = skyboxModel->getFirstMesh();
-
-		glBindVertexArray(mesh->VAO);
-		glActiveTexture(GL_TEXTURE0);
-		glUniform1i(glGetUniformLocation(shader->Program, "skybox"), 0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-		glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
-		glBindVertexArray(0);
+		skyboxModel->Draw(*this->shader);
 	}
 };
