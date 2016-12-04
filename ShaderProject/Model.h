@@ -19,40 +19,21 @@ using namespace std;
 #include "Mesh.h"
 #include "Shader.h"
 
-GLint TextureFromFile(const char* path, string directory);
-
-// Material struct.
-struct Material
-{
-	glm::vec3 color;
-	float specularStrength;
-	float shininess;
-};
+GLint TextureFromFile(const char* path, string directory, bool gamma = false);
 
 class Model
 {
 public:
-	// Position of the model.
-	glm::vec3* position;
-	
-	glm::vec3 scale;
-
-	Shader* shader;
-
-	Material material;
+	/*  Model Data */
+	vector<Texture> textures_loaded;	// Stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+	vector<Mesh> meshes;
+	string directory;
+	bool gammaCorrection;
 
 	/*  Functions   */
 	// Constructor, expects a filepath to a 3D model.
-	Model(GLchar* path, Shader* shader)
+	Model(string const & path, bool gamma = false) : gammaCorrection(gamma)
 	{
-		position = new glm::vec3(0.0, 0.0, 0.0);
-		scale = glm::vec3(1.0, 1.0, 1.0);
-
-		material.color = glm::vec3(1.0, 1.0, 1.0);
-		material.specularStrength = 0.5f;
-		material.shininess = 32.0f;
-		
-		this->shader = shader;
 		this->loadModel(path);
 	}
 
@@ -63,27 +44,14 @@ public:
 			this->meshes[i].Draw(shader);
 	}
 
-	/**
-	* Returns the first mesh of the mesh list.
-	*/
-	Mesh* getFirstMesh()
-	{
-		return &meshes[0];
-	}
-
 private:
-	/*  Model Data  */
-	vector<Mesh> meshes;
-	string directory;
-	vector<Texture> textures_loaded;	// Stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
-
-										/*  Functions   */
-										// Loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
+	/*  Functions   */
+	// Loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
 	void loadModel(string path)
 	{
 		// Read file via ASSIMP
 		Assimp::Importer importer;
-		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+		const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 		// Check for errors
 		if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 		{
@@ -138,7 +106,6 @@ private:
 			vector.y = mesh->mNormals[i].y;
 			vector.z = mesh->mNormals[i].z;
 			vertex.Normal = vector;
-
 			// Texture Coordinates
 			if (mesh->mTextureCoords[0]) // Does the mesh contain texture coordinates?
 			{
@@ -151,6 +118,16 @@ private:
 			}
 			else
 				vertex.TexCoords = glm::vec2(0.0f, 0.0f);
+			// Tangent
+			vector.x = mesh->mTangents[i].x;
+			vector.y = mesh->mTangents[i].y;
+			vector.z = mesh->mTangents[i].z;
+			vertex.Tangent = vector;
+			// Bitangent
+			vector.x = mesh->mBitangents[i].x;
+			vector.y = mesh->mBitangents[i].y;
+			vector.z = mesh->mBitangents[i].z;
+			vertex.Bitangent = vector;
 			vertices.push_back(vertex);
 		}
 		// Now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
@@ -179,8 +156,11 @@ private:
 			vector<Texture> specularMaps = this->loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 			// 3. Normal maps
-			vector<Texture> normalMaps = this->loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+			std::vector<Texture> normalMaps = this->loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
 			textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+			// 4. Height maps
+			std::vector<Texture> heightMaps = this->loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+			textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 		}
 
 		// Return a mesh object created from the extracted mesh data
@@ -224,7 +204,7 @@ private:
 
 
 
-GLint TextureFromFile(const char* path, string directory)
+GLint TextureFromFile(const char* path, string directory, bool gamma)
 {
 	//Generate texture ID and load texture data 
 	string filename = string(path);
@@ -235,7 +215,7 @@ GLint TextureFromFile(const char* path, string directory)
 	unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
 	// Assign texture to ID
 	glBindTexture(GL_TEXTURE_2D, textureID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glTexImage2D(GL_TEXTURE_2D, 0, gamma ? GL_SRGB : GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	// Parameters
