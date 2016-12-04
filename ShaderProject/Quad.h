@@ -13,7 +13,7 @@ public:
 		GLuint length = 20;
 		//vertex and uv coordinates
 		GLfloat vertices[] = {
-			// vertex coordinates   // uv coordinates
+			// vertices             // uvs
 			-1.0f, 	1.0f,	0.0f,	0.0f,	1.0f,
 			-1.0f, -1.0f,	0.0f,	0.0f,	0.0f,
 			1.0f,	1.0f,	0.0f,	1.0f,	1.0f,
@@ -41,6 +41,10 @@ public:
 		glEnableVertexAttribArray(1);
 		//specify the uv position in the array 
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+		
+		//unbind vbo and vao
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
 	}
 
 	//renders the quad
