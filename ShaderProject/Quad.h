@@ -9,8 +9,6 @@ public:
 	Quad() {
 		//vertex buffer object
 		GLuint vbo;
-		//vertices length
-		GLuint length = 20;
 		//vertex and uv coordinates
 		GLfloat vertices[] = {
 			// vertices             // uvs
