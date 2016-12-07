@@ -122,20 +122,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GBuffer.cpp" />
     <ClCompile Include="ShaderProject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cube.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="Quad.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shader\DeferredShading\GeometryPass.frag" />
+    <None Include="Shader\DeferredShading\GeometryPass.vert" />
+    <None Include="Shader\DeferredShading\LightPass.frag" />
+    <None Include="Shader\DeferredShading\LightPass.vert" />
     <None Include="Shader\Refraction\Refraction.frag" />
     <None Include="Shader\Refraction\Refraction.vert" />
     <None Include="Shader\RenderToTexture\FrameBuffer.frag" />

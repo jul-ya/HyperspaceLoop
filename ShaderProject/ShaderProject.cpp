@@ -232,11 +232,11 @@ void loadModels()
 	objectPositions.push_back(glm::vec3(0.0, -3.0, 3.0));
 	objectPositions.push_back(glm::vec3(3.0, -3.0, 3.0));
 	
-	screenQuad = new Quad();
+	//screenQuad = new Quad();
 }
 
 void setUpLights() {
-	const GLuint NR_LIGHTS = 32;
+	const GLuint NR_LIGHTS = 64;
 
 	srand(13);
 	for (GLuint i = 0; i < NR_LIGHTS; i++)
@@ -253,6 +253,48 @@ void setUpLights() {
 		lightColors.push_back(glm::vec3(rColor, gColor, bColor));
 	}
 }
+
+
+
+
+GLuint quadVAO = 0;
+GLuint quadVBO;
+void RenderQuad()
+{
+	if (quadVAO == 0)
+	{
+		GLfloat quadVertices[] = {
+			// Positions        // Texture Coords
+			-1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+			1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+		};
+		// Setup plane VAO
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+}
+
+
+
+
+
+
+
+
+
+
 
 
 void geometryStep() {
@@ -309,7 +351,13 @@ void lightingStep() {
 	}
 	glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
 
-	screenQuad->render();
+
+	RenderQuad();
+	/*if (screenQuad == NULL) {
+		screenQuad = new Quad();
+	}
+
+	screenQuad->render();*/
 }
 
 
@@ -339,6 +387,8 @@ void update()
 		
 		// Deferred Rendering
 		renderSceneDSAlternative();
+
+		//nanosuit->Draw(*testShader);
 
 		// Double buffering
 		glfwSwapBuffers(window);
