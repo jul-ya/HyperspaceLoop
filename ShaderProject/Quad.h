@@ -29,7 +29,7 @@ public:
 		
 		//bind vbo and fill it with the mesh informations
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, length, &vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 		
 		//define the vertex attributes		
 		//----enable slot 0
