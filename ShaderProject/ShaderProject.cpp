@@ -36,8 +36,21 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void handleMovement();
 
-// Function definition
+// Function definitions
 void destroy();
+int initWindow();
+int initGLEW();
+void initCallbacks();
+void initGBuffer();
+void initShader();
+void loadModels();
+void setUpLights();
+void geometryStep();
+void lightingStep();
+void update();
+int main();
+void handleMovement();
+void postprocessingStep();
 
 // Camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -55,6 +68,7 @@ GLfloat lastFrame = 0.0f;
 Shader* testShader;
 Shader* testShaderNoTexture;
 Shader* skyboxShader;
+Shader* framebufferShader;
 Shader* reflectionNoTextureShader;
 Shader* reflectionTextureShader;
 Shader* refractiveShader;
@@ -81,6 +95,9 @@ PointLight* pointLight;
 vector<glm::vec3> lightPositions;
 vector<glm::vec3> lightColors;
 
+// Framebuffer
+FrameBuffer* frameBuffer;
+
 
 /**
 * Initializes the window.
@@ -92,6 +109,14 @@ int initWindow()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glEnable(GL_FRAMEBUFFER_SRGB);
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	glEnable(GL_MULTISAMPLE);
+
+	//glEnable(GL_BLEND);
+	//glEnable(GL_ALPHA_TEST);
+	//glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glClearColor(0, 0, 0, 0);
 	
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Hyperspace Loop", nullptr, nullptr);
 	if (window == nullptr)
@@ -199,6 +224,7 @@ void initShader()
 	testShader = new Shader("../ShaderProject/Shader/Standard.vert", "../ShaderProject/Shader/Standard.frag");
 	testShaderNoTexture = new Shader("../ShaderProject/Shader/Standard.vert", "../ShaderProject/Shader/StandardNoTexture.frag");
 	skyboxShader = new Shader("../ShaderProject/Shader/Skybox.vert", "../ShaderProject/Shader/Skybox.frag");
+	framebufferShader = new Shader("../ShaderProject/Shader/RenderToTexture/FrameBuffer.vert", "../ShaderProject/Shader/RenderToTexture/FrameBuffer.frag");
 	reflectionNoTextureShader = new Shader("../ShaderProject/Shader/Standard.vert", "../ShaderProject/Shader/StandardNoTextureReflection.frag");
 	reflectionTextureShader = new Shader("../ShaderProject/Shader/Standard.vert", "../ShaderProject/Shader/StandardTextureReflection.frag");
 	refractiveShader = new Shader("../ShaderProject/Shader/Refraction/Refraction.vert", "../ShaderProject/Shader/Refraction/Refraction.frag");
@@ -212,6 +238,9 @@ void initShader()
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gPosition"), 0);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gNormal"), 1);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gAlbedoSpec"), 2);
+
+	framebufferShader->Use();
+	glUniform1i(glGetUniformLocation(framebufferShader->Program, "screenTexture"), 0);
 
 }
 
@@ -259,7 +288,13 @@ void geometryStep() {
 	//bind the gBuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, gBufferA);
 		//clear the buffer
+		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//back face culling
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glFrontFace(GL_CCW);
 
 		//get required matrices
 		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
@@ -287,6 +322,8 @@ void geometryStep() {
 
 void lightingStep() {
 
+	frameBuffer->bindFrameBuffer();
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	lightingShader->Use();
 	glActiveTexture(GL_TEXTURE0);
@@ -309,13 +346,16 @@ void lightingStep() {
 	}
 	glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
 
-	screenQuad->render();
+	frameBuffer->unbindFrameBuffer();
 }
 
-
-void renderSceneDSAlternative() {
-	geometryStep();
-	lightingStep();
+void postprocessingStep() {
+	/*glBindTexture(GL_TEXTURE_2D, 0);
+	framebufferShader->Use();
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, frameBuffer->textureColorbuffer);*/
+	screenQuad->render();
+	//glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 
@@ -338,9 +378,9 @@ void update()
 		handleMovement();
 		
 		// Deferred Rendering
-		renderSceneDSAlternative();
-
-		//nanosuit->Draw(*testShader);
+		geometryStep();
+		lightingStep();
+		postprocessingStep();
 
 		// Double buffering
 		glfwSwapBuffers(window);
@@ -382,8 +422,14 @@ int main()
 	// Init GBuffer
 	initGBuffer();
 
+	// Init FrameBuffer
+	frameBuffer = new FrameBuffer(WIDTH, HEIGHT);
+
 	// Game Loop
 	update();
+
+	// Clear Framebuffers
+	glDeleteFramebuffers(1, &frameBuffer->framebuffer);
 
 	// Terminate and clean
 	glfwTerminate();
@@ -420,6 +466,7 @@ void destroy()
 	delete refractiveShader;
 	delete reflectionNoTextureShader;
 	delete reflectionTextureShader;
+	delete framebufferShader;
 
 	delete geometryShader;
 	delete lightingShader;
@@ -427,6 +474,7 @@ void destroy()
 	delete nanosuit;
 	delete screenQuad;
 	delete pointLight;
+	delete frameBuffer;
 }
 
 /**
