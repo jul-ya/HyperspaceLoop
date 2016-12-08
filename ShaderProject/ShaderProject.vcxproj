@@ -126,10 +126,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Controls.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="FBuffer.h" />
     <ClInclude Include="FrameBuffer.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="GBuffer.h" />
+    <ClInclude Include="Hyperspace.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="PointLight.h" />
@@ -137,6 +140,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Stars.h" />
+    <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\DeferredShading\GeometryPass.frag" />

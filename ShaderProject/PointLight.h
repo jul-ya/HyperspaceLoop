@@ -7,18 +7,23 @@ class PointLight
 {
 public:
 
-	PointLight(glm::vec3 color, glm::vec3 position, float intensity) {
-		this->color = color;
+	PointLight(glm::vec3 color, glm::vec3 position) {
+		this->color =  color;
 		this->position = position;
-		this->intensity = intensity;
 	}
 
-	~PointLight() {
+	~PointLight() {}
 
+	glm::vec3 getLightPosition() {
+		return position;
+	}
+
+	glm::vec3 getLightColor() {
+		return color;
 	}
 
 private:
+
 	glm::vec3 color;
 	glm::vec3 position;
-	float intensity;
 };
