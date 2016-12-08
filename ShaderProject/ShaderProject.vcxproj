@@ -127,6 +127,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="FBuffer.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="Mesh.h" />
@@ -135,6 +136,7 @@
     <ClInclude Include="Quad.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="Stars.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\DeferredShading\GeometryPass.frag" />
@@ -154,6 +156,8 @@
     <None Include="Shader\StandardNoTexture.frag" />
     <None Include="Shader\StandardNoTextureReflection.frag" />
     <None Include="Shader\StandardTextureReflection.frag" />
+    <None Include="Shader\Stars\Stars.frag" />
+    <None Include="Shader\Stars\Stars.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

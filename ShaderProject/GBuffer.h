@@ -1,5 +1,6 @@
 #pragma once
 #include <sstream>
+#include <iostream>
 #include <GL/glew.h> // Contains all the necessery OpenGL includes
 
 class GBuffer

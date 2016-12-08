@@ -9,11 +9,13 @@
 #include "Shader.h"
 #include "Model.h"
 #include "GBuffer.h"
+#include "FBuffer.h"
 #include "PointLight.h"
 #include "Camera.h"
 #include "Skybox.h"
 #include "FrameBuffer.h"
 #include "Quad.h"
+#include "Stars.h"
 #include <SOIL\SOIL.h>
 
 // GLM
@@ -41,7 +43,7 @@ void destroy();
 int initWindow();
 int initGLEW();
 void initCallbacks();
-void initGBuffer();
+void initBuffers();
 void initShader();
 void loadModels();
 void setUpLights();
@@ -74,12 +76,12 @@ Shader* reflectionTextureShader;
 Shader* refractiveShader;
 Shader* geometryShader;
 Shader* lightingShader;
+Shader* starShader;
 
 // Models
 vector<Model> models;
 Model* nanosuit;
 vector<glm::vec3> objectPositions;
-
 
 // Screen quad
 Quad* screenQuad;
@@ -87,16 +89,15 @@ Quad* screenQuad;
 //GBuffer
 GBuffer* gBuffer;
 
-GLuint gBufferA;
-
 //PointLight
-PointLight* pointLight;
 vector<glm::vec3> lightPositions;
 vector<glm::vec3> lightColors;
 
 // Framebuffer
-FrameBuffer* frameBuffer;
+FBuffer* fBuffer;
 
+// Stars
+Stars* stars;
 
 /**
 * Initializes the window.
@@ -165,8 +166,9 @@ void initCallbacks()
 /**
 * Inits the GBuffer object	
 */
-void initGBuffer() {
-	gBuffer = new GBuffer(WIDTH, HEIGHT);	
+void initBuffers() {
+	gBuffer = new GBuffer(WIDTH, HEIGHT);
+	fBuffer = new FBuffer(WIDTH, HEIGHT);
 }
 
 
@@ -187,6 +189,9 @@ void initShader()
 	//deferred shaders
 	geometryShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/DeferredShading/GeometryPass.frag");
 	lightingShader = new Shader("../ShaderProject/Shader/DeferredShading/LightPass.vert", "../ShaderProject/Shader/DeferredShading/LightPass.frag");
+
+	//star shader
+	starShader = new Shader("../ShaderProject/Shader/Stars/Stars.vert", "../ShaderProject/Shader/Stars/Stars.frag");
 	
 	//set the position, normal and albedo samplers
 	lightingShader->Use();
@@ -196,6 +201,12 @@ void initShader()
 
 	framebufferShader->Use();
 	glUniform1i(glGetUniformLocation(framebufferShader->Program, "screenTexture"), 0);
+
+	starShader->Use();
+	glUniform1i(glGetUniformLocation(starShader->Program, "position"), 0);
+	glUniform1i(glGetUniformLocation(starShader->Program, "uv"), 1);
+	glUniform1i(glGetUniformLocation(starShader->Program, "lum"), 2);
+	glUniform1i(glGetUniformLocation(starShader->Program, "size"), 3);
 
 }
 
@@ -242,7 +253,6 @@ void setUpLights() {
 void geometryStep() {
 	//bind the gBuffer
 	gBuffer->bindBuffer();
-	//glBindFramebuffer(GL_FRAMEBUFFER, gBufferA);
 		//clear the buffer
 		glClearColor(0,0,0,0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -278,9 +288,11 @@ void geometryStep() {
 
 void lightingStep() {
 
-	frameBuffer->bindFrameBuffer();
+	//fBuffer->bindBuffer();
 
+	//clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	lightingShader->Use();
 
 	gBuffer->bindTexture(GBuffer::TextureType::Position);
@@ -300,16 +312,14 @@ void lightingStep() {
 	}
 	glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
 
-	frameBuffer->unbindFrameBuffer();
+	//unbind the fBuffer
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void postprocessingStep() {
-	/*glBindTexture(GL_TEXTURE_2D, 0);
-	framebufferShader->Use();
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, frameBuffer->textureColorbuffer);*/
+	//framebufferShader->Use();
+	//fBuffer->bindTexture(0);
 	screenQuad->render();
-	//glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 
@@ -373,17 +383,15 @@ int main()
 	// Lights Setup
 	setUpLights();
 
-	// Init GBuffer
-	initGBuffer();
+	// Stars Setup
+	stars = new Stars(100);
+	stars->setupStarMesh();
 
-	// Init FrameBuffer
-	frameBuffer = new FrameBuffer(WIDTH, HEIGHT);
+	// Init Buffers
+	initBuffers();
 
 	// Game Loop
 	update();
-
-	// Clear Framebuffers
-	glDeleteFramebuffers(1, &frameBuffer->framebuffer);
 
 	// Terminate and clean
 	glfwTerminate();
@@ -421,14 +429,15 @@ void destroy()
 	delete reflectionNoTextureShader;
 	delete reflectionTextureShader;
 	delete framebufferShader;
+	delete starShader;
 
 	delete geometryShader;
 	delete lightingShader;
 	delete gBuffer;
+	delete fBuffer;
 	delete nanosuit;
 	delete screenQuad;
-	delete pointLight;
-	delete frameBuffer;
+	delete stars;
 }
 
 /**
