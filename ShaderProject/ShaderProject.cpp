@@ -113,9 +113,9 @@ int initWindow()
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glEnable(GL_MULTISAMPLE);
 
-	//glEnable(GL_BLEND);
-	//glEnable(GL_ALPHA_TEST);
-	//glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	glEnable(GL_ALPHA_TEST);
+	glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClearColor(0, 0, 0, 0);
 	
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Hyperspace Loop", nullptr, nullptr);
@@ -281,6 +281,7 @@ void geometryStep() {
 			glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 			nanosuit->Draw(*geometryShader);
 		}
+
 	
 	//unbind the gBuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -312,6 +313,21 @@ void lightingStep() {
 	}
 	glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
 
+	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+	glm::mat4 view = camera.GetViewMatrix();
+	glm::mat4 model = glm::mat4();
+	model = glm::translate(model, stars->centerPos);
+	starShader->Use();
+	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glEnable(GL_BLEND);
+	glEnable(GL_ALPHA_TEST);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	stars->draw();
+	glDisable(GL_BLEND);
+	glDisable(GL_ALPHA_TEST);
 	//unbind the fBuffer
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -384,7 +400,7 @@ int main()
 	setUpLights();
 
 	// Stars Setup
-	stars = new Stars(100);
+	stars = new Stars(1000, 20, glm::vec3(0,0,0));
 	stars->setupStarMesh();
 
 	// Init Buffers

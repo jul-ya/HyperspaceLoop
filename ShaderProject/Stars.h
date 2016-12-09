@@ -18,12 +18,14 @@ struct StarVertex {
 };
 
 class Stars {
-	vector<StarVertex> vertices;
 
 public:
+	glm::vec3 centerPos;
 
-	Stars(unsigned int amount) {
+	Stars(unsigned int amount, unsigned int spread, glm::vec3 centerPos) {
 		this->amount = amount;
+		this->spread = spread;
+		this->centerPos = centerPos;
 		this->generateStars();
 	}
 
@@ -68,6 +70,8 @@ public:
 
 private:
 	unsigned int amount;
+	unsigned int spread;
+	vector<StarVertex> vertices;
 	GLuint VBO;
 	GLuint VAO;
 
@@ -83,6 +87,11 @@ private:
 	}
 
 	glm::vec3 randomPosition() {
-		return glm::vec3(rand() % 100, rand() % 100, rand() % 100);
+		float halfSpread = (float) spread * 0.5;
+		return (glm::vec3(randomFloat(), randomFloat(), randomFloat()) - glm::vec3(randomFloat(), randomFloat(), randomFloat()))*halfSpread;
+	}
+
+	float randomFloat() {
+		return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	}
 };
