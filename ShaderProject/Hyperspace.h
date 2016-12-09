@@ -31,6 +31,8 @@ public:
 	}
 
 private:
+
+	
 	std::vector<PointLight> sceneLights;
 	std::vector<GameObject> sceneObjects;
 
@@ -58,15 +60,15 @@ private:
 		
 		Model* model = new Model("../ShaderProject/Model/Nanosuit/nanosuit.obj");	
 
-		sceneObjects.push_back(GameObject(*model, Transform(glm::vec3(-3.0, -3.0, -3.0))));
-		sceneObjects.push_back(GameObject(*model, Transform(glm::vec3(0.0, -3.0, -3.0))));
-		sceneObjects.push_back(GameObject(*model, Transform(glm::vec3(3.0, -3.0, -3.0))));
-		sceneObjects.push_back(GameObject(*model, Transform(glm::vec3(-3.0, -3.0, 0.0))));
-		sceneObjects.push_back(GameObject(*model, Transform(glm::vec3(0.0, -3.0, 0.0))));
-		sceneObjects.push_back(GameObject(*model, Transform(glm::vec3(3.0, -3.0, 0.0))));
-		sceneObjects.push_back(GameObject(*model, Transform(glm::vec3(-3.0, 3.0, 3.0))));
-		sceneObjects.push_back(GameObject(*model, Transform(glm::vec3(0.0, 3.0, 3.0))));
-		sceneObjects.push_back(GameObject(*model, Transform(glm::vec3(3.0, 3.0, 3.0))));
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(-3.0, -3.0, -3.0))));
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0.0, -3.0, -3.0))));
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(3.0, -3.0, -3.0))));
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(-3.0, -3.0, 0.0))));
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0.0, -3.0, 0.0))));
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(3.0, -3.0, 0.0))));
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(-3.0, -3.0, 3.0))));
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0.0, -3.0, 3.0))));
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(3.0, -3.0, 3.0))));
 	}
 };
 

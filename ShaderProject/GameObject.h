@@ -6,11 +6,11 @@
 class GameObject {
 public:
 
-	GameObject(Model model, Transform transform) : model(model), transform(transform) {}
+	GameObject(Model* model, Transform transform) : model(model), transform(transform) {}
 
 	~GameObject() {}
 
-	Model getModel() {
+	Model* getModel() {
 		return model;
 	}
 
@@ -20,6 +20,6 @@ public:
 
 private:
 
-	Model model;
+	Model* model;
 	Transform transform;
 };

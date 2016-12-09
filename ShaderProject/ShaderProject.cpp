@@ -16,6 +16,7 @@
 #include "FrameBuffer.h"
 #include "Quad.h"
 #include "Stars.h"
+#include "Hyperspace.h"
 #include <SOIL\SOIL.h>
 
 // GLM
@@ -98,6 +99,9 @@ FBuffer* fBuffer;
 
 // Stars
 Stars* stars;
+
+// Hyperspace
+Hyperspace* hyperspace;
 
 /**
 * Initializes the window.
@@ -215,18 +219,7 @@ void initShader()
 */
 void loadModels()
 {
-	nanosuit = new Model("../ShaderProject/Model/Nanosuit/nanosuit.obj", geometryShader);
-
-	objectPositions.push_back(glm::vec3(-3.0, -3.0, -3.0));
-	objectPositions.push_back(glm::vec3(0.0, -3.0, -3.0));
-	objectPositions.push_back(glm::vec3(3.0, -3.0, -3.0));
-	objectPositions.push_back(glm::vec3(-3.0, -3.0, 0.0));
-	objectPositions.push_back(glm::vec3(0.0, -3.0, 0.0));
-	objectPositions.push_back(glm::vec3(3.0, -3.0, 0.0));
-	objectPositions.push_back(glm::vec3(-3.0, -3.0, 3.0));
-	objectPositions.push_back(glm::vec3(0.0, -3.0, 3.0));
-	objectPositions.push_back(glm::vec3(3.0, -3.0, 3.0));
-	
+	hyperspace = new Hyperspace();
 	screenQuad = new Quad();
 }
 
@@ -273,13 +266,16 @@ void geometryStep() {
 		//set the matrices 
 		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		for (GLuint i = 0; i < objectPositions.size(); i++)
+
+
+		vector<GameObject> sceneObjects = hyperspace->getSceneObjects();
+		for (GLuint i = 0; i < sceneObjects.size(); i++)
 		{
 			model = glm::mat4();
-			model = glm::translate(model, objectPositions[i]);
+			model = glm::translate(model, sceneObjects[i].getTransform().getPosition());
 			model = glm::scale(model, glm::vec3(0.25f));
 			glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-			nanosuit->Draw(*geometryShader);
+			sceneObjects[i].getModel()->Draw(*geometryShader);
 		}
 
 	
@@ -300,10 +296,14 @@ void lightingStep() {
 	gBuffer->bindTexture(GBuffer::TextureType::Normal);
 	gBuffer->bindTexture(GBuffer::TextureType::Color);
 
-	for (GLuint i = 0; i < lightPositions.size(); i++)
-	{
+	vector<PointLight> sceneLights = hyperspace->getSceneLights();
+	for (GLuint i = 0; i < sceneLights.size(); i++)
+	{ 
 		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &lightPositions[i][0]);
 		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &lightColors[i][0]);
+		/*glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLights[i].getLightPosition()[0]);
+		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLights[i].getLightColor()[0]);*/
+
 		// Update attenuation parameters and calculate radius
 		const GLfloat constant = 1.0; // Note that we don't send this to the shader, we assume it is always 1.0 (in our case)
 		const GLfloat linear = 0.7;
@@ -454,6 +454,7 @@ void destroy()
 	delete nanosuit;
 	delete screenQuad;
 	delete stars;
+	delete hyperspace;
 }
 
 /**
