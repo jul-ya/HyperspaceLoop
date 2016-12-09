@@ -159,9 +159,6 @@ void initCallbacks()
 	// Mouse callback
 	glfwSetCursorPosCallback(window, mouse_callback);
 
-	// Scroll callback
-	glfwSetScrollCallback(window, scroll_callback);
-
 	// Options
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
@@ -435,28 +432,6 @@ void handleMovement()
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
-/**
-* Clears the program.
-*/
-void destroy()
-{
-	delete testShader;
-	delete testShaderNoTexture;
-	delete refractiveShader;
-	delete reflectionNoTextureShader;
-	delete reflectionTextureShader;
-	delete framebufferShader;
-	delete starShader;
-
-	delete geometryShader;
-	delete lightingShader;
-	delete gBuffer;
-	delete fBuffer;
-	delete nanosuit;
-	delete screenQuad;
-	delete stars;
-	delete hyperspace;
-}
 
 /**
 * Key callback function.
@@ -497,9 +472,24 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 }
 
 /**
-* Scroll callback function.
+* Clears the program.
 */
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+void destroy()
 {
-	camera.ProcessMouseScroll(yoffset);
+	delete testShader;
+	delete testShaderNoTexture;
+	delete refractiveShader;
+	delete reflectionNoTextureShader;
+	delete reflectionTextureShader;
+	delete framebufferShader;
+	delete starShader;
+
+	delete geometryShader;
+	delete lightingShader;
+	delete gBuffer;
+	delete fBuffer;
+	delete nanosuit;
+	delete screenQuad;
+	delete stars;
+	delete hyperspace;
 }
