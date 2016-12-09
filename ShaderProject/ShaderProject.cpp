@@ -117,9 +117,9 @@ int initWindow()
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glEnable(GL_MULTISAMPLE);
 
-	glEnable(GL_BLEND);
+	/*glEnable(GL_BLEND);
 	glEnable(GL_ALPHA_TEST);
-	glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
 	glClearColor(0, 0, 0, 0);
 	
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Hyperspace Loop", nullptr, nullptr);
@@ -322,12 +322,13 @@ void lightingStep() {
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glEnable(GL_BLEND);
-	glEnable(GL_ALPHA_TEST);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendEquation(GL_FUNC_ADD);
+	glDisable(GL_DEPTH_TEST);
 	stars->draw();
 	glDisable(GL_BLEND);
-	glDisable(GL_ALPHA_TEST);
+	glEnable(GL_DEPTH_TEST);
+
 	//unbind the fBuffer
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
