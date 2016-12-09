@@ -126,7 +126,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Controls.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="FBuffer.h" />
     <ClInclude Include="FrameBuffer.h" />
