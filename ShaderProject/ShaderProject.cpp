@@ -342,7 +342,7 @@ void instancedDraw() {
 	for (GLuint i = 0; i < teapot->meshes.size(); i++)
 	{
 		glBindVertexArray(teapot->meshes[i].VAO);
-		glDrawElementsInstanced(GL_TRIANGLES, teapot->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 3000);
+		glDrawElementsInstanced(GL_TRIANGLES, teapot->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
 		glBindVertexArray(0);
 	}
 
@@ -517,7 +517,7 @@ int main()
 	setUpLights();
 
 	//instancing setup
-	modelMatrices = generateModelInstanceMatrices(3000);
+	modelMatrices = generateModelInstanceMatrices(500);
 
 	// Stars Setup
 	stars = new Stars(1000, 20, glm::vec3(0,0,0));
