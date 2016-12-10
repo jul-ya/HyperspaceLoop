@@ -17,7 +17,12 @@
 #include "Quad.h"
 #include "Stars.h"
 #include "Hyperspace.h"
+#include "Timeline.h"
 #include <SOIL\SOIL.h>
+
+#include "Animation.h"
+#include "CameraAnimation.h"
+
 
 // GLM
 #include <glm/glm.hpp>
@@ -35,7 +40,6 @@ GLFWwindow* window;
 
 // Input callback functions
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void handleMovement();
 
@@ -90,9 +94,9 @@ Quad* screenQuad;
 //GBuffer
 GBuffer* gBuffer;
 
-//PointLight
-vector<glm::vec3> lightPositions;
-vector<glm::vec3> lightColors;
+// Lighjts
+vector<glm::vec3> sceneLightPositions;
+vector<glm::vec3> sceneLightColors;
 
 // Framebuffer
 FBuffer* fBuffer;
@@ -102,6 +106,10 @@ Stars* stars;
 
 // Hyperspace
 Hyperspace* hyperspace;
+
+// Animation timeline
+Timeline* timeline;
+
 
 /**
 * Initializes the window.
@@ -218,25 +226,22 @@ void loadModels()
 {
 	hyperspace = new Hyperspace();
 	screenQuad = new Quad();
+	
+	timeline = new Timeline();	
+	timeline->addAnimation(new Animation( 1.0f));
+	timeline->addAnimation(new Animation( 1.0f));
+	timeline->addAnimation(new Animation( 0.99f));
+	timeline->addAnimation(new CameraAnimation(&camera, 1.0f, 10.0f, glm::vec3(0,0,-0.005f)));
+	//timeline->addAnimation(new CameraAnimation(&camera, 4.5f, 10.0f, glm::vec3(-0.025, 0, 0)));
+	timeline->addAnimation(new Animation( 10.0f));
+
+	timeline->play();
 }
 
 void setUpLights() {
-	const GLuint NR_LIGHTS = 64;
 
-	srand(13);
-	for (GLuint i = 0; i < NR_LIGHTS; i++)
-	{
-		// Calculate slightly random offsets
-		GLfloat xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
-		GLfloat yPos = ((rand() % 100) / 100.0) * 6.0 - 4.0;
-		GLfloat zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
-		lightPositions.push_back(glm::vec3(xPos, yPos, zPos));
-		// Also calculate random color
-		GLfloat rColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
-		GLfloat gColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
-		GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
-		lightColors.push_back(glm::vec3(rColor, gColor, bColor));
-	}
+	sceneLightPositions = hyperspace->getSceneLightPositions();
+	sceneLightColors = hyperspace->getSceneLightColors();
 }
 
 
@@ -293,13 +298,11 @@ void lightingStep() {
 	gBuffer->bindTexture(GBuffer::TextureType::Normal);
 	gBuffer->bindTexture(GBuffer::TextureType::Color);
 
-	vector<PointLight> sceneLights = hyperspace->getSceneLights();
-	for (GLuint i = 0; i < sceneLights.size(); i++)
+	
+	for (GLuint i = 0; i < sceneLightPositions.size(); i++)
 	{ 
-		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &lightPositions[i][0]);
-		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &lightColors[i][0]);
-		/*glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLights[i].getLightPosition()[0]);
-		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLights[i].getLightColor()[0]);*/
+		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLightPositions[i][0]);
+		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLightColors[i][0]);
 
 		// Update attenuation parameters and calculate radius
 		const GLfloat constant = 1.0; // Note that we don't send this to the shader, we assume it is always 1.0 (in our case)
@@ -354,6 +357,9 @@ void update()
 
 		// Update movement
 		handleMovement();
+
+		//update animations
+		timeline->update();
 		
 		// Deferred Rendering
 		geometryStep();

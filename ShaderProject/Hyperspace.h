@@ -26,14 +26,24 @@ public:
 		return sceneLights;
 	}
 
+	std::vector<glm::vec3> getSceneLightPositions() {
+		return sceneLightPositions;
+	}
+
+	std::vector<glm::vec3> getSceneLightColors() {
+		return sceneLightColors;
+	}
+
 	std::vector<GameObject> getSceneObjects() {
 		return sceneObjects;
 	}
 
 private:
-
 	
 	std::vector<PointLight> sceneLights;
+	std::vector<glm::vec3> sceneLightPositions;
+	std::vector<glm::vec3> sceneLightColors;
+
 	std::vector<GameObject> sceneObjects;
 
 	void addSceneLights() {
@@ -52,6 +62,8 @@ private:
 			GLfloat gColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
 			GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
 
+			sceneLightPositions.push_back(glm::vec3(xPos, yPos, zPos));
+			sceneLightColors.push_back(glm::vec3(rColor, bColor, gColor));
 			sceneLights.push_back(PointLight(glm::vec3(xPos, yPos, zPos), glm::vec3(rColor, gColor, bColor)));
 		}
 	}

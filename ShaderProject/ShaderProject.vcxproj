@@ -125,7 +125,9 @@
     <ClCompile Include="ShaderProject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraAnimation.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="FBuffer.h" />
     <ClInclude Include="FrameBuffer.h" />
@@ -139,6 +141,7 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Stars.h" />
+    <ClInclude Include="Timeline.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
