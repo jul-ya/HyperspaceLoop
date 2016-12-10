@@ -147,6 +147,8 @@
   <ItemGroup>
     <None Include="Shader\DeferredShading\GeometryPass.frag" />
     <None Include="Shader\DeferredShading\GeometryPass.vert" />
+    <None Include="Shader\DeferredShading\InstancingGeometryPass.vert" />
+    <None Include="Shader\DeferredShading\InstancingGeometryPass.frag" />
     <None Include="Shader\DeferredShading\LightPass.frag" />
     <None Include="Shader\DeferredShading\LightPass.vert" />
     <None Include="Shader\Refraction\Refraction.frag" />

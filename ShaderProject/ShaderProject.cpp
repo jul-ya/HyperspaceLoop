@@ -82,6 +82,7 @@ Shader* refractiveShader;
 Shader* geometryShader;
 Shader* lightingShader;
 Shader* starShader;
+Shader* instancingShader;
 
 // Models
 vector<Model> models;
@@ -110,6 +111,9 @@ Hyperspace* hyperspace;
 // Animation timeline
 Timeline* timeline;
 
+//instancing test
+glm::mat4* modelMatrices;
+Model* teapot;
 
 /**
 * Initializes the window.
@@ -199,6 +203,10 @@ void initShader()
 	geometryShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/DeferredShading/GeometryPass.frag");
 	lightingShader = new Shader("../ShaderProject/Shader/DeferredShading/LightPass.vert", "../ShaderProject/Shader/DeferredShading/LightPass.frag");
 
+	//basic instancing shader
+	instancingShader = new Shader("../ShaderProject/Shader/DeferredShading/InstancingGeometryPass.vert", "../ShaderProject/Shader/DeferredShading/InstancingGeometryPass.frag");
+
+
 	//star shader
 	starShader = new Shader("../ShaderProject/Shader/Stars/Stars.vert", "../ShaderProject/Shader/Stars/Stars.frag");
 	
@@ -216,6 +224,10 @@ void initShader()
 	glUniform1i(glGetUniformLocation(starShader->Program, "uv"), 1);
 	glUniform1i(glGetUniformLocation(starShader->Program, "lum"), 2);
 	glUniform1i(glGetUniformLocation(starShader->Program, "size"), 3);
+
+	instancingShader->Use();
+	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 10000.0f);
+	glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 }
 
@@ -243,6 +255,99 @@ void setUpLights() {
 	sceneLightPositions = hyperspace->getSceneLightPositions();
 	sceneLightColors = hyperspace->getSceneLightColors();
 }
+
+
+glm::mat4* generateModelInstanceMatrices(GLuint amount) {
+	// Generate a large list of semi-random model transformation matrices
+	glm::mat4* modelMatrices;
+	modelMatrices = new glm::mat4[amount];
+	srand(glfwGetTime()); // initialize random seed	
+	GLfloat radius = 50.0f;
+	GLfloat offset = 150.0f;
+	for (GLuint i = 0; i < amount; i++)
+	{
+		glm::mat4 model;
+		// 1. Translation: Randomly displace along circle with radius 'radius' in range [-offset, offset]
+		GLfloat angle = (GLfloat)i / (GLfloat)amount * 360.0f;
+		GLfloat displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
+		GLfloat x = sin(angle) * radius + displacement;
+		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
+		GLfloat y = -2.5f + displacement * 0.4f; // Keep height of asteroid field smaller compared to width of x and z
+		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
+		GLfloat z = cos(angle) * radius + displacement;
+		model = glm::translate(model, glm::vec3(x, y, z));
+
+		// 2. Scale: Scale between 0.05 and 0.25f
+		GLfloat scale = (rand() % 3) / 100.0f + 0.05;
+		model = glm::scale(model, glm::vec3(scale));
+
+		// 3. Rotation: add random rotation around a (semi)randomly picked rotation axis vector
+		GLfloat rotAngle = (rand() % 360);
+		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+
+		// 4. Now add to list of matrices
+		modelMatrices[i] = model;
+	}
+
+	teapot = new Model("../ShaderProject/Model/Teapot/Teapot.obj");
+
+
+	// forward declare the buffer
+	GLuint buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+
+	// Set transformation matrices as an instance vertex attribute (with divisor 1)
+	// NOTE: We're cheating a little by taking the, now publicly declared, VAO of the model's mesh(es) and adding new vertexAttribPointers
+	// Normally you'd want to do this in a more organized fashion, but for learning purposes this will do.
+	for (GLuint i = 0; i < teapot->meshes.size(); i++)
+	{
+		GLuint VAO = teapot->meshes[i].VAO;
+		glBindVertexArray(VAO);
+		// Set attribute pointers for matrix (4 times vec4)
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)0);
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)(sizeof(glm::vec4)));
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)(2 * sizeof(glm::vec4)));
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)(3 * sizeof(glm::vec4)));
+
+		glVertexAttribDivisor(3, 1);
+		glVertexAttribDivisor(4, 1);
+		glVertexAttribDivisor(5, 1);
+		glVertexAttribDivisor(6, 1);
+
+		glBindVertexArray(0);
+	}
+
+
+
+
+	return modelMatrices;
+}
+
+void instancedDraw() {
+
+
+	instancingShader->Use();
+	glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
+
+	// Draw teapots
+	instancingShader->Use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, teapot->textures_loaded[0].id); // Note we also made the textures_loaded vector public (instead of private) from the model class.
+	for (GLuint i = 0; i < teapot->meshes.size(); i++)
+	{
+		glBindVertexArray(teapot->meshes[i].VAO);
+		glDrawElementsInstanced(GL_TRIANGLES, teapot->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 3000);
+		glBindVertexArray(0);
+	}
+
+}
+
 
 
 void geometryStep() {
@@ -279,6 +384,11 @@ void geometryStep() {
 			glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 			sceneObjects[i].getModel()->Draw(*geometryShader);
 		}
+
+
+		
+
+
 
 	
 	//unbind the gBuffer
@@ -366,6 +476,9 @@ void update()
 		lightingStep();
 		postprocessingStep();
 
+		// Instancing Test, to deactivate comment line below
+		instancedDraw();
+
 		// Double buffering
 		glfwSwapBuffers(window);
 	}
@@ -402,6 +515,9 @@ int main()
 
 	// Lights Setup
 	setUpLights();
+
+	//instancing setup
+	modelMatrices = generateModelInstanceMatrices(3000);
 
 	// Stars Setup
 	stars = new Stars(1000, 20, glm::vec3(0,0,0));
