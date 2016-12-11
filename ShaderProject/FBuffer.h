@@ -6,6 +6,8 @@
 class FBuffer
 {
 public:
+	GLuint fBuffer;
+	GLuint fBufferTexture;
 
 	FBuffer(unsigned int windowWidth, unsigned int windowHeight){
 			//generate the gBuffer 
@@ -61,7 +63,7 @@ public:
 		glBindTexture(GL_TEXTURE_2D, fBufferTexture);
 	}
 private:
-	GLuint fBuffer;
-	GLuint fBufferTexture;
+	
+	
 };
 

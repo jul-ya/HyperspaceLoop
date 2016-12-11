@@ -54,6 +54,14 @@ public:
 		//unbind vao
 		glBindVertexArray(0);
 	}
+
+	void render(GLuint textureBuffer) {
+		glBindTexture(GL_TEXTURE_2D, textureBuffer);
+		glDisable(GL_DEPTH_TEST);
+		render();
+		glEnable(GL_DEPTH_TEST);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 private:
 	//vertex array object
 	GLuint vao;	

@@ -53,9 +53,9 @@ private:
 		for (GLuint i = 0; i < NR_LIGHTS; i++)
 		{
 			// Calculate slightly random offsets
-			GLfloat xPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
-			GLfloat yPos = ((rand() % 100) / 100.0) * 6.0 - 4.0;
-			GLfloat zPos = ((rand() % 100) / 100.0) * 6.0 - 3.0;
+			GLfloat xPos = ((rand() % 100) / 100.0) * 12.0 - 3.0;
+			GLfloat yPos = ((rand() % 100) / 100.0) * 12.0 - 4.0;
+			GLfloat zPos = ((rand() % 100) / 100.0) * 12.0 - 3.0;
 
 			// Also calculate random color
 			GLfloat rColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0

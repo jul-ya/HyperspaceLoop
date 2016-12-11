@@ -102,6 +102,8 @@ vector<glm::vec3> sceneLightColors;
 // Framebuffer
 FBuffer* fBuffer;
 
+FrameBuffer* frameBuffer;
+
 // Stars
 Stars* stars;
 
@@ -182,6 +184,8 @@ void initCallbacks()
 void initBuffers() {
 	gBuffer = new GBuffer(WIDTH, HEIGHT);
 	fBuffer = new FBuffer(WIDTH, HEIGHT);
+
+	frameBuffer = new FrameBuffer(WIDTH, HEIGHT);
 }
 
 
@@ -224,11 +228,6 @@ void initShader()
 	glUniform1i(glGetUniformLocation(starShader->Program, "uv"), 1);
 	glUniform1i(glGetUniformLocation(starShader->Program, "lum"), 2);
 	glUniform1i(glGetUniformLocation(starShader->Program, "size"), 3);
-
-	instancingShader->Use();
-	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 10000.0f);
-	
-
 }
 
 /**
@@ -240,13 +239,7 @@ void loadModels()
 	screenQuad = new Quad();
 	
 	timeline = new Timeline();	
-	timeline->addAnimation(new Animation( 1.0f));
-	timeline->addAnimation(new Animation( 1.0f));
-	timeline->addAnimation(new Animation( 0.99f));
 	timeline->addAnimation(new CameraAnimation(&camera, 1.0f, 10.0f, glm::vec3(0,0,-0.005f)));
-	//timeline->addAnimation(new CameraAnimation(&camera, 4.5f, 10.0f, glm::vec3(-0.025, 0, 0)));
-	timeline->addAnimation(new Animation( 10.0f));
-
 	timeline->play();
 }
 
@@ -262,8 +255,8 @@ glm::mat4* generateModelInstanceMatrices(GLuint amount) {
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(glfwGetTime()); // initialize random seed	
-	GLfloat radius = 50.0f;
-	GLfloat offset = 150.0f;
+	GLfloat radius = 30.0f;
+	GLfloat offset = 100.0f;
 	for (GLuint i = 0; i < amount; i++)
 	{
 		glm::mat4 model;
@@ -331,21 +324,6 @@ glm::mat4* generateModelInstanceMatrices(GLuint amount) {
 
 void instancedDraw() {
 
-
-	//instancingShader->Use();
-	//glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
-
-	//// Draw teapots
-	////instancingShader->Use();
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, teapot->textures_loaded[0].id); // Note we also made the textures_loaded vector public (instead of private) from the model class.
-	//for (GLuint i = 0; i < teapot->meshes.size(); i++)
-	//{
-	//	glBindVertexArray(teapot->meshes[i].VAO);
-	//	glDrawElementsInstanced(GL_TRIANGLES, teapot->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
-	//	glBindVertexArray(0);
-	//}
-
 }
 
 
@@ -380,7 +358,6 @@ void geometryStep() {
 		{
 			model = glm::mat4();
 			model = glm::translate(model, sceneObjects[i].getTransform().getPosition());
-			model = glm::scale(model, glm::vec3(0.25f));
 			glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 			sceneObjects[i].getModel()->Draw(*geometryShader);
 		}
@@ -412,9 +389,8 @@ void geometryStep() {
 void lightingStep() {
 
 	//fBuffer->bindBuffer();
-
-	//clear the buffer
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT); // We're not using stencil buffer so why bother with clearing?
 
 	lightingShader->Use();
 
@@ -437,6 +413,8 @@ void lightingStep() {
 	}
 	glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
 
+	//screenQuad->render();
+
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
 	glm::mat4 view = camera.GetViewMatrix();
 	glm::mat4 model = glm::mat4();
@@ -452,14 +430,13 @@ void lightingStep() {
 	stars->draw();
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
+	
 
-	//unbind the fBuffer
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void postprocessingStep() {
-	//framebufferShader->Use();
-	//fBuffer->bindTexture(0);
+void postprocessingStep() {	
+	//screenQuad->render(fBuffer->fBufferTexture);
 	screenQuad->render();
 }
 
