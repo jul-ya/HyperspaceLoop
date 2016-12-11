@@ -70,7 +70,7 @@ private:
 
 	void addSceneObjects() {
 		
-		Model* model = new Model("../ShaderProject/Model/Nanosuit/nanosuit.obj");	
+		Model* model = new Model("../ShaderProject/Model/Birdman/Birdman.obj");	
 
 		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(-3.0, -3.0, -3.0))));
 		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0.0, -3.0, -3.0))));

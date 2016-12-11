@@ -227,7 +227,7 @@ void initShader()
 
 	instancingShader->Use();
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 10000.0f);
-	glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	
 
 }
 
@@ -332,19 +332,19 @@ glm::mat4* generateModelInstanceMatrices(GLuint amount) {
 void instancedDraw() {
 
 
-	instancingShader->Use();
-	glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
+	//instancingShader->Use();
+	//glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
 
-	// Draw teapots
-	instancingShader->Use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, teapot->textures_loaded[0].id); // Note we also made the textures_loaded vector public (instead of private) from the model class.
-	for (GLuint i = 0; i < teapot->meshes.size(); i++)
-	{
-		glBindVertexArray(teapot->meshes[i].VAO);
-		glDrawElementsInstanced(GL_TRIANGLES, teapot->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
-		glBindVertexArray(0);
-	}
+	//// Draw teapots
+	////instancingShader->Use();
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, teapot->textures_loaded[0].id); // Note we also made the textures_loaded vector public (instead of private) from the model class.
+	//for (GLuint i = 0; i < teapot->meshes.size(); i++)
+	//{
+	//	glBindVertexArray(teapot->meshes[i].VAO);
+	//	glDrawElementsInstanced(GL_TRIANGLES, teapot->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
+	//	glBindVertexArray(0);
+	//}
 
 }
 
@@ -385,8 +385,22 @@ void geometryStep() {
 			sceneObjects[i].getModel()->Draw(*geometryShader);
 		}
 
+		//instanced draw
 
-		
+		instancingShader->Use();
+		glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
+
+		// Draw teapots
+		//instancingShader->Use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, teapot->textures_loaded[0].id); // Note we also made the textures_loaded vector public (instead of private) from the model class.
+		for (GLuint i = 0; i < teapot->meshes.size(); i++)
+		{
+			glBindVertexArray(teapot->meshes[i].VAO);
+			glDrawElementsInstanced(GL_TRIANGLES, teapot->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
+			glBindVertexArray(0);
+		}
 
 
 
