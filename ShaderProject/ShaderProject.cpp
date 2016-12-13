@@ -322,10 +322,6 @@ glm::mat4* generateModelInstanceMatrices(GLuint amount) {
 	return modelMatrices;
 }
 
-void instancedDraw() {
-
-}
-
 
 
 void geometryStep() {
@@ -466,9 +462,6 @@ void update()
 		geometryStep();
 		lightingStep();
 		postprocessingStep();
-
-		// Instancing Test, to deactivate comment line below
-		instancedDraw();
 
 		// Double buffering
 		glfwSwapBuffers(window);
