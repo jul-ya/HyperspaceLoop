@@ -2,6 +2,9 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <vector>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 using namespace std;
 
 #include "Shader.h"
@@ -78,7 +81,7 @@ private:
 	void generateStars() {
 		for (int i = 0; i < amount; i++) {
 			StarVertex vertex;
-			vertex.Position = randomPosition();
+			vertex.Position = randomPositionSphere();
 			vertex.TexCoords = glm::vec2(0.0, 1.0);
 			vertex.Luminance = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 			vertex.Size = 1.0f;
@@ -86,12 +89,28 @@ private:
 		}
 	}
 
-	glm::vec3 randomPosition() {
-		float halfSpread = (float) spread * 0.5;
-		return (glm::vec3(randomFloat(), randomFloat(), randomFloat()) - glm::vec3(randomFloat(), randomFloat(), randomFloat()))*halfSpread;
+	/**
+	* Generates a random position inside the cube specified by spread
+	*/
+	glm::vec3 randomPositionCube() {
+		return (glm::vec3(randomFloat(), randomFloat(), randomFloat()) - glm::vec3(randomFloat(), randomFloat(), randomFloat())) * (float)(spread*0.5);
 	}
 
+	glm::vec3 randomPositionSphere() {
+		float z = randomFloat() * 2.0 - 1.0;
+		float rxy = sqrt(1 - z*z);
+		float phi = randomFloat() * 2 * M_PI;
+		float x = rxy * cos(phi);
+		float y = rxy * sin(phi);
+
+		return glm::vec3(x, y, z) * (float)(spread*0.5);
+	}
+
+	/**
+	* Creates a random float number between 0 and 1, inclusive
+	*/
 	float randomFloat() {
 		return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	}
+
 };

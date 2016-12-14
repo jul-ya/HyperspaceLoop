@@ -13,6 +13,11 @@ uniform mat4 model;
 void main()
 {
     gl_Position = projection * view * model * vec4(position, 1.0);
-	gl_PointSize = size*30.0;
+
+	/*mat4 viewModel = model * view;  
+	vec3 cameraPos = viewModel[3].xyz;
+	float dist = distance(gl_Position.xyz, cameraPos);  <-- increase size by camera distance*/
+	gl_PointSize = size*30;
+
 	starLum = lum;
 }  
