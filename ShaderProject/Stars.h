@@ -1,11 +1,9 @@
 #pragma once
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <vector>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-using namespace std;
+#include "PointGenerator.h"
 
 #include "Shader.h"
 
@@ -23,16 +21,18 @@ struct StarVertex {
 class Stars {
 
 public:
+
 	glm::vec3 centerPos;
 
-	Stars(unsigned int amount, unsigned int spread, glm::vec3 centerPos) {
+	Stars(unsigned int amount, glm::vec3 centerPos) {
 		this->amount = amount;
-		this->spread = spread;
 		this->centerPos = centerPos;
-		this->generateStars();
 	}
 
-	void setupStarMesh() {
+	void setupStarMesh(PointGenerator &generator) {
+		//generate the stars by startype
+		this->generateStars(generator);
+
 		// Create buffers/arrays
 		glGenVertexArrays(1, &this->VAO);
 		glGenBuffers(1, &this->VBO);
@@ -73,44 +73,19 @@ public:
 
 private:
 	unsigned int amount;
-	unsigned int spread;
+	unsigned int length;
 	vector<StarVertex> vertices;
 	GLuint VBO;
 	GLuint VAO;
 
-	void generateStars() {
+	void generateStars(PointGenerator &generator) {
 		for (int i = 0; i < amount; i++) {
 			StarVertex vertex;
-			vertex.Position = randomPositionSphere();
+			vertex.Position = generator.randomPoint();
 			vertex.TexCoords = glm::vec2(0.0, 1.0);
 			vertex.Luminance = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			vertex.Size = 1.0f;
+			vertex.Size = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 			this->vertices.push_back(vertex);
 		}
 	}
-
-	/**
-	* Generates a random position inside the cube specified by spread
-	*/
-	glm::vec3 randomPositionCube() {
-		return (glm::vec3(randomFloat(), randomFloat(), randomFloat()) - glm::vec3(randomFloat(), randomFloat(), randomFloat())) * (float)(spread*0.5);
-	}
-
-	glm::vec3 randomPositionSphere() {
-		float z = randomFloat() * 2.0 - 1.0;
-		float rxy = sqrt(1 - z*z);
-		float phi = randomFloat() * 2 * M_PI;
-		float x = rxy * cos(phi);
-		float y = rxy * sin(phi);
-
-		return glm::vec3(x, y, z) * (float)(spread*0.5);
-	}
-
-	/**
-	* Creates a random float number between 0 and 1, inclusive
-	*/
-	float randomFloat() {
-		return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	}
-
 };

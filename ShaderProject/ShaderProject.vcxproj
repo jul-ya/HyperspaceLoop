@@ -136,6 +136,7 @@
     <ClInclude Include="Hyperspace.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="PointGenerator.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="Shader.h" />

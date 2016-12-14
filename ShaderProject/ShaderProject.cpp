@@ -32,8 +32,8 @@
 using namespace std;
 
 // Window dimensions
-const int static WIDTH = 1280;
-const int static HEIGHT = 720;
+const int static WIDTH = 1920;
+const int static HEIGHT = 1080;
 
 // Window object
 GLFWwindow* window;
@@ -136,7 +136,7 @@ int initWindow()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
 	glClearColor(0, 0, 0, 0);
 	
-	window = glfwCreateWindow(WIDTH, HEIGHT, "Hyperspace Loop", nullptr, nullptr);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "Hyperspace Loop", glfwGetPrimaryMonitor(), nullptr);
 	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -337,7 +337,7 @@ void geometryStep() {
 		glFrontFace(GL_CCW);
 
 		//get required matrices
-		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 200.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model;
 
@@ -504,8 +504,8 @@ int main()
 	modelMatrices = generateModelInstanceMatrices(500);
 
 	// Stars Setup
-	stars = new Stars(1000, 20, glm::vec3(0,0,0));
-	stars->setupStarMesh();
+	stars = new Stars(10000, glm::vec3(0,0,0));
+	stars->setupStarMesh(TubePointGenerator(100, -100));
 
 	// Init Buffers
 	initBuffers();
