@@ -3,8 +3,9 @@ in vec2 TexCoords;
 out vec4 color;
 
 uniform sampler2D screenTexture;
+uniform sampler2D depthTexture;
 
 void main()
 { 
-    color = vec4(texture(screenTexture, TexCoords).rgb, 0.5);
+    color = texture(screenTexture, TexCoords);
 }

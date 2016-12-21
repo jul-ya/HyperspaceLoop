@@ -102,8 +102,6 @@ vector<glm::vec3> sceneLightColors;
 // Framebuffer
 FBuffer* fBuffer;
 
-FrameBuffer* frameBuffer;
-
 // Stars
 Stars* stars;
 
@@ -184,8 +182,6 @@ void initCallbacks()
 void initBuffers() {
 	gBuffer = new GBuffer(WIDTH, HEIGHT);
 	fBuffer = new FBuffer(WIDTH, HEIGHT);
-
-	frameBuffer = new FrameBuffer(WIDTH, HEIGHT);
 }
 
 
@@ -219,9 +215,11 @@ void initShader()
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gPosition"), 0);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gNormal"), 1);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gAlbedoSpec"), 2);
+	glUniform1i(glGetUniformLocation(lightingShader->Program, "gDepth"), 3);
 
 	framebufferShader->Use();
 	glUniform1i(glGetUniformLocation(framebufferShader->Program, "screenTexture"), 0);
+	glUniform1i(glGetUniformLocation(framebufferShader->Program, "depthTexture"), 1);
 
 	starShader->Use();
 	glUniform1i(glGetUniformLocation(starShader->Program, "position"), 0);
@@ -384,7 +382,7 @@ void geometryStep() {
 
 void lightingStep() {
 
-	//fBuffer->bindBuffer();
+	fBuffer->bindBuffer();
 	
 	glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT); // We're not using stencil buffer so why bother with clearing?
 
@@ -393,6 +391,7 @@ void lightingStep() {
 	gBuffer->bindTexture(GBuffer::TextureType::Position);
 	gBuffer->bindTexture(GBuffer::TextureType::Normal);
 	gBuffer->bindTexture(GBuffer::TextureType::Color);
+	gBuffer->bindTexture(GBuffer::TextureType::Depth);
 
 	
 	for (GLuint i = 0; i < sceneLightPositions.size(); i++)
@@ -409,6 +408,14 @@ void lightingStep() {
 	}
 	glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
 
+	screenQuad->render();
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void postprocessingStep() {
+	//fBuffer->setDepth(gBuffer->textures[3]);
+	screenQuad->render(fBuffer->fBufferTexture);
 	//screenQuad->render();
 
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
@@ -422,18 +429,10 @@ void lightingStep() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);
-	glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
 	stars->draw();
 	glDisable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
-	
-
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void postprocessingStep() {	
-	//screenQuad->render(fBuffer->fBufferTexture);
-	screenQuad->render();
+	//glEnable(GL_DEPTH_TEST);
 }
 
 
