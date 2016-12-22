@@ -32,8 +32,8 @@
 using namespace std;
 
 // Window dimensions
-const int static WIDTH = 1920;
-const int static HEIGHT = 1080;
+const int static WIDTH = 1280;
+const int static HEIGHT = 720;
 
 // Window object
 GLFWwindow* window;
@@ -83,6 +83,7 @@ Shader* geometryShader;
 Shader* lightingShader;
 Shader* starShader;
 Shader* instancingShader;
+Shader* hdrShader;
 
 // Models
 vector<Model> models;
@@ -115,6 +116,10 @@ Timeline* timeline;
 glm::mat4* modelMatrices;
 Model* teapot;
 
+//hdr variables
+float exposure = 1.0f;
+
+
 /**
 * Initializes the window.
 */
@@ -134,7 +139,7 @@ int initWindow()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
 	glClearColor(0, 0, 0, 0);
 	
-	window = glfwCreateWindow(WIDTH, HEIGHT, "Hyperspace Loop", glfwGetPrimaryMonitor(), nullptr);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "Hyperspace Loop", NULL, nullptr);
 	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -209,6 +214,9 @@ void initShader()
 
 	//star shader
 	starShader = new Shader("../ShaderProject/Shader/Stars/Stars.vert", "../ShaderProject/Shader/Stars/Stars.frag");
+
+	//hdr shader
+	hdrShader = new Shader("../ShaderProject/Shader/HDR/HDR.vert", "../ShaderProject/Shader/HDR/HDR.frag");
 	
 	//set the position, normal and albedo samplers
 	lightingShader->Use();
@@ -280,7 +288,7 @@ glm::mat4* generateModelInstanceMatrices(GLuint amount) {
 		modelMatrices[i] = model;
 	}
 
-	teapot = new Model("../ShaderProject/Model/Teapot/Teapot.obj");
+	teapot = new Model("../ShaderProject/Model/Plane/Plane.obj");
 
 
 	// forward declare the buffer
@@ -408,16 +416,26 @@ void lightingStep() {
 	}
 	glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
 
+
 	screenQuad->render();
 	
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void postprocessingStep() {
-	//fBuffer->setDepth(gBuffer->textures[3]);
-	screenQuad->render(fBuffer->fBufferTexture);
-	//screenQuad->render();
 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	hdrShader->Use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
+	glUniform1i(glGetUniformLocation(hdrShader->Program, "hdr"), true);
+	glUniform1f(glGetUniformLocation(hdrShader->Program, "exposure"), exposure);
+	//fBuffer->setDepth(gBuffer->textures[3]);
+	screenQuad->render();
+	//screenQuad->render();
+	
+	
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
 	glm::mat4 view = camera.GetViewMatrix();
 	glm::mat4 model = glm::mat4();
@@ -426,13 +444,16 @@ void postprocessingStep() {
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
+	//glBindBuffer(GL_RENDERBUFFER, gBuffer->textures[3]);
+
+	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);
-	//glDisable(GL_DEPTH_TEST);
 	stars->draw();
 	glDisable(GL_BLEND);
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 }
 
 
@@ -535,6 +556,11 @@ void handleMovement()
 		camera.ProcessKeyboard(LEFT, deltaTime);
 	if (keys[GLFW_KEY_D])
 		camera.ProcessKeyboard(RIGHT, deltaTime);
+	if (keys[GLFW_KEY_1]) 
+		exposure += 0.1f;
+	if (keys[GLFW_KEY_2])
+		exposure -= 0.1f;
+
 }
 
 
