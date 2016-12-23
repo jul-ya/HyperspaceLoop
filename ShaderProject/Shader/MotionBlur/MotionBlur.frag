@@ -1,40 +1,54 @@
 #version 330 core
+
 out vec4 color;
 in vec2 texCoord;
 
 uniform sampler2D gPosition;
 uniform sampler2D gDepth;
-
 uniform sampler2D blurBuffer;
-uniform float numSamples;
+
+uniform int numSamples;
 
 uniform mat4 lastProjection;
 uniform mat4 lastView;
+uniform mat4 projection;
+uniform mat4 view;
 
-uniform vec3 viewPos;
-
+/*
+* basic screen-space motion-blur technique from Nvidia GPUGems3:
+* http://http.developer.nvidia.com/GPUGems3/gpugems3_ch27.html
+*/
 void main()
 {
-    vec4 worldPos = texture(gPosition, texCoord).rgba;
     float depth = texture(gDepth, texCoord).r;
 
+	// viewport position at this pixel in the range -1 to 1
+	vec4 viewportPos = vec4(texCoord.x * 2.0 - 1.0, (1.0 - texCoord.y) * 2.0 - 1.0, depth, 1.0);
+
+	// transform by the view-projection inverse & divide by w to get the world position 
+	vec4 D = inverse(projection * view) * viewportPos;
+	vec4 worldPos = D / D.w;
+
 	// calculate the per-pixel velocity vectors determining the direction of the blur 
-	vec4 currentPos = vec4(viewPos, 1.0);
-	vec4 previousPos = worldPos * (lastProjection * lastView);  
-	
-	// convert to nonhomogeneous points [-1,1] by dividing by w 
-	previousPos /= previousPos.w;  
-	// use this frame's position and last frame's to compute the pixel velocity  
-	vec2 velocity = vec2((currentPos - previousPos)/2.0);  
+	vec4 currentPos = viewportPos;
+    vec4 previousPos = lastProjection * lastView * worldPos;
+    // convert to nonhomogeneous points [-1,1] by dividing by w 
+	previousPos /= previousPos.w;
+    // use this frame's position and last frame's to compute the pixel velocity  
+	vec2 velocity = ((currentPos - previousPos)/2.f).xy;
 
-	vec4 colors = texture(blurBuffer, texCoord);  
-	vec2 textureC =  texCoord + velocity; 
+    vec4 colors = texture(blurBuffer, texCoord);
+    vec2 textureC =  texCoord;
+    textureC += velocity;
 
-	for(int i = 1; i < numSamples; ++i, textureC += velocity) {  
-		// sample the color buffer along the velocity vector  
-		vec4 currentColor = texture(blurBuffer, textureC); 
-		colors += currentColor;  
-	}  
+    for(int i = 1; i < numSamples; ++i, textureC += velocity) {
+        // center the blur with offset and sample the color buffer along the velocity vector  
+		vec2 offset = velocity * (float(i) / float(numSamples - 1) - 0.5);
+		vec4 currentColor = texture(blurBuffer, textureC + offset);
+        colors += currentColor;
+    }
+  
 
     color = vec4(colors / numSamples);
 }
+
