@@ -79,6 +79,7 @@ Shader* lightingShader;
 Shader* starShader;
 Shader* instancingShader;
 Shader* hdrShader;
+Shader* motionblurShader;
 
 // Models
 vector<Model> models;
@@ -113,6 +114,10 @@ Model* teapot;
 
 //hdr variables
 float exposure = 1.0f;
+
+//motionblur variables
+glm::mat4 lastProjection = glm::mat4();
+glm::mat4 lastView = glm::mat4();
 
 
 /**
@@ -202,8 +207,9 @@ void initShader()
 	//star shader
 	starShader = new Shader("../ShaderProject/Shader/Stars/Stars.vert", "../ShaderProject/Shader/Stars/Stars.frag");
 
-	//hdr shader
+	//postpro shaders
 	hdrShader = new Shader("../ShaderProject/Shader/HDR/HDR.vert", "../ShaderProject/Shader/HDR/HDR.frag");
+	motionblurShader = new Shader("../ShaderProject/Shader/MotionBlur/MotionBlur.vert", "../ShaderProject/Shader/MotionBlur/MotionBlur.frag");
 	
 	//set the position, normal and albedo samplers
 	lightingShader->Use();
@@ -217,6 +223,12 @@ void initShader()
 	glUniform1i(glGetUniformLocation(starShader->Program, "uv"), 1);
 	glUniform1i(glGetUniformLocation(starShader->Program, "lum"), 2);
 	glUniform1i(glGetUniformLocation(starShader->Program, "size"), 3);
+
+	motionblurShader->Use();
+	glUniform1i(glGetUniformLocation(motionblurShader->Program, "gPosition"), 0);
+	glUniform1i(glGetUniformLocation(motionblurShader->Program, "gDepth"), 3);
+	glUniform1i(glGetUniformLocation(motionblurShader->Program, "blurBuffer"), 0);
+	glUniform1i(glGetUniformLocation(starShader->Program, "numSamples"), 300);
 }
 
 /**
@@ -410,16 +422,28 @@ void postprocessingStep() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	hdrShader->Use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
+	fBuffer->bindTexture(0);
 	glUniform1i(glGetUniformLocation(hdrShader->Program, "hdr"), true);
 	glUniform1f(glGetUniformLocation(hdrShader->Program, "exposure"), exposure);
 	screenQuad->render();
+
+	/*motionblurShader->Use();
+	gBuffer->bindTexture(GBuffer::TextureType::Position);
+	gBuffer->bindTexture(GBuffer::TextureType::Depth);
+	fBuffer->bindTexture(2);
+	glUniform3fv(glGetUniformLocation(motionblurShader->Program, "viewPos"), 1, &camera.Position[0]);
+	glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastView"), 1, GL_FALSE, glm::value_ptr(lastView));
+	glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastProjection"), 1, GL_FALSE, glm::value_ptr(lastProjection));
+	screenQuad->render();*/
 	
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
 	glm::mat4 view = camera.GetViewMatrix();
 	glm::mat4 model = glm::mat4();
 	model = glm::translate(model, stars->centerPos);
+
+	lastView = view;
+	lastProjection = projection;
+
 	starShader->Use();
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -431,11 +455,12 @@ void postprocessingStep() {
 		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
 	glEnable(GL_BLEND);
+	glDepthMask(GL_FALSE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);
 	stars->draw();
 	glDisable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
 }
 
 
@@ -593,6 +618,7 @@ void destroy()
 	delete hdrShader;
 	delete geometryShader;
 	delete lightingShader;
+	delete motionblurShader;
 	//delete skyboxShader;
 
 	delete gBuffer;
