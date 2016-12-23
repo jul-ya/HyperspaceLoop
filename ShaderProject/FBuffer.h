@@ -30,17 +30,6 @@ public:
 			GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
 			glDrawBuffers(1, attachments);
 		
-			/*generate the depth texture
-			GLuint rboDepth;
-			//generate render buffer
-			glGenRenderbuffers(1, &rboDepth);
-			//bind the buffer
-			glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
-			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, windowWidth, windowHeight);
-			//add the buffer to the framebuffer
-			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);*/
-		
-		
 			// - Finally check if framebuffer is complete
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 				std::cout << "Framebuffer not complete!" << std::endl;
@@ -61,16 +50,6 @@ public:
 	void bindTexture(int textureID) {
 		glActiveTexture(GL_TEXTURE0 + textureID);
 		glBindTexture(GL_TEXTURE_2D, fBufferTexture);
-	}
-
-	void setDepth(GLuint depth) {
-		//bind the fBuffer
-		glBindFramebuffer(GL_FRAMEBUFFER, fBuffer);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth, 0);
-
-		//unbind the fBuffer
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 private:
 	

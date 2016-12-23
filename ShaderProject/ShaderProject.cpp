@@ -72,13 +72,8 @@ GLfloat lastFrame = 0.0f;
 /*========================*/
 
 // Shader
-Shader* testShader;
-Shader* testShaderNoTexture;
-Shader* skyboxShader;
+//Shader* skyboxShader;
 Shader* framebufferShader;
-Shader* reflectionNoTextureShader;
-Shader* reflectionTextureShader;
-Shader* refractiveShader;
 Shader* geometryShader;
 Shader* lightingShader;
 Shader* starShader;
@@ -195,14 +190,7 @@ void initBuffers() {
 */
 void initShader()
 {
-	// Test Shader
-	testShader = new Shader("../ShaderProject/Shader/Standard.vert", "../ShaderProject/Shader/Standard.frag");
-	testShaderNoTexture = new Shader("../ShaderProject/Shader/Standard.vert", "../ShaderProject/Shader/StandardNoTexture.frag");
-	skyboxShader = new Shader("../ShaderProject/Shader/Skybox.vert", "../ShaderProject/Shader/Skybox.frag");
-	framebufferShader = new Shader("../ShaderProject/Shader/RenderToTexture/FrameBuffer.vert", "../ShaderProject/Shader/RenderToTexture/FrameBuffer.frag");
-	reflectionNoTextureShader = new Shader("../ShaderProject/Shader/Standard.vert", "../ShaderProject/Shader/StandardNoTextureReflection.frag");
-	reflectionTextureShader = new Shader("../ShaderProject/Shader/Standard.vert", "../ShaderProject/Shader/StandardTextureReflection.frag");
-	refractiveShader = new Shader("../ShaderProject/Shader/Refraction/Refraction.vert", "../ShaderProject/Shader/Refraction/Refraction.frag");
+	// skyboxShader = new Shader("../ShaderProject/Shader/Skybox.vert", "../ShaderProject/Shader/Skybox.frag");
 	
 	//deferred shaders
 	geometryShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/DeferredShading/GeometryPass.frag");
@@ -210,7 +198,6 @@ void initShader()
 
 	//basic instancing shader
 	instancingShader = new Shader("../ShaderProject/Shader/DeferredShading/InstancingGeometryPass.vert", "../ShaderProject/Shader/DeferredShading/InstancingGeometryPass.frag");
-
 
 	//star shader
 	starShader = new Shader("../ShaderProject/Shader/Stars/Stars.vert", "../ShaderProject/Shader/Stars/Stars.frag");
@@ -224,10 +211,6 @@ void initShader()
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gNormal"), 1);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gAlbedoSpec"), 2);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gDepth"), 3);
-
-	framebufferShader->Use();
-	glUniform1i(glGetUniformLocation(framebufferShader->Program, "screenTexture"), 0);
-	glUniform1i(glGetUniformLocation(framebufferShader->Program, "depthTexture"), 1);
 
 	starShader->Use();
 	glUniform1i(glGetUniformLocation(starShader->Program, "position"), 0);
@@ -431,10 +414,7 @@ void postprocessingStep() {
 	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
 	glUniform1i(glGetUniformLocation(hdrShader->Program, "hdr"), true);
 	glUniform1f(glGetUniformLocation(hdrShader->Program, "exposure"), exposure);
-	//fBuffer->setDepth(gBuffer->textures[3]);
 	screenQuad->render();
-	//screenQuad->render();
-	
 	
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
 	glm::mat4 view = camera.GetViewMatrix();
@@ -445,14 +425,11 @@ void postprocessingStep() {
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 
-	//glBindBuffer(GL_RENDERBUFFER, gBuffer->textures[3]);
-
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer(0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT,
 		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
-	//glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);
@@ -525,7 +502,7 @@ int main()
 	// Lights Setup
 	setUpLights();
 
-	//instancing setup
+	// Instancing setup
 	modelMatrices = generateModelInstanceMatrices(500);
 
 	// Stars Setup
@@ -612,20 +589,20 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 */
 void destroy()
 {
-	delete testShader;
-	delete testShaderNoTexture;
-	delete refractiveShader;
-	delete reflectionNoTextureShader;
-	delete reflectionTextureShader;
-	delete framebufferShader;
 	delete starShader;
-
+	delete hdrShader;
 	delete geometryShader;
 	delete lightingShader;
+	//delete skyboxShader;
+
 	delete gBuffer;
 	delete fBuffer;
+
 	delete nanosuit;
 	delete screenQuad;
 	delete stars;
 	delete hyperspace;
+	delete timeline;
+	delete modelMatrices;
+	delete teapot;
 }
