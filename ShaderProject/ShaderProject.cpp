@@ -447,7 +447,12 @@ void postprocessingStep() {
 
 	//glBindBuffer(GL_RENDERBUFFER, gBuffer->textures[3]);
 
-	glDisable(GL_DEPTH_TEST);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT,
+		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+	//glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);

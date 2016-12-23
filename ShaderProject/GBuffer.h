@@ -15,6 +15,8 @@ public:
 		TextureAmount = 4
 	};
 
+
+	GLuint gBuffer;
 	GLuint textures[TextureAmount];
 
 	GBuffer(unsigned int windowWidth, unsigned int windowHeight){
@@ -111,6 +113,6 @@ public:
 		glBindTexture(GL_TEXTURE_2D, textures[textureType]);
 	}
 private:
-	GLuint gBuffer;
+	
 };
 
