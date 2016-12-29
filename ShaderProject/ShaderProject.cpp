@@ -80,6 +80,8 @@ Shader* starShader;
 Shader* instancingShader;
 Shader* hdrShader;
 Shader* motionblurShader;
+Shader* gaussianBlurShader;
+Shader* bloomShader;
 
 // Models
 vector<Model> models;
@@ -98,6 +100,8 @@ vector<glm::vec3> sceneLightColors;
 
 // Framebuffer
 FBuffer* fBuffer;
+FBuffer* swapBuffer;
+FBuffer* swapBuffer2;
 
 // Stars
 Stars* stars;
@@ -114,6 +118,8 @@ Model* teapot;
 
 //hdr variables
 float exposure = 1.0f;
+
+bool bloom = true;
 
 //motionblur variables
 glm::mat4 lastProjection = glm::mat4();
@@ -187,6 +193,8 @@ void initCallbacks()
 void initBuffers() {
 	gBuffer = new GBuffer(WIDTH, HEIGHT);
 	fBuffer = new FBuffer(WIDTH, HEIGHT);
+	swapBuffer = new FBuffer(WIDTH, HEIGHT);
+	swapBuffer2 = new FBuffer(WIDTH, HEIGHT);
 }
 
 
@@ -210,7 +218,10 @@ void initShader()
 	//postpro shaders
 	hdrShader = new Shader("../ShaderProject/Shader/HDR/HDR.vert", "../ShaderProject/Shader/HDR/HDR.frag");
 	motionblurShader = new Shader("../ShaderProject/Shader/MotionBlur/MotionBlur.vert", "../ShaderProject/Shader/MotionBlur/MotionBlur.frag");
-	
+	gaussianBlurShader = new Shader("../ShaderProject/Shader/GaussianBlur/GaussianBlur.vert", "../ShaderProject/Shader/GaussianBlur/GaussianBlur.frag");
+	bloomShader = new Shader("../ShaderProject/Shader/Bloom/Bloom.vert", "../ShaderProject/Shader/Bloom/Bloom.frag");
+
+
 	//set the position, normal and albedo samplers
 	lightingShader->Use();
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gPosition"), 0);
@@ -228,6 +239,11 @@ void initShader()
 	glUniform1i(glGetUniformLocation(motionblurShader->Program, "gDepth"), 3);
 	glUniform1i(glGetUniformLocation(motionblurShader->Program, "blurBuffer"), 0);
 	glUniform1i(glGetUniformLocation(motionblurShader->Program, "numSamples"), 10);
+
+	bloomShader->Use();
+	glUniform1i(glGetUniformLocation(bloomShader->Program, "scene"), 0);
+	glUniform1i(glGetUniformLocation(bloomShader->Program, "bloomBlur"), 1);
+
 }
 
 /**
@@ -386,32 +402,32 @@ void lightingStep() {
 
 	fBuffer->bindBuffer();
 	
-	glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT); // We're not using stencil buffer so why bother with clearing?
+		glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT); // We're not using stencil buffer so why bother with clearing?
 
-	lightingShader->Use();
+		lightingShader->Use();
 
-	gBuffer->bindTexture(GBuffer::TextureType::Position);
-	gBuffer->bindTexture(GBuffer::TextureType::Normal);
-	gBuffer->bindTexture(GBuffer::TextureType::Color);
-	gBuffer->bindTexture(GBuffer::TextureType::Depth);
+		gBuffer->bindTexture(GBuffer::TextureType::Position);
+		gBuffer->bindTexture(GBuffer::TextureType::Normal);
+		gBuffer->bindTexture(GBuffer::TextureType::Color);
+		gBuffer->bindTexture(GBuffer::TextureType::Depth);
 
 	
-	for (GLuint i = 0; i < sceneLightPositions.size(); i++)
-	{ 
-		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLightPositions[i][0]);
-		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLightColors[i][0]);
+		for (GLuint i = 0; i < sceneLightPositions.size(); i++)
+		{ 
+			glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLightPositions[i][0]);
+			glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLightColors[i][0]);
 
-		// Update attenuation parameters and calculate radius
-		const GLfloat constant = 1.0; // Note that we don't send this to the shader, we assume it is always 1.0 (in our case)
-		const GLfloat linear = 0.7;
-		const GLfloat quadratic = 1.8;
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Linear").c_str()), linear);
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
-	}
-	glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
+			// Update attenuation parameters and calculate radius
+			const GLfloat constant = 1.0; // Note that we don't send this to the shader, we assume it is always 1.0 (in our case)
+			const GLfloat linear = 0.7;
+			const GLfloat quadratic = 1.8;
+			glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Linear").c_str()), linear);
+			glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
+		}
+		glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
 
 
-	screenQuad->render();
+		screenQuad->render();
 	
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -420,24 +436,65 @@ void lightingStep() {
 void postprocessingStep() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	hdrShader->Use();
-	fBuffer->bindTexture(0);
-	glUniform1i(glGetUniformLocation(hdrShader->Program, "hdr"), true);
-	glUniform1f(glGetUniformLocation(hdrShader->Program, "exposure"), exposure);
+
+	//hdr test
+	//hdrShader->Use();
+
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferBrightTexture);
+	////fBuffer->bindTexture(fBuffer->fBufferTexture);
+	//glUniform1i(glGetUniformLocation(hdrShader->Program, "hdr"), true);
+	//glUniform1f(glGetUniformLocation(hdrShader->Program, "exposure"), exposure);
+	//screenQuad->render();
+
+
+	//bloom
+	glActiveTexture(GL_TEXTURE0);
+	
+	gaussianBlurShader->Use();
+	//horizontal blur
+	swapBuffer->bindBuffer();
+		glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferBrightTexture);
+		glUniform1i(glGetUniformLocation(gaussianBlurShader->Program, "horizontal"), true);
+		screenQuad->render();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//vertical blur
+	swapBuffer2->bindBuffer();
+		glBindTexture(GL_TEXTURE_2D, swapBuffer->fBufferTexture);
+		glUniform1i(glGetUniformLocation(gaussianBlurShader->Program, "horizontal"), false);
+		screenQuad->render();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//blending 
+	bloomShader->Use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, swapBuffer2->fBufferTexture);
+
+	glUniform1f(glGetUniformLocation(bloomShader->Program, "bloom"), bloom);
+	glUniform1f(glGetUniformLocation(bloomShader->Program, "exposure"), exposure);
 	screenQuad->render();
+
+
 
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
 	glm::mat4 view = camera.GetViewMatrix();
 
-	/*motionblurShader->Use();
-	gBuffer->bindTexture(GBuffer::TextureType::Depth);
-	fBuffer->bindTexture(0);
-	glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastView"), 1, GL_FALSE, glm::value_ptr(lastView));
-	glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastProjection"), 1, GL_FALSE, glm::value_ptr(lastProjection));
-	screenQuad->render();*/
+	//motion blur
+
+	//motionblurShader->Use();
+	//gBuffer->bindTexture(GBuffer::TextureType::Depth);
+	//fBuffer->bindTexture(0);
+	//glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	//glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	//glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastView"), 1, GL_FALSE, glm::value_ptr(lastView));
+	//glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastProjection"), 1, GL_FALSE, glm::value_ptr(lastProjection));
+	//screenQuad->render();
 	
+	//stars
+
 	glm::mat4 model = glm::mat4();
 	model = glm::translate(model, stars->centerPos);
 
@@ -567,6 +624,10 @@ void handleMovement()
 		exposure += 0.1f;
 	if (keys[GLFW_KEY_2])
 		exposure -= 0.1f;
+	if (keys[GLFW_KEY_B])
+		bloom = true;
+	if (keys[GLFW_KEY_N])
+		bloom = false;
 
 }
 
@@ -619,10 +680,14 @@ void destroy()
 	delete geometryShader;
 	delete lightingShader;
 	delete motionblurShader;
+	delete gaussianBlurShader;
+	delete bloomShader;
 	//delete skyboxShader;
 
 	delete gBuffer;
 	delete fBuffer;
+	delete swapBuffer;
+	delete swapBuffer2;
 
 	delete nanosuit;
 	delete screenQuad;

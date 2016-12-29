@@ -8,6 +8,7 @@ class FBuffer
 public:
 	GLuint fBuffer;
 	GLuint fBufferTexture;
+	GLuint fBufferBrightTexture;
 
 	FBuffer(unsigned int windowWidth, unsigned int windowHeight){
 			//generate the fBuffer 
@@ -16,7 +17,7 @@ public:
 			//bind the fBuffer
 			glBindFramebuffer(GL_FRAMEBUFFER, fBuffer);
 		
-			//generate the position texture
+			//generate the color texture
 			glGenTextures(1, &fBufferTexture);
 			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, fBufferTexture);
@@ -27,8 +28,23 @@ public:
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 			//add the generated texture to the framebuffer at slot 0 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fBufferTexture, 0);
-			GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
-			glDrawBuffers(1, attachments);
+			
+			
+			//generate the bright color texture (used for bloom)
+			glGenTextures(1, &fBufferBrightTexture);
+			//bind the texture
+			glBindTexture(GL_TEXTURE_2D, fBufferBrightTexture);
+			//set texture attributes: size correspondes to the window dimensions, float precision and no alpha 
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+			//setting min and mag filter
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			//add the generated texture to the framebuffer at slot 0 
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, fBufferBrightTexture, 0);
+
+
+			GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+			glDrawBuffers(2, attachments);
 		
 			// - Finally check if framebuffer is complete
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
