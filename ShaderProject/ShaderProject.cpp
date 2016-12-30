@@ -78,10 +78,10 @@ Shader* geometryShader;
 Shader* lightingShader;
 Shader* starShader;
 Shader* instancingShader;
-Shader* hdrShader;
 Shader* motionblurShader;
 Shader* gaussianBlurShader;
 Shader* bloomShader;
+Shader* lightScatterShader;
 
 // Models
 vector<Model> models;
@@ -124,6 +124,10 @@ bool bloom = true;
 //motionblur variables
 glm::mat4 lastProjection = glm::mat4();
 glm::mat4 lastView = glm::mat4();
+
+//light scattering light source position
+glm::vec3 startLightPosition = glm::vec3(200.0f,0.0f,200.0f);
+
 
 
 /**
@@ -216,11 +220,10 @@ void initShader()
 	starShader = new Shader("../ShaderProject/Shader/Stars/Stars.vert", "../ShaderProject/Shader/Stars/Stars.frag");
 
 	//postpro shaders
-	hdrShader = new Shader("../ShaderProject/Shader/HDR/HDR.vert", "../ShaderProject/Shader/HDR/HDR.frag");
 	motionblurShader = new Shader("../ShaderProject/Shader/MotionBlur/MotionBlur.vert", "../ShaderProject/Shader/MotionBlur/MotionBlur.frag");
 	gaussianBlurShader = new Shader("../ShaderProject/Shader/GaussianBlur/GaussianBlur.vert", "../ShaderProject/Shader/GaussianBlur/GaussianBlur.frag");
 	bloomShader = new Shader("../ShaderProject/Shader/Bloom/Bloom.vert", "../ShaderProject/Shader/Bloom/Bloom.frag");
-
+	lightScatterShader = new Shader("../ShaderProject/Shader/LightScattering/LightScatter.vert", "../ShaderProject/Shader/LightScattering/LightScatter.frag");
 
 	//set the position, normal and albedo samplers
 	lightingShader->Use();
@@ -437,18 +440,7 @@ void postprocessingStep() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//hdr test
-	//hdrShader->Use();
-
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferBrightTexture);
-	////fBuffer->bindTexture(fBuffer->fBufferTexture);
-	//glUniform1i(glGetUniformLocation(hdrShader->Program, "hdr"), true);
-	//glUniform1f(glGetUniformLocation(hdrShader->Program, "exposure"), exposure);
-	//screenQuad->render();
-
-
-	//bloom
+	//hdr + bloom
 	glActiveTexture(GL_TEXTURE0);
 	
 	gaussianBlurShader->Use();
@@ -477,10 +469,27 @@ void postprocessingStep() {
 	glUniform1f(glGetUniformLocation(bloomShader->Program, "exposure"), exposure);
 	screenQuad->render();
 
-
-
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
 	glm::mat4 view = camera.GetViewMatrix();
+
+	//light scattering shader test (heavy wip)
+	/*lightScatterShader->Use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
+
+
+	glUniform1f(glGetUniformLocation(lightScatterShader->Program, "weight"), 0.3f);
+	glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 0.2f);
+	glUniform1f(glGetUniformLocation(lightScatterShader->Program, "decay"), 0.9f);
+
+
+	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniform3fv(glGetUniformLocation(starShader->Program, "model"), 1, &startLightPosition[0]);
+	screenQuad->render();*/
+
+
+	
 
 	//motion blur
 
@@ -676,12 +685,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 void destroy()
 {
 	delete starShader;
-	delete hdrShader;
 	delete geometryShader;
 	delete lightingShader;
 	delete motionblurShader;
 	delete gaussianBlurShader;
 	delete bloomShader;
+	delete lightScatterShader;
 	//delete skyboxShader;
 
 	delete gBuffer;

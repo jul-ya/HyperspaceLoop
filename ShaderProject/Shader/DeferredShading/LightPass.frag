@@ -49,10 +49,14 @@ void main()
         lighting += diffuse + specular;
     }
 
-	float brightness = dot(lighting, vec3(0.2126, 0.7152, 0.0722));
-    if(brightness > 1.0){
-        BrightColor = vec4(lighting, 1.0);
-	}
+	//float brightness = dot(lighting, vec3(0.2126, 0.7152, 0.0722));
+ //   if(brightness > 1.0){
+ //       BrightColor = vec4(lighting, 1.0);
+	//}
+
+
+	float brightness =  (lighting.r * 0.2126)+ (lighting.g * 0.7152) + (lighting.b * 0.0722);
+	BrightColor = vec4(lighting, 0.0) * brightness * brightness * brightness;
 
     FragColor = vec4(lighting, 1.0);
 }

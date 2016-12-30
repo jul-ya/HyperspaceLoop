@@ -156,8 +156,8 @@
     <None Include="Shader\DeferredShading\LightPass.vert" />
     <None Include="Shader\GaussianBlur\GaussianBlur.frag" />
     <None Include="Shader\GaussianBlur\GaussianBlur.vert" />
-    <None Include="Shader\HDR\HDR.frag" />
-    <None Include="Shader\HDR\HDR.vert" />
+    <None Include="Shader\LightScattering\LightScatter.frag" />
+    <None Include="Shader\LightScattering\LightScatter.vert" />
     <None Include="Shader\MotionBlur\MotionBlur.frag" />
     <None Include="Shader\MotionBlur\MotionBlur.vert" />
     <None Include="Shader\Refraction\Refraction.frag" />
