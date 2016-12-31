@@ -60,7 +60,7 @@ void handleMovement();
 void postprocessingStep();
 
 // Camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(5.0f, 0.0f, 8.0f));
 
 /*====Input variables=====*/
 bool keys[1024];
@@ -126,8 +126,12 @@ glm::mat4 lastProjection = glm::mat4();
 glm::mat4 lastView = glm::mat4();
 
 //light scattering light source position
-glm::vec3 startLightPosition = glm::vec3(200.0f,0.0f,200.0f);
+glm::vec3 startLightPosition = glm::vec3(-30.0f,-100.0f,-300.0f);
+Model* starLight;
 
+float weight = 0.6f;
+float density = 1.85f;
+float rayDecay = 0.89f;
 
 
 /**
@@ -258,8 +262,10 @@ void loadModels()
 	screenQuad = new Quad();
 	
 	timeline = new Timeline();	
-	timeline->addAnimation(new CameraAnimation(&camera, 1.0f, 10.0f, glm::vec3(0,0,-0.005f)));
+	timeline->addAnimation(new CameraAnimation(&camera, 1.0f, 10.0f, glm::vec3(-0.02f,0,0)));
 	timeline->play();
+
+	starLight = new Model("../ShaderProject/Model/Teapot/Teapot.obj");
 }
 
 void setUpLights() {
@@ -374,9 +380,16 @@ void geometryStep() {
 			model = glm::mat4();
 			model = glm::translate(model, sceneObjects[i].getTransform().getPosition());
 			glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+			glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), false);
 			sceneObjects[i].getModel()->Draw(*geometryShader);
 		}
 
+		model = glm::mat4();
+		model = glm::scale(model, glm::vec3(0.15f,0.15f,0.15f));
+		model = glm::translate(model, startLightPosition);
+		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
+		starLight->Draw(*geometryShader);
 		//instanced draw
 
 		instancingShader->Use();
@@ -393,6 +406,8 @@ void geometryStep() {
 			glDrawElementsInstanced(GL_TRIANGLES, teapot->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
 			glBindVertexArray(0);
 		}
+
+		
 
 
 
@@ -459,7 +474,7 @@ void postprocessingStep() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//blending 
-	bloomShader->Use();
+	/*bloomShader->Use();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
 	glActiveTexture(GL_TEXTURE1);
@@ -467,30 +482,43 @@ void postprocessingStep() {
 
 	glUniform1f(glGetUniformLocation(bloomShader->Program, "bloom"), bloom);
 	glUniform1f(glGetUniformLocation(bloomShader->Program, "exposure"), exposure);
-	screenQuad->render();
+	screenQuad->render();*/
 
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
 	glm::mat4 view = camera.GetViewMatrix();
 
 	//light scattering shader test (heavy wip)
-	/*lightScatterShader->Use();
+	lightScatterShader->Use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gBuffer->textures[4]);
+
+	swapBuffer->bindBuffer();
+
+		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "weight"), weight);
+		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), density);
+		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "decay"), rayDecay);
+
+
+		glm::vec3 pos = glm::project(startLightPosition, view, projection, glm::vec4(0.0f, 0.0f, WIDTH, HEIGHT) );
+		pos.x /= WIDTH;
+		pos.y /= HEIGHT;
+		
+		//std::cout << pos.x << "  " << pos.y << std::endl;
+		glUniform3fv(glGetUniformLocation(lightScatterShader->Program, "lightPositionScreenSpace"), 1, &pos[0]);
+		screenQuad->render();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	bloomShader->Use();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, swapBuffer->fBufferTexture);
 
-
-	glUniform1f(glGetUniformLocation(lightScatterShader->Program, "weight"), 0.3f);
-	glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 0.2f);
-	glUniform1f(glGetUniformLocation(lightScatterShader->Program, "decay"), 0.9f);
-
-
-	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniform3fv(glGetUniformLocation(starShader->Program, "model"), 1, &startLightPosition[0]);
-	screenQuad->render();*/
-
+	glUniform1f(glGetUniformLocation(bloomShader->Program, "bloom"), bloom);
+	glUniform1f(glGetUniformLocation(bloomShader->Program, "exposure"), exposure);
+	screenQuad->render(); 
 
 	
-
 	//motion blur
 
 	//motionblurShader->Use();
@@ -637,7 +665,24 @@ void handleMovement()
 		bloom = true;
 	if (keys[GLFW_KEY_N])
 		bloom = false;
-
+	if (keys[GLFW_KEY_3]) {
+		weight += 0.025f; std::cout << "weight: " << weight << std::endl;		
+	}
+	if (keys[GLFW_KEY_4]) {
+		weight -= 0.025f; std::cout << "weight: " << weight << std::endl;
+	}
+	if (keys[GLFW_KEY_5]) {
+		density += 0.05f; std::cout << "density: " << density << std::endl;
+	}
+	if (keys[GLFW_KEY_6]) {
+		density -= 0.05f; std::cout << "density: " << density << std::endl;
+	}
+	if (keys[GLFW_KEY_7]) {
+		rayDecay += 0.0025f; std::cout << "rayDecay: " << rayDecay << std::endl;
+	}
+	if (keys[GLFW_KEY_8]) {
+		rayDecay -= 0.0025f; std::cout << "rayDecay: " << rayDecay << std::endl;
+	}
 }
 
 
@@ -705,4 +750,5 @@ void destroy()
 	delete timeline;
 	delete modelMatrices;
 	delete teapot;
+	delete starLight;
 }

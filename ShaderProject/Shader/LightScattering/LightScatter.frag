@@ -5,24 +5,16 @@ in vec2 TexCoords;
 uniform float weight;
 uniform float decay;
 uniform float density;
-
-uniform mat4 projection;
-uniform mat4 view;
-uniform vec3 model;
-
-
+uniform vec3 lightPositionScreenSpace;
 
 uniform sampler2D frameSampler;
 
 out vec4 FragColor;
 
-int SAMPLE_SIZE = 48;
-vec2 lightScreenSpaceCoords = vec2(0.0,0.0);
+int SAMPLE_SIZE = 128;
 
 void main(){
-	lightScreenSpaceCoords = (projection * view * vec4(model, 1.0)).xy;
-	//lightScreenSpaceCoords *= 2.f;
-	//lightScreenSpaceCoords -= 1.0f;
+	vec2 lightScreenSpaceCoords = lightPositionScreenSpace.xy;
 
 	vec2 textureCoords = TexCoords;
 	vec2 deltaLightVector = TexCoords - lightScreenSpaceCoords;
@@ -46,8 +38,4 @@ void main(){
 	}
 
 	FragColor = vec4(colorResult, 1.0);
-
-	//FragColor = vec4(TexCoords.x, TexCoords.y, 1.0,  1.0);
-	//FragColor = vec4(textureCoords.x, textureCoords.y, 1.0,  1.0);
-	//FragColor = vec4(deltaLightVector.x, deltaLightVector.y, 1.0,  1.0);
 }
