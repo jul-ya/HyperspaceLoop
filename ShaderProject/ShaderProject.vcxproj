@@ -146,6 +146,8 @@
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shader\Bloom\AdditiveBlend.frag" />
+    <None Include="Shader\Bloom\AdditiveBlend.vert" />
     <None Include="Shader\Bloom\Bloom.frag" />
     <None Include="Shader\Bloom\Bloom.vert" />
     <None Include="Shader\DeferredShading\GeometryPass.frag" />

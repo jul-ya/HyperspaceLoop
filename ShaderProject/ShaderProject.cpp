@@ -82,6 +82,7 @@ Shader* motionblurShader;
 Shader* gaussianBlurShader;
 Shader* bloomShader;
 Shader* lightScatterShader;
+Shader* additiveBlendShader;
 
 // Models
 vector<Model> models;
@@ -228,6 +229,7 @@ void initShader()
 	gaussianBlurShader = new Shader("../ShaderProject/Shader/GaussianBlur/GaussianBlur.vert", "../ShaderProject/Shader/GaussianBlur/GaussianBlur.frag");
 	bloomShader = new Shader("../ShaderProject/Shader/Bloom/Bloom.vert", "../ShaderProject/Shader/Bloom/Bloom.frag");
 	lightScatterShader = new Shader("../ShaderProject/Shader/LightScattering/LightScatter.vert", "../ShaderProject/Shader/LightScattering/LightScatter.frag");
+	additiveBlendShader = new Shader("../ShaderProject/Shader/Bloom/AdditiveBlend.vert", "../ShaderProject/Shader/Bloom/AdditiveBlend.frag");
 
 	//set the position, normal and albedo samplers
 	lightingShader->Use();
@@ -250,6 +252,10 @@ void initShader()
 	bloomShader->Use();
 	glUniform1i(glGetUniformLocation(bloomShader->Program, "scene"), 0);
 	glUniform1i(glGetUniformLocation(bloomShader->Program, "bloomBlur"), 1);
+
+	additiveBlendShader->Use();
+	glUniform1i(glGetUniformLocation(additiveBlendShader->Program, "texture1"), 0);
+	glUniform1i(glGetUniformLocation(additiveBlendShader->Program, "texture2"), 1);
 
 }
 
@@ -454,6 +460,44 @@ void lightingStep() {
 void postprocessingStep() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+	glm::mat4 view = camera.GetViewMatrix();
+
+	//light scattering 
+
+	//binding the black geometry + plus light source texture
+	lightScatterShader->Use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gBuffer->textures[4]);
+
+	swapBuffer->bindBuffer();
+
+		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "weight"), weight);
+		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), density);
+		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "decay"), rayDecay);
+
+
+		glm::vec3 pos = glm::project(startLightPosition, view, projection, glm::vec4(0.0f, 0.0f, WIDTH, HEIGHT));
+		pos.x /= WIDTH;
+		pos.y /= HEIGHT;
+
+		//std::cout << pos.x << "  " << pos.y << std::endl;
+		glUniform3fv(glGetUniformLocation(lightScatterShader->Program, "lightPositionScreenSpace"), 1, &pos[0]);
+		screenQuad->render();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	//blend black light scatter texture with bloom texture
+	additiveBlendShader->Use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferBrightTexture);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, swapBuffer->fBufferTexture);
+
+	swapBuffer2->bindBuffer();
+		screenQuad->render();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 	//hdr + bloom
 	glActiveTexture(GL_TEXTURE0);
@@ -461,7 +505,7 @@ void postprocessingStep() {
 	gaussianBlurShader->Use();
 	//horizontal blur
 	swapBuffer->bindBuffer();
-		glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferBrightTexture);
+		glBindTexture(GL_TEXTURE_2D, swapBuffer2->fBufferTexture);
 		glUniform1i(glGetUniformLocation(gaussianBlurShader->Program, "horizontal"), true);
 		screenQuad->render();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -474,7 +518,7 @@ void postprocessingStep() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//blending 
-	/*bloomShader->Use();
+	bloomShader->Use();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
 	glActiveTexture(GL_TEXTURE1);
@@ -482,43 +526,9 @@ void postprocessingStep() {
 
 	glUniform1f(glGetUniformLocation(bloomShader->Program, "bloom"), bloom);
 	glUniform1f(glGetUniformLocation(bloomShader->Program, "exposure"), exposure);
-	screenQuad->render();*/
-
-	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
-	glm::mat4 view = camera.GetViewMatrix();
-
-	//light scattering shader test (heavy wip)
-	lightScatterShader->Use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gBuffer->textures[4]);
-
-	swapBuffer->bindBuffer();
-
-		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "weight"), weight);
-		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), density);
-		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "decay"), rayDecay);
+	screenQuad->render();
 
 
-		glm::vec3 pos = glm::project(startLightPosition, view, projection, glm::vec4(0.0f, 0.0f, WIDTH, HEIGHT) );
-		pos.x /= WIDTH;
-		pos.y /= HEIGHT;
-		
-		//std::cout << pos.x << "  " << pos.y << std::endl;
-		glUniform3fv(glGetUniformLocation(lightScatterShader->Program, "lightPositionScreenSpace"), 1, &pos[0]);
-		screenQuad->render();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	bloomShader->Use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, swapBuffer->fBufferTexture);
-
-	glUniform1f(glGetUniformLocation(bloomShader->Program, "bloom"), bloom);
-	glUniform1f(glGetUniformLocation(bloomShader->Program, "exposure"), exposure);
-	screenQuad->render(); 
-
-	
 	//motion blur
 
 	//motionblurShader->Use();
@@ -736,6 +746,7 @@ void destroy()
 	delete gaussianBlurShader;
 	delete bloomShader;
 	delete lightScatterShader;
+	delete additiveBlendShader;
 	//delete skyboxShader;
 
 	delete gBuffer;

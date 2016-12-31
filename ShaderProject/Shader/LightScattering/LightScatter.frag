@@ -19,7 +19,6 @@ void main(){
 	vec2 textureCoords = TexCoords;
 	vec2 deltaLightVector = TexCoords - lightScreenSpaceCoords;
 	deltaLightVector *= 1.0 / float(SAMPLE_SIZE) * density;
-	
 
 	vec3 colorResult = texture(frameSampler, textureCoords).rgb;
 
