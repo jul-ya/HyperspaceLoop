@@ -38,7 +38,7 @@ void main()
     {
         // Calculate distance between light source and current fragment
         float distance = length(lights[i].Position - FragPos);
-        if(distance < lights[i].Radius)
+        //if(distance < lights[i].Radius)
         {
             // Diffuse
             vec3 lightDir = normalize(lights[i].Position - FragPos);

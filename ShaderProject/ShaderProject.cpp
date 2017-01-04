@@ -32,8 +32,8 @@
 using namespace std;
 
 // Window dimensions
-const int static WIDTH = 1280;
-const int static HEIGHT = 720;
+const int static WIDTH = 1920;
+const int static HEIGHT = 1080;
 
 // Window object
 GLFWwindow* window;
@@ -334,7 +334,7 @@ glm::mat4* generateModelInstanceMatrices(GLuint amount) {
 		modelMatrices[i] = model;
 	}
 
-	teapot = new Model("../ShaderProject/Model/Plane/Plane.obj");
+	teapot = new Model("../ShaderProject/Model/Sphere/sphere.obj");
 
 
 	// forward declare the buffer
