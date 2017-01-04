@@ -19,7 +19,7 @@ struct Light {
     float Quadratic;
     float Radius;
 };
-const int NR_LIGHTS = 12;
+const int NR_LIGHTS = 24;
 uniform Light lights[NR_LIGHTS];
 uniform vec3 viewPos;
 
@@ -62,7 +62,7 @@ void main()
 
 
 	float brightness =  (lighting.r * 0.2126)+ (lighting.g * 0.7152) + (lighting.b * 0.0722);
-	BrightColor = vec4(lighting, 0.0) * brightness * brightness * brightness;
+	BrightColor = vec4(lighting, 0.0) * brightness * brightness;
 
     FragColor = vec4(lighting, 1.0);
 }

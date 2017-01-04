@@ -236,6 +236,7 @@ void initShader()
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gAlbedoSpec"), 2);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gDepth"), 3);
 
+	//pass in the lights
 	for (GLuint i = 0; i < sceneLightPositions.size(); i++)
 	{
 		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLightPositions[i][0]);
@@ -527,30 +528,42 @@ void postprocessingStep() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//blending 
-	bloomShader->Use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, swapBuffer2->fBufferTexture);
+	swapBuffer->bindBuffer();
+		bloomShader->Use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, swapBuffer2->fBufferTexture);
 
-	glUniform1f(glGetUniformLocation(bloomShader->Program, "bloom"), bloom);
-	glUniform1f(glGetUniformLocation(bloomShader->Program, "exposure"), exposure);
-	screenQuad->render();
-
+		glUniform1f(glGetUniformLocation(bloomShader->Program, "bloom"), bloom);
+		glUniform1f(glGetUniformLocation(bloomShader->Program, "exposure"), exposure);
+		screenQuad->render();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//motion blur
 
-	//motionblurShader->Use();
-	//gBuffer->bindTexture(GBuffer::TextureType::Depth);
-	//fBuffer->bindTexture(0);
-	//glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	//glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	//glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastView"), 1, GL_FALSE, glm::value_ptr(lastView));
-	//glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastProjection"), 1, GL_FALSE, glm::value_ptr(lastProjection));
-	//screenQuad->render();
+	swapBuffer2->bindBuffer();
+		motionblurShader->Use();
+		gBuffer->bindTexture(GBuffer::TextureType::Depth);
+		fBuffer->bindTexture(0);
+		glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastView"), 1, GL_FALSE, glm::value_ptr(lastView));
+		glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastProjection"), 1, GL_FALSE, glm::value_ptr(lastProjection));
+		screenQuad->render();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
-	//stars
 
+	additiveBlendShader->Use();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, swapBuffer->fBufferBrightTexture);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, swapBuffer2->fBufferTexture);
+
+	screenQuad->render();
+
+	//stars
+	fBuffer->bindBuffer();
 	glm::mat4 model = glm::mat4();
 	model = glm::translate(model, stars->centerPos);
 
@@ -574,6 +587,8 @@ void postprocessingStep() {
 	stars->draw();
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
+
+
 }
 
 
@@ -589,13 +604,13 @@ void update()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		//// Check call events.
+		// Check call events.
 		glfwPollEvents();
 
-		//// Update movement
+		// Update movement
 		handleMovement();
 
-		////update animations
+		//update animations
 		timeline->update();
 		
 		// Deferred Rendering
@@ -652,6 +667,8 @@ int main()
 	// Init Buffers
 	initBuffers();
 
+
+	glfwSwapInterval(0);
 	// Game Loop
 	update();
 
