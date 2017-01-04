@@ -89,7 +89,7 @@ public:
 		xoffset *= this->MouseSensitivity;
 		yoffset *= this->MouseSensitivity;
 
-		this->Yaw += xoffset;
+		this->Yaw = glm::mod(this->Yaw + xoffset, 360.0f);
 		this->Pitch += yoffset;
 
 		// Make sure that when pitch is out of bounds, screen doesn't get flipped
