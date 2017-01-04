@@ -212,8 +212,6 @@ void initBuffers() {
 */
 void initShader()
 {
-	// skyboxShader = new Shader("../ShaderProject/Shader/Skybox.vert", "../ShaderProject/Shader/Skybox.frag");
-	
 	//deferred shaders
 	geometryShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/DeferredShading/GeometryPass.frag");
 	lightingShader = new Shader("../ShaderProject/Shader/DeferredShading/LightPass.vert", "../ShaderProject/Shader/DeferredShading/LightPass.frag");
@@ -237,6 +235,28 @@ void initShader()
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gNormal"), 1);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gAlbedoSpec"), 2);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gDepth"), 3);
+
+	for (GLuint i = 0; i < sceneLightPositions.size(); i++)
+	{
+		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLightPositions[i][0]);
+		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLightColors[i][0]);
+
+		// Update attenuation parameters and calculate radius
+		const GLfloat constant = 1.0; // Note that we don't send this to the shader, we assume it is always 1.0 (in our case)
+		const GLfloat linear = 0.7;
+		const GLfloat quadratic = 1.8;
+		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Linear").c_str()), linear);
+		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
+
+
+		const GLfloat maxBrightness = std::fmaxf(std::fmaxf(sceneLightColors[i].r, sceneLightColors[i].g), sceneLightColors[i].b);
+		GLfloat radius = (-linear + std::sqrtf(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * maxBrightness))) / (2 * quadratic);
+		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Radius").c_str()), radius);
+	}
+
+
+
+
 
 	starShader->Use();
 	glUniform1i(glGetUniformLocation(starShader->Program, "position"), 0);
@@ -434,22 +454,8 @@ void lightingStep() {
 		gBuffer->bindTexture(GBuffer::TextureType::Normal);
 		gBuffer->bindTexture(GBuffer::TextureType::Color);
 		gBuffer->bindTexture(GBuffer::TextureType::Depth);
-
 	
-		for (GLuint i = 0; i < sceneLightPositions.size(); i++)
-		{ 
-			glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLightPositions[i][0]);
-			glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLightColors[i][0]);
-
-			// Update attenuation parameters and calculate radius
-			const GLfloat constant = 1.0; // Note that we don't send this to the shader, we assume it is always 1.0 (in our case)
-			const GLfloat linear = 0.7;
-			const GLfloat quadratic = 1.8;
-			glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Linear").c_str()), linear);
-			glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
-		}
 		glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
-
 
 		screenQuad->render();
 	
@@ -462,6 +468,9 @@ void postprocessingStep() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
 	glm::mat4 view = camera.GetViewMatrix();
+
+
+
 
 	//light scattering 
 
@@ -580,13 +589,13 @@ void update()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		// Check call events.
+		//// Check call events.
 		glfwPollEvents();
 
-		// Update movement
+		//// Update movement
 		handleMovement();
 
-		//update animations
+		////update animations
 		timeline->update();
 		
 		// Deferred Rendering
@@ -622,14 +631,16 @@ int main()
 	glViewport(0, 0, WIDTH, HEIGHT);
 	glEnable(GL_DEPTH_TEST);
 	
-	// Init Shader
-	initShader();
 	
 	// Load Models
 	loadModels();
 
 	// Lights Setup
 	setUpLights();
+	
+	
+	// Init Shader
+	initShader();
 
 	// Instancing setup
 	modelMatrices = generateModelInstanceMatrices(500);

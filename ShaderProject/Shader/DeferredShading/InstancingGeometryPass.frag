@@ -3,6 +3,7 @@
 layout (location = 0) out vec3 gPosition;
 layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec4 gAlbedoSpec;
+layout (location = 3) out vec4 gBlackColor;
 
 
 in vec2 TexCoords;
@@ -22,4 +23,6 @@ void main()
     gAlbedoSpec.rgb = texture(texture_diffuse1, TexCoords).rgb;
     // Store specular intensity in gAlbedoSpec's alpha component
     gAlbedoSpec.a = texture(texture_specular1, TexCoords).r;
+
+	gBlackColor = vec4(0.0,0.0,0.0,1.0);
 }
