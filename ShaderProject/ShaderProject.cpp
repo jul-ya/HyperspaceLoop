@@ -21,8 +21,9 @@
 #include <SOIL\SOIL.h>
 
 
-#include "Animation.h"
-#include "CameraAnimation.h"
+#include "Animations\Animation.h"
+#include "Animations\CameraAnimation.h"
+#include "Animations\AsteroidAnimation.h"
 
 
 // GLM
@@ -104,8 +105,10 @@ vector<glm::vec3> sceneLightColors;
 FBuffer* fBuffer;
 FBuffer* swapBuffer;
 FBuffer* swapBuffer2;
+FBuffer* swapBuffer3;
 
 // Stars
+vector<Stars*> starVector;
 Stars* stars;
 float fadeOutDistance = 200.0f;
 
@@ -116,6 +119,7 @@ Hyperspace* hyperspace;
 Timeline* timeline;
 
 //instancing test
+GLuint instanceBuffer;
 glm::mat4* modelMatrices;
 Model* teapot;
 
@@ -206,6 +210,7 @@ void initBuffers() {
 	fBuffer = new FBuffer(WIDTH, HEIGHT);
 	swapBuffer = new FBuffer(WIDTH, HEIGHT);
 	swapBuffer2 = new FBuffer(WIDTH, HEIGHT);
+	swapBuffer3 = new FBuffer(WIDTH, HEIGHT);
 }
 
 
@@ -292,7 +297,8 @@ void loadModels()
 	screenQuad = new Quad();
 	
 	timeline = new Timeline();	
-	timeline->addAnimation(new CameraAnimation(&camera, 0.0f, 4.0f, glm::vec3(-5.0f,0,0)));
+	timeline->addAnimation(new CameraAnimation(&camera, 0.0f, 3.0f, glm::vec3(-5.0f,0,0)));
+	timeline->addAnimation(new AsteroidAnimation(3.0f, 10.0f, modelMatrices, 500, instanceBuffer));
 	timeline->play();
 
 	starLight = new Model("../ShaderProject/Model/Teapot/Teapot.obj");
@@ -341,9 +347,9 @@ glm::mat4* generateModelInstanceMatrices(GLuint amount) {
 
 
 	// forward declare the buffer
-	GLuint buffer;
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+
+	glGenBuffers(1, &instanceBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
 	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
 
 	// Set transformation matrices as an instance vertex attribute (with divisor 1)
@@ -532,7 +538,7 @@ void postprocessingStep() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//blending 
-	swapBuffer->bindBuffer();
+	swapBuffer3->bindBuffer();
 		bloomShader->Use();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
@@ -560,7 +566,7 @@ void postprocessingStep() {
 
 	additiveBlendShader->Use();
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, swapBuffer->fBufferBrightTexture);
+	glBindTexture(GL_TEXTURE_2D, swapBuffer3->fBufferBrightTexture);
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, swapBuffer2->fBufferTexture);
 
@@ -568,18 +574,14 @@ void postprocessingStep() {
 
 	//stars
 	fBuffer->bindBuffer();
-	glm::mat4 model = glm::mat4();
-	model = glm::translate(model, stars->centerPos);
+	
 
-	lastView = view;
-	lastProjection = projection;
+	
 
 	starShader->Use();
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glUniform3fv(glGetUniformLocation(starShader->Program, "cameraPosition"), 1, &camera.Position[0]);
-
 	glUniform1f(glGetUniformLocation(starShader->Program, "fadeOutDistance"), fadeOutDistance);
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
@@ -591,11 +593,19 @@ void postprocessingStep() {
 	glDepthMask(GL_FALSE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);
-	stars->draw();
+	for (int i = 0; i < starVector.size(); i++) {
+		glm::mat4 model = glm::mat4();
+		model = glm::translate(model, starVector[i]->centerPos);
+
+		glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		starVector[i]->draw();
+	}
+	//stars->draw();
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
 
-
+	lastView = view;
+	lastProjection = projection;
 }
 
 
@@ -652,7 +662,8 @@ int main()
 	// Set Viewport
 	glViewport(0, 0, WIDTH, HEIGHT);
 	glEnable(GL_DEPTH_TEST);
-	
+	// Instancing setup
+	modelMatrices = generateModelInstanceMatrices(500);
 	
 	// Load Models
 	loadModels();
@@ -664,12 +675,20 @@ int main()
 	// Init Shader
 	initShader();
 
-	// Instancing setup
-	modelMatrices = generateModelInstanceMatrices(500);
+	
 
 	// Stars Setup
-	stars = new Stars(10000, glm::vec3(0,0,0));
-	stars->setupStarMesh(TubePointGenerator(100, -100));
+	Stars* star = new Stars(5000, glm::vec3(0, 0, 0));
+	star->setupStarMesh(TubePointGenerator(400, -100));
+	starVector.push_back(star);
+
+	Stars* star2 = new Stars(5000, glm::vec3(0, 0, 100));
+	star2->setupStarMesh(TubePointGenerator(400, -100));
+	starVector.push_back(star2);
+
+	Stars* star3 = new Stars(5000, glm::vec3(0, 0, 200));
+	star3->setupStarMesh(TubePointGenerator(400, -100));
+	starVector.push_back(star3);
 
 	// Init Buffers
 	initBuffers();
@@ -793,6 +812,7 @@ void destroy()
 	delete fBuffer;
 	delete swapBuffer;
 	delete swapBuffer2;
+	delete swapBuffer3;
 
 	delete nanosuit;
 	delete screenQuad;

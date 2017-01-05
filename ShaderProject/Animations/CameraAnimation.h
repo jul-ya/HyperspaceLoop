@@ -4,8 +4,9 @@
 #include "Animation.h"
 #include <GLFW\glfw3.h>
 #include <iostream>
-#include "TweenFunctions.h"
-#include "MathUtils.h"
+#include "..\TweenFunctions.h"
+#include "..\MathUtils.h"
+#include "..\Camera.h"
 
 
 
@@ -16,8 +17,6 @@ public:
 	CameraAnimation(Camera* camera, GLfloat startTime, GLfloat duration, glm::vec3 destination): Animation(startTime), camera(camera), duration(duration), destination(destination) {
 		startX = camera->Position.x;
 		endX = destination.x;
-	
-	
 	}
 
 	virtual void update(GLfloat deltaTime) {
@@ -50,9 +49,5 @@ private:
 		glm::vec3 p3 = glm::vec3(-50, 0, 200);
 	};
 	bezier bez = bezier();
-
-	
-	
-
 	Camera* camera;
 };

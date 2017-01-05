@@ -4,7 +4,7 @@
 #include <list>
 #include <queue>
 #include <iostream>
-#include "Animation.h"
+#include "Animations\Animation.h"
 #include <GLFW/glfw3.h>
 
 class Timeline {
