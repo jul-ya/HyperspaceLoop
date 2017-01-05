@@ -107,6 +107,7 @@ FBuffer* swapBuffer2;
 
 // Stars
 Stars* stars;
+float fadeOutDistance = 200.0f;
 
 // Hyperspace
 Hyperspace* hyperspace;
@@ -579,6 +580,8 @@ void postprocessingStep() {
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glUniform3fv(glGetUniformLocation(starShader->Program, "cameraPosition"), 1, &camera.Position[0]);
 
+	glUniform1f(glGetUniformLocation(starShader->Program, "fadeOutDistance"), fadeOutDistance);
+
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer(0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT,
@@ -723,6 +726,12 @@ void handleMovement()
 	}
 	if (keys[GLFW_KEY_8]) {
 		rayDecay -= 0.0025f; std::cout << "rayDecay: " << rayDecay << std::endl;
+	}
+	if (keys[GLFW_KEY_9]) {
+		fadeOutDistance += 1.0f; std::cout << "fadeOutDistance: " << fadeOutDistance << std::endl;
+	}
+	if (keys[GLFW_KEY_0]) {
+		fadeOutDistance -= 1.0f; std::cout << "fadeOutDistance: " << fadeOutDistance << std::endl;
 	}
 }
 
