@@ -20,6 +20,7 @@
 #include "Timeline.h"
 #include <SOIL\SOIL.h>
 
+
 #include "Animation.h"
 #include "CameraAnimation.h"
 
@@ -29,11 +30,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-using namespace std;
+//using namespace std;
 
 // Window dimensions
-const int static WIDTH = 1920;
-const int static HEIGHT = 1080;
+const int static WIDTH = 1280;
+const int static HEIGHT = 720;
 
 // Window object
 GLFWwindow* window;
@@ -264,6 +265,7 @@ void initShader()
 	glUniform1i(glGetUniformLocation(starShader->Program, "uv"), 1);
 	glUniform1i(glGetUniformLocation(starShader->Program, "lum"), 2);
 	glUniform1i(glGetUniformLocation(starShader->Program, "size"), 3);
+	glUniform1i(glGetUniformLocation(starShader->Program, "cameraPosition"), 4);
 
 	motionblurShader->Use();
 	glUniform1i(glGetUniformLocation(motionblurShader->Program, "gDepth"), 3);
@@ -289,7 +291,7 @@ void loadModels()
 	screenQuad = new Quad();
 	
 	timeline = new Timeline();	
-	timeline->addAnimation(new CameraAnimation(&camera, 1.0f, 10.0f, glm::vec3(-0.02f,0,0)));
+	timeline->addAnimation(new CameraAnimation(&camera, 0.0f, 4.0f, glm::vec3(-5.0f,0,0)));
 	timeline->play();
 
 	starLight = new Model("../ShaderProject/Model/Teapot/Teapot.obj");
@@ -389,7 +391,7 @@ void geometryStep() {
 		glFrontFace(GL_CCW);
 
 		//get required matrices
-		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 200.0f);
+		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model;
 
@@ -467,7 +469,7 @@ void lightingStep() {
 void postprocessingStep() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
 	glm::mat4 view = camera.GetViewMatrix();
 
 
@@ -490,6 +492,7 @@ void postprocessingStep() {
 		glm::vec3 pos = glm::project(startLightPosition, view, projection, glm::vec4(0.0f, 0.0f, WIDTH, HEIGHT));
 		pos.x /= WIDTH;
 		pos.y /= HEIGHT;
+		
 
 		//std::cout << pos.x << "  " << pos.y << std::endl;
 		glUniform3fv(glGetUniformLocation(lightScatterShader->Program, "lightPositionScreenSpace"), 1, &pos[0]);
@@ -574,6 +577,7 @@ void postprocessingStep() {
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3fv(glGetUniformLocation(starShader->Program, "cameraPosition"), 1, &camera.Position[0]);
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -666,7 +670,6 @@ int main()
 
 	// Init Buffers
 	initBuffers();
-
 
 	glfwSwapInterval(0);
 	// Game Loop

@@ -134,6 +134,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="Hyperspace.h" />
+    <ClInclude Include="MathUtils.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="PointGenerator.h" />
@@ -144,6 +145,7 @@
     <ClInclude Include="Stars.h" />
     <ClInclude Include="Timeline.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="TweenFunctions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\Bloom\AdditiveBlend.frag" />
