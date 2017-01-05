@@ -110,7 +110,7 @@ FBuffer* swapBuffer3;
 // Stars
 vector<Stars*> starVector;
 Stars* stars;
-float fadeOutDistance = 200.0f;
+float fadeOutDistance = 400.0f;
 
 // Hyperspace
 Hyperspace* hyperspace;
@@ -600,7 +600,6 @@ void postprocessingStep() {
 		glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		starVector[i]->draw();
 	}
-	//stars->draw();
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
 
@@ -678,18 +677,13 @@ int main()
 	
 
 	// Stars Setup
-	Stars* star = new Stars(5000, glm::vec3(0, 0, 0));
-	star->setupStarMesh(TubePointGenerator(400, -100));
-	starVector.push_back(star);
 
-	Stars* star2 = new Stars(5000, glm::vec3(0, 0, 100));
-	star2->setupStarMesh(TubePointGenerator(400, -100));
-	starVector.push_back(star2);
-
-	Stars* star3 = new Stars(5000, glm::vec3(0, 0, 200));
-	star3->setupStarMesh(TubePointGenerator(400, -100));
-	starVector.push_back(star3);
-
+	for (int i = 0; i < 4; i++) {
+		Stars* star = new Stars(5000, glm::vec3(0, 0, -(-2+i)*100));
+		star->setupStarMesh(TubePointGenerator(500, 100));
+		starVector.push_back(star);
+	}
+	
 	// Init Buffers
 	initBuffers();
 
