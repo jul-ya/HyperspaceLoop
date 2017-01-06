@@ -297,7 +297,7 @@ void loadModels()
 	screenQuad = new Quad();
 	
 	timeline = new Timeline();	
-	timeline->addAnimation(new CameraAnimation(&camera, 0.0f, 3.0f, glm::vec3(-5.0f,0,0)));
+	timeline->addAnimation(new CameraAnimation(&camera, 0.0f, 3.0f));
 	timeline->addAnimation(new AsteroidAnimation(3.0f, 10.0f, modelMatrices, 500, instanceBuffer));
 	timeline->play();
 

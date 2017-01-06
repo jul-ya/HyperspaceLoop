@@ -18,21 +18,19 @@ public:
 
 
 	/*
-		based on http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
+		http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
 		author: Herman Tulleken 
 	*/
-	static glm::vec3 calculateBezierPoint(float currentTime, glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,  float duration)
+	static glm::vec3 calculateBezierPoint(float currentTime, glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 	{
-		float normalizedTime = currentTime / duration;
-
-		float u = 1 - normalizedTime;
-		float tt = normalizedTime*normalizedTime;
+		float u = 1 - currentTime;
+		float tt = currentTime*currentTime;
 		float uu = u*u;
 		float uuu = uu * u;
-		float ttt = tt * normalizedTime;
+		float ttt = tt * currentTime;
 
 		glm::vec3 p = uuu * p0; //first term
-		p += 3 * uu * normalizedTime * p1; //second term
+		p += 3 * uu * currentTime * p1; //second term
 		p += 3 * u * tt * p2; //third term
 		p += ttt * p3; //fourth term
 
