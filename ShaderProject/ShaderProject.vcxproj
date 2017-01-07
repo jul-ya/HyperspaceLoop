@@ -171,6 +171,8 @@
     <None Include="Shader\RenderToTexture\FrameBuffer.vert" />
     <None Include="Shader\Skybox.frag" />
     <None Include="Shader\Skybox.vert" />
+    <None Include="Shader\Skybox\Skybox.frag" />
+    <None Include="Shader\Skybox\Skybox.vert" />
     <None Include="Shader\Standard.frag">
       <FileType>Document</FileType>
     </None>

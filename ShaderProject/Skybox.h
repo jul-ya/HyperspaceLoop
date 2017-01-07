@@ -26,12 +26,12 @@ public:
 
 		// Assign faces
 		vector<const GLchar*> faces;
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/right.jpg");
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/left.jpg");
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/top.jpg");
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/bottom.jpg");
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/back.jpg");
-		faces.push_back("../ShaderProject/Texture/Skyboxes/Nebula/front.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/BlueGalaxy/blue_galaxy_right1.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/BlueGalaxy/blue_galaxy_left2.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/BlueGalaxy/blue_galaxy_top3.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/BlueGalaxy/blue_galaxy_bottom4.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/BlueGalaxy/blue_galaxy_front5.jpg");
+		faces.push_back("../ShaderProject/Texture/Skyboxes/BlueGalaxy/blue_galaxy_back6.jpg");
 		cubemapTexture = loadCubemap(faces);
 	}
 		
@@ -70,8 +70,8 @@ public:
 	/**
 	* Draws the skybox.
 	*/
-	void Draw()
+	void Draw(Shader* shader)
 	{
-		skyboxModel->Draw(*this->shader);
+		skyboxModel->Draw(*shader);
 	}
 };

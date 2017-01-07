@@ -11,7 +11,6 @@ uniform float fadeOutDistance;
 
 void main()
 { 
-
 	float distFactor = distance(cameraPosition, pointWorldPos.xyz) / fadeOutDistance;
 	float distToCenter = length(gl_PointCoord - 0.5) * 2.0;
 	if(distToCenter > 0.8 || pointSize < 3.0 || distFactor > 1.0) // if brightness is almost zero or points are super small
@@ -21,6 +20,6 @@ void main()
 		// calculate fragment brightness from distance to star center
 		float brightness = exp(1.0 / (20.0 * distToCenter)) - 1.05;
 		brightness = clamp(brightness, 0.0, 1.0) * starLum;
-		color = vec4(1.0, 1.0, 1.0, brightness * (1-(distFactor*distFactor))); //using quadratic falloff so the fading in and out is done in a shorter range
+		color = vec4(0.5, 0.5+(pointWorldPos.z+200)/600.0, 0.5+1.0 - ((pointWorldPos.z+200)/600.0), brightness * (1-(distFactor*distFactor))); //using quadratic falloff so the fading in and out is done in a shorter range
 	} 
 }

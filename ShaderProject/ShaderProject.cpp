@@ -19,6 +19,7 @@
 #include "Hyperspace.h"
 #include "Timeline.h"
 #include <SOIL\SOIL.h>
+#include "Skybox.h"
 
 
 #include "Animations\Animation.h"
@@ -85,6 +86,7 @@ Shader* gaussianBlurShader;
 Shader* bloomShader;
 Shader* lightScatterShader;
 Shader* additiveBlendShader;
+Shader* skyboxShader;
 
 // Models
 vector<Model> models;
@@ -139,6 +141,9 @@ Model* starLight;
 float weight = 0.6f;
 float density = 1.85f;
 float rayDecay = 0.89f;
+
+//skybox 
+Skybox* skybox;
 
 
 /**
@@ -219,6 +224,10 @@ void initBuffers() {
 */
 void initShader()
 {
+
+	//skybox shader
+	skyboxShader = new Shader("../ShaderProject/Shader/Skybox/Skybox.vert", "../ShaderProject/Shader/Skybox/Skybox.frag");
+
 	//deferred shaders
 	geometryShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/DeferredShading/GeometryPass.frag");
 	lightingShader = new Shader("../ShaderProject/Shader/DeferredShading/LightPass.vert", "../ShaderProject/Shader/DeferredShading/LightPass.frag");
@@ -302,6 +311,8 @@ void loadModels()
 	timeline->play();
 
 	starLight = new Model("../ShaderProject/Model/Teapot/Teapot.obj");
+
+	skybox = new Skybox(skyboxShader);
 }
 
 void setUpLights() {
@@ -402,6 +413,20 @@ void geometryStep() {
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model;
 
+		// glDepthRange(0.999, 1.0);
+		glDepthMask(GL_FALSE);
+		skyboxShader->Use();
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(glm::mat4(glm::mat3(camera.GetViewMatrix()))));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		// skybox cube
+		glBindVertexArray(skybox->skyboxModel->meshes[0].VAO);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthMask(GL_TRUE);
+		//glDepthRange(0.0, 1.0);
+
+
 		//set geometry pass shader as active
 		geometryShader->Use();
 
@@ -444,8 +469,7 @@ void geometryStep() {
 		}
 
 		
-
-
+		
 
 	
 	//unbind the gBuffer
@@ -679,7 +703,7 @@ int main()
 	// Stars Setup
 
 	for (int i = 0; i < 4; i++) {
-		Stars* star = new Stars(5000, glm::vec3(0, 0, -(-2+i)*100));
+		Stars* star = new Stars(1000, glm::vec3(0, 0, -(-2+i)*100));
 		star->setupStarMesh(TubePointGenerator(500, 100));
 		starVector.push_back(star);
 	}
@@ -800,7 +824,7 @@ void destroy()
 	delete bloomShader;
 	delete lightScatterShader;
 	delete additiveBlendShader;
-	//delete skyboxShader;
+	delete skyboxShader;
 
 	delete gBuffer;
 	delete fBuffer;
@@ -816,4 +840,5 @@ void destroy()
 	delete modelMatrices;
 	delete teapot;
 	delete starLight;
+	delete skybox;
 }
