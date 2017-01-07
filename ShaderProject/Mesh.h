@@ -40,6 +40,9 @@ public:
 	vector<Texture> textures;
 	GLuint VAO;
 
+	/* Start Pos*/
+	glm::vec3 startPos;
+
 	/*  Functions  */
 	// Constructor
 	Mesh(vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures)

@@ -90,7 +90,6 @@ Shader* skyboxShader;
 
 // Models
 vector<Model> models;
-Model* nanosuit;
 vector<glm::vec3> objectPositions;
 
 // Screen quad
@@ -99,7 +98,7 @@ Quad* screenQuad;
 //GBuffer
 GBuffer* gBuffer;
 
-// Lighjts
+// Lights
 vector<glm::vec3> sceneLightPositions;
 vector<glm::vec3> sceneLightColors;
 
@@ -123,7 +122,7 @@ Timeline* timeline;
 //instancing test
 GLuint instanceBuffer;
 glm::mat4* modelMatrices;
-Model* teapot;
+Model* asteroid;
 
 //hdr variables
 float exposure = 1.0f;
@@ -323,6 +322,15 @@ void setUpLights() {
 
 
 glm::mat4* generateModelInstanceMatrices(GLuint amount) {
+
+	asteroid = new Model("../ShaderProject/Model/Sphere/sphere.obj");
+
+	// forward declare the buffer
+
+	glGenBuffers(1, &instanceBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
+	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
+
 	// Generate a large list of semi-random model transformation matrices
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
@@ -354,21 +362,13 @@ glm::mat4* generateModelInstanceMatrices(GLuint amount) {
 		modelMatrices[i] = model;
 	}
 
-	teapot = new Model("../ShaderProject/Model/Sphere/sphere.obj");
-
-
-	// forward declare the buffer
-
-	glGenBuffers(1, &instanceBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
-	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
 
 	// Set transformation matrices as an instance vertex attribute (with divisor 1)
 	// NOTE: We're cheating a little by taking the, now publicly declared, VAO of the model's mesh(es) and adding new vertexAttribPointers
-	// Normally you'd want to do this in a more organized fashion, but for learning purposes this will do.
-	for (GLuint i = 0; i < teapot->meshes.size(); i++)
+	for (GLuint i = 0; i < asteroid->meshes.size(); i++)
 	{
-		GLuint VAO = teapot->meshes[i].VAO;
+		GLuint VAO = asteroid->meshes[i].VAO;
+
 		glBindVertexArray(VAO);
 		// Set attribute pointers for matrix (4 times vec4)
 		glEnableVertexAttribArray(3);
@@ -457,14 +457,14 @@ void geometryStep() {
 		glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
 
-		// Draw teapots
-		//instancingShader->Use();
+		// Draw asteroids
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, teapot->textures_loaded[0].id); // Note we also made the textures_loaded vector public (instead of private) from the model class.
-		for (GLuint i = 0; i < teapot->meshes.size(); i++)
+		glBindTexture(GL_TEXTURE_2D, asteroid->textures_loaded[0].id); // Note we also made the textures_loaded vector public (instead of private) from the model class.
+		for (GLuint i = 0; i < asteroid->meshes.size(); i++)
 		{
-			glBindVertexArray(teapot->meshes[i].VAO);
-			glDrawElementsInstanced(GL_TRIANGLES, teapot->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
+			glUniform3f(glGetUniformLocation(instancingShader->Program, "startPos"), asteroid->meshes[i].startPos.x, asteroid->meshes[i].startPos.y, asteroid->meshes[i].startPos.z);
+			glBindVertexArray(asteroid->meshes[i].VAO);
+			glDrawElementsInstanced(GL_TRIANGLES, asteroid->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
 			glBindVertexArray(0);
 		}
 
@@ -832,13 +832,12 @@ void destroy()
 	delete swapBuffer2;
 	delete swapBuffer3;
 
-	delete nanosuit;
 	delete screenQuad;
 	delete stars;
 	delete hyperspace;
 	delete timeline;
 	delete modelMatrices;
-	delete teapot;
+	delete asteroid;
 	delete starLight;
 	delete skybox;
 }
