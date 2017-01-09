@@ -87,6 +87,7 @@ Shader* bloomShader;
 Shader* lightScatterShader;
 Shader* additiveBlendShader;
 Shader* skyboxShader;
+Shader* warpShader;
 
 // Models
 vector<Model> models;
@@ -243,6 +244,7 @@ void initShader()
 	bloomShader = new Shader("../ShaderProject/Shader/Bloom/Bloom.vert", "../ShaderProject/Shader/Bloom/Bloom.frag");
 	lightScatterShader = new Shader("../ShaderProject/Shader/LightScattering/LightScatter.vert", "../ShaderProject/Shader/LightScattering/LightScatter.frag");
 	additiveBlendShader = new Shader("../ShaderProject/Shader/Bloom/AdditiveBlend.vert", "../ShaderProject/Shader/Bloom/AdditiveBlend.frag");
+	warpShader = new Shader("../ShaderProject/Shader/Warp/Warp.vert", "../ShaderProject/Shader/Warp/Warp.frag");
 
 	//set the position, normal and albedo samplers
 	lightingShader->Use();
@@ -293,6 +295,9 @@ void initShader()
 	additiveBlendShader->Use();
 	glUniform1i(glGetUniformLocation(additiveBlendShader->Program, "texture1"), 0);
 	glUniform1i(glGetUniformLocation(additiveBlendShader->Program, "texture2"), 1);
+
+	warpShader->Use();
+	glUniform1i(glGetUniformLocation(warpShader->Program, "scene"), 0);
 
 }
 
@@ -598,9 +603,6 @@ void postprocessingStep() {
 
 	//stars
 	fBuffer->bindBuffer();
-	
-
-	
 
 	starShader->Use();
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -629,6 +631,12 @@ void postprocessingStep() {
 
 	lastView = view;
 	lastProjection = projection;
+
+	//just for testing purposes
+	/*warpShader->Use();
+	glBindTexture(GL_TEXTURE_2D, swapBuffer2->fBufferTexture);
+	glUniform1f(glGetUniformLocation(warpShader->Program, "time"), glfwGetTime());
+	screenQuad->render();*/
 }
 
 

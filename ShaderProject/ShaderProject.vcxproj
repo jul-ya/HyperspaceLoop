@@ -182,6 +182,8 @@
     <None Include="Shader\StandardTextureReflection.frag" />
     <None Include="Shader\Stars\Stars.frag" />
     <None Include="Shader\Stars\Stars.vert" />
+    <None Include="Shader\Warp\Warp.frag" />
+    <None Include="Shader\Warp\Warp.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
