@@ -23,9 +23,8 @@
 
 
 #include "Animations\Animation.h"
-#include "Animations\CameraAnimation.h"
 #include "Animations\AsteroidAnimation.h"
-
+#include "Animations\SpaceShipAnimation.h"
 
 // GLM
 #include <glm/glm.hpp>
@@ -144,6 +143,8 @@ float rayDecay = 0.89f;
 
 //skybox 
 Skybox* skybox;
+
+Model spaceShip;
 
 
 /**
@@ -270,6 +271,7 @@ void initShader()
 		const GLfloat maxBrightness = std::fmaxf(std::fmaxf(sceneLightColors[i].r, sceneLightColors[i].g), sceneLightColors[i].b);
 		GLfloat radius = (-linear + std::sqrtf(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * maxBrightness))) / (2 * quadratic);
 		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Radius").c_str()), radius);
+		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].isDirectional").c_str()), i == sceneLightPositions.size()-2 ? true : false);
 	}
 
 
@@ -308,9 +310,11 @@ void loadModels()
 {
 	hyperspace = new Hyperspace();
 	screenQuad = new Quad();
+
+	//spaceShip = hyperspace->spaceShip;
 	
 	timeline = new Timeline();	
-	timeline->addAnimation(new CameraAnimation(&camera, 0.0f));
+	timeline->addAnimation(new SpaceShipAnimation(camera, hyperspace->getSpaceShipObject(), 0.0f));
 	timeline->addAnimation(new AsteroidAnimation(3.0f, 10.0f, modelMatrices, 500, instanceBuffer));
 	timeline->play();
 
@@ -445,9 +449,9 @@ void geometryStep() {
 		{
 			model = glm::mat4();
 			model = glm::translate(model, sceneObjects[i].getTransform().getPosition());
-			glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+			glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(sceneObjects[i].getTransform().getModelMatrix()));
 			glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), false);
-			sceneObjects[i].getModel()->Draw(*geometryShader);
+			sceneObjects[i].getModel().Draw(*geometryShader);
 		}
 
 		model = glm::mat4();
@@ -527,13 +531,16 @@ void postprocessingStep() {
 
 		glm::vec3 pos = glm::project(startLightPosition, view, projection, glm::vec4(0.0f, 0.0f, WIDTH, HEIGHT));
 		pos.x /= WIDTH;
+		pos.x = MathUtils::clamp(pos.x, 0.0f, 1.0f);
 		pos.y /= HEIGHT;
+		pos.y = MathUtils::clamp(pos.y, 0.0f, 1.0f);
 		
 
 		//std::cout << pos.x << "  " << pos.y << std::endl;
 		glUniform3fv(glGetUniformLocation(lightScatterShader->Program, "lightPositionScreenSpace"), 1, &pos[0]);
 		screenQuad->render();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 
 	//blend black light scatter texture with bloom texture
@@ -603,6 +610,9 @@ void postprocessingStep() {
 
 	//stars
 	fBuffer->bindBuffer();
+	
+
+	
 
 	starShader->Use();
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
