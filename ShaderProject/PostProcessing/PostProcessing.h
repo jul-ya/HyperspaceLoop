@@ -5,15 +5,20 @@
 
 class PostProcessing {
 public:
-
 	virtual void setup() = 0;
-	virtual void execute(FBuffer frameBuffer) = 0;
 	virtual FBuffer* getOutputBuffer() {
-		return frameBuffer;
+		return outputBuffer;
+	}
+protected:
+	void render(Quad* screenQuad, bool drawToBuffer) {
+		if (drawToBuffer) {
+			outputBuffer->bindBuffer();
+		}
+		screenQuad->render();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-private:
-	FBuffer* frameBuffer;
 
-
+	FBuffer* outputBuffer;
+	Shader* postProShader;
 };

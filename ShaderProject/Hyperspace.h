@@ -42,7 +42,6 @@ public:
 		return sceneObjects[0];
 	}
 
-	//GameObject spaceShip;
 private:
 	
 	std::vector<PointLight> sceneLights;
@@ -79,9 +78,9 @@ private:
 		
 		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 0), glm::vec3(0.05f, 0.05f, 0.05f))));
 
-		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 100), glm::vec3(0.05f, 0.05f, 0.05f))));
+		/*sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 100), glm::vec3(0.05f, 0.05f, 0.05f))));
 
-		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 200), glm::vec3(0.05f, 0.05f, 0.05f))));
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 200), glm::vec3(0.05f, 0.05f, 0.05f))));*/
 	}
 };
 

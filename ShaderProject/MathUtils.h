@@ -36,5 +36,14 @@ public:
 
 		return p;
 	}
+
+	static glm::vec3 normalizeScreenSpacePosition(glm::vec3 position, int width, int height) {
+		position.x /= width;
+		position.x = MathUtils::clamp(position.x, 0.0f, 1.0f);
+		position.y /= height;
+		position.y = MathUtils::clamp(position.y, 0.0f, 1.0f);
+
+		return position;
+	}
 	
 };

@@ -26,6 +26,14 @@
 #include "Animations\AsteroidAnimation.h"
 #include "Animations\SpaceShipAnimation.h"
 
+#include "PostProcessing\PostProcessing.h"
+#include "PostProcessing\BlurPostProcess.h"
+#include "PostProcessing\LightScatterPostPro.h"
+#include "PostProcessing\AdditiveBlendPostProcess.h"
+#include "PostProcessing\MotionBlurPostProcessing.h"
+#include "PostProcessing\BloomPostProcessing.h"
+#include "PostProcessing\WarpPostProcessing.h"
+
 // GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -74,19 +82,12 @@ GLfloat lastFrame = 0.0f;
 /*========================*/
 
 // Shader
-//Shader* skyboxShader;
 Shader* framebufferShader;
 Shader* geometryShader;
 Shader* lightingShader;
 Shader* starShader;
 Shader* instancingShader;
-Shader* motionblurShader;
-Shader* gaussianBlurShader;
-Shader* bloomShader;
-Shader* lightScatterShader;
-Shader* additiveBlendShader;
 Shader* skyboxShader;
-Shader* warpShader;
 
 // Models
 vector<Model> models;
@@ -144,7 +145,14 @@ float rayDecay = 0.89f;
 //skybox 
 Skybox* skybox;
 
-Model spaceShip;
+// Postpro objects
+
+BlurPostProcessing* blurPostPro = new BlurPostProcessing();
+LightScatterPostProcessing* lightScatterPostPro = new LightScatterPostProcessing();
+AdditiveBlendPostProcessing* additiveBlendPostPro = new AdditiveBlendPostProcessing();
+MotionBlurPostProcessing* motionBlurPostPro = new MotionBlurPostProcessing();
+BloomPostProcessing* bloomPostPro = new BloomPostProcessing();
+WarpPostProcessing* warpPostPro = new WarpPostProcessing();
 
 
 /**
@@ -225,7 +233,6 @@ void initBuffers() {
 */
 void initShader()
 {
-
 	//skybox shader
 	skyboxShader = new Shader("../ShaderProject/Shader/Skybox/Skybox.vert", "../ShaderProject/Shader/Skybox/Skybox.frag");
 
@@ -238,14 +245,6 @@ void initShader()
 
 	//star shader
 	starShader = new Shader("../ShaderProject/Shader/Stars/Stars.vert", "../ShaderProject/Shader/Stars/Stars.frag");
-
-	//postpro shaders
-	motionblurShader = new Shader("../ShaderProject/Shader/MotionBlur/MotionBlur.vert", "../ShaderProject/Shader/MotionBlur/MotionBlur.frag");
-	gaussianBlurShader = new Shader("../ShaderProject/Shader/GaussianBlur/GaussianBlur.vert", "../ShaderProject/Shader/GaussianBlur/GaussianBlur.frag");
-	bloomShader = new Shader("../ShaderProject/Shader/Bloom/Bloom.vert", "../ShaderProject/Shader/Bloom/Bloom.frag");
-	lightScatterShader = new Shader("../ShaderProject/Shader/LightScattering/LightScatter.vert", "../ShaderProject/Shader/LightScattering/LightScatter.frag");
-	additiveBlendShader = new Shader("../ShaderProject/Shader/Bloom/AdditiveBlend.vert", "../ShaderProject/Shader/Bloom/AdditiveBlend.frag");
-	warpShader = new Shader("../ShaderProject/Shader/Warp/Warp.vert", "../ShaderProject/Shader/Warp/Warp.frag");
 
 	//set the position, normal and albedo samplers
 	lightingShader->Use();
@@ -274,10 +273,6 @@ void initShader()
 		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].isDirectional").c_str()), i == sceneLightPositions.size()-2 ? true : false);
 	}
 
-
-
-
-
 	starShader->Use();
 	glUniform1i(glGetUniformLocation(starShader->Program, "position"), 0);
 	glUniform1i(glGetUniformLocation(starShader->Program, "uv"), 1);
@@ -285,22 +280,13 @@ void initShader()
 	glUniform1i(glGetUniformLocation(starShader->Program, "size"), 3);
 	glUniform1i(glGetUniformLocation(starShader->Program, "cameraPosition"), 4);
 
-	motionblurShader->Use();
-	glUniform1i(glGetUniformLocation(motionblurShader->Program, "gDepth"), 3);
-	glUniform1i(glGetUniformLocation(motionblurShader->Program, "blurBuffer"), 0);
-	glUniform1i(glGetUniformLocation(motionblurShader->Program, "numSamples"), 10);
 
-	bloomShader->Use();
-	glUniform1i(glGetUniformLocation(bloomShader->Program, "scene"), 0);
-	glUniform1i(glGetUniformLocation(bloomShader->Program, "bloomBlur"), 1);
-
-	additiveBlendShader->Use();
-	glUniform1i(glGetUniformLocation(additiveBlendShader->Program, "texture1"), 0);
-	glUniform1i(glGetUniformLocation(additiveBlendShader->Program, "texture2"), 1);
-
-	warpShader->Use();
-	glUniform1i(glGetUniformLocation(warpShader->Program, "scene"), 0);
-
+	blurPostPro->setup();
+	lightScatterPostPro->setup();
+	additiveBlendPostPro->setup();
+	motionBlurPostPro->setup();
+	bloomPostPro->setup();
+	warpPostPro->setup();
 }
 
 /**
@@ -310,8 +296,6 @@ void loadModels()
 {
 	hyperspace = new Hyperspace();
 	screenQuad = new Quad();
-
-	//spaceShip = hyperspace->spaceShip;
 	
 	timeline = new Timeline();	
 	
@@ -448,8 +432,6 @@ void geometryStep() {
 		vector<GameObject> sceneObjects = hyperspace->getSceneObjects();
 		for (GLuint i = 0; i < sceneObjects.size(); i++)
 		{
-			model = glm::mat4();
-			model = glm::translate(model, sceneObjects[i].getTransform().getPosition());
 			glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(sceneObjects[i].getTransform().getModelMatrix()));
 			glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), false);
 			sceneObjects[i].getModel().Draw(*geometryShader);
@@ -477,10 +459,6 @@ void geometryStep() {
 			glDrawElementsInstanced(GL_TRIANGLES, asteroid->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
 			glBindVertexArray(0);
 		}
-
-		
-		
-
 	
 	//unbind the gBuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -513,108 +491,24 @@ void postprocessingStep() {
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
 	glm::mat4 view = camera.GetViewMatrix();
 
-
-
-
-	//light scattering 
-
-	//binding the black geometry + plus light source texture
-	lightScatterShader->Use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, gBuffer->textures[4]);
-
-	swapBuffer->bindBuffer();
-
-		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "weight"), weight);
-		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), density);
-		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "decay"), rayDecay);
-
-
-		glm::vec3 pos = glm::project(startLightPosition, view, projection, glm::vec4(0.0f, 0.0f, WIDTH, HEIGHT));
-		pos.x /= WIDTH;
-		pos.x = MathUtils::clamp(pos.x, 0.0f, 1.0f);
-		pos.y /= HEIGHT;
-		pos.y = MathUtils::clamp(pos.y, 0.0f, 1.0f);
-		
-
-		//std::cout << pos.x << "  " << pos.y << std::endl;
-		glUniform3fv(glGetUniformLocation(lightScatterShader->Program, "lightPositionScreenSpace"), 1, &pos[0]);
-		screenQuad->render();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
+	///light scattering 
+	glm::vec3 lightPos = MathUtils::normalizeScreenSpacePosition(glm::project(startLightPosition, view, projection, glm::vec4(0.0f, 0.0f, WIDTH, HEIGHT)), WIDTH, HEIGHT);
+	lightScatterPostPro->execute(swapBuffer, gBuffer, screenQuad, lightPos, weight, density, rayDecay, true);
 
 	//blend black light scatter texture with bloom texture
-	additiveBlendShader->Use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferBrightTexture);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, swapBuffer->fBufferTexture);
+	additiveBlendPostPro->execute(swapBuffer2, fBuffer->fBufferBrightTexture, lightScatterPostPro->getOutputBuffer()->fBufferTexture, screenQuad, true);
 
-	swapBuffer2->bindBuffer();
-		screenQuad->render();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-	//hdr + bloom
-	glActiveTexture(GL_TEXTURE0);
-	
-	gaussianBlurShader->Use();
+	///hdr + bloom
 	//horizontal blur
-	swapBuffer->bindBuffer();
-		glBindTexture(GL_TEXTURE_2D, swapBuffer2->fBufferTexture);
-		glUniform1i(glGetUniformLocation(gaussianBlurShader->Program, "horizontal"), true);
-		screenQuad->render();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	blurPostPro->execute(swapBuffer, swapBuffer2, screenQuad, true, true);
 
 	//vertical blur
-	swapBuffer2->bindBuffer();
-		glBindTexture(GL_TEXTURE_2D, swapBuffer->fBufferTexture);
-		glUniform1i(glGetUniformLocation(gaussianBlurShader->Program, "horizontal"), false);
-		screenQuad->render();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	blurPostPro->execute(swapBuffer2, blurPostPro->getOutputBuffer(), screenQuad, false, true);
 
-	//blending 
-	swapBuffer3->bindBuffer();
-		bloomShader->Use();
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, fBuffer->fBufferTexture);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, swapBuffer2->fBufferTexture);
+	//blending the bloom and light scatter colours with the original colour output
+	bloomPostPro->execute(swapBuffer, fBuffer->fBufferTexture, blurPostPro->getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, true);
 
-		glUniform1f(glGetUniformLocation(bloomShader->Program, "bloom"), bloom);
-		glUniform1f(glGetUniformLocation(bloomShader->Program, "exposure"), exposure);
-		screenQuad->render();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	//motion blur
-
-	swapBuffer2->bindBuffer();
-		motionblurShader->Use();
-		gBuffer->bindTexture(GBuffer::TextureType::Depth);
-		fBuffer->bindTexture(0);
-		glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastView"), 1, GL_FALSE, glm::value_ptr(lastView));
-		glUniformMatrix4fv(glGetUniformLocation(motionblurShader->Program, "lastProjection"), 1, GL_FALSE, glm::value_ptr(lastProjection));
-		screenQuad->render();
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
-
-	additiveBlendShader->Use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, swapBuffer3->fBufferBrightTexture);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, swapBuffer2->fBufferTexture);
-
-	screenQuad->render();
-
-	//stars
-	fBuffer->bindBuffer();
-	
-
-	
-
+	///stars rendered forward
 	starShader->Use();
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -626,28 +520,29 @@ void postprocessingStep() {
 	glBlitFramebuffer(0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT,
 		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 
+	gBuffer->bindTexture(GBuffer::TextureType::Depth);
 	glEnable(GL_BLEND);
-	glDepthMask(GL_FALSE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);
-	for (int i = 0; i < starVector.size(); i++) {
-		glm::mat4 model = glm::mat4();
-		model = glm::translate(model, starVector[i]->centerPos);
-
-		glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		starVector[i]->draw();
-	}
+	swapBuffer->bindBuffer();
+		for (int i = 0; i < starVector.size(); i++) {
+			glm::mat4 model = glm::mat4();
+			model = glm::translate(model, starVector[i]->centerPos);
+			glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+			starVector[i]->draw();
+		}		
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_BLEND);
-	glDepthMask(GL_TRUE);
 
+	///motion blur
+	motionBlurPostPro->execute(swapBuffer2, gBuffer->textures[3], swapBuffer->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, true);
+
+	///warp
+	warpPostPro->execute(swapBuffer, motionBlurPostPro->getOutputBuffer(), screenQuad, glfwGetTime(), false);
+
+	//save the view and projection for the motion blur calculation next frame
 	lastView = view;
 	lastProjection = projection;
-
-	//just for testing purposes
-	/*warpShader->Use();
-	glBindTexture(GL_TEXTURE_2D, swapBuffer2->fBufferTexture);
-	glUniform1f(glGetUniformLocation(warpShader->Program, "time"), glfwGetTime());
-	screenQuad->render();*/
 }
 
 
@@ -758,9 +653,9 @@ void handleMovement()
 	if (keys[GLFW_KEY_D])
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 	if (keys[GLFW_KEY_1]) 
-		exposure += 0.1f;
+		exposure += 0.025f;
 	if (keys[GLFW_KEY_2])
-		exposure -= 0.1f;
+		exposure -= 0.025f;
 	if (keys[GLFW_KEY_B])
 		bloom = true;
 	if (keys[GLFW_KEY_N])
@@ -838,11 +733,6 @@ void destroy()
 	delete starShader;
 	delete geometryShader;
 	delete lightingShader;
-	delete motionblurShader;
-	delete gaussianBlurShader;
-	delete bloomShader;
-	delete lightScatterShader;
-	delete additiveBlendShader;
 	delete skyboxShader;
 
 	delete gBuffer;
@@ -859,4 +749,11 @@ void destroy()
 	delete asteroid;
 	delete starLight;
 	delete skybox;
+
+	delete blurPostPro;
+	delete lightScatterPostPro;
+	delete additiveBlendPostPro;
+	delete motionBlurPostPro;
+	delete bloomPostPro;
+	delete warpPostPro;
 }

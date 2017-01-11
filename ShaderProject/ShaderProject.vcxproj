@@ -140,8 +140,13 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="PointGenerator.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="PostProcessing\AdditiveBlendPostProcess.h" />
+    <ClInclude Include="PostProcessing\BloomPostProcessing.h" />
     <ClInclude Include="PostProcessing\BlurPostProcess.h" />
+    <ClInclude Include="PostProcessing\LightScatterPostPro.h" />
+    <ClInclude Include="PostProcessing\MotionBlurPostProcessing.h" />
     <ClInclude Include="PostProcessing\PostProcessing.h" />
+    <ClInclude Include="PostProcessing\WarpPostProcessing.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />
