@@ -37,6 +37,22 @@ void main()
     // use this frame's position and last frame's to compute the pixel velocity  
 	vec2 velocity = ((currentPos - previousPos)/2.f).xy;
 
+	/*mat4 l_PreviousModelViewProjection = lastProjection * lastView;
+    mat4 l_CurrentModelViewProjection = projection * view;
+    
+    // Transform old vertex position into homogenous screen-space.
+    vec4 l_PreviousPosition = l_PreviousModelViewProjection * texture(gPosition, texCoord);
+
+    // Transform current vertex position into homogenous screen-space.
+    vec4 l_CurrentPosition = l_CurrentModelViewProjection * texture(gPosition, texCoord);
+    
+    // Compute window-space velocity
+    vec3 l_PreviousPosition3 = l_PreviousPosition.xyz / l_PreviousPosition.w;
+    vec3 l_CurrentPosition3 = l_CurrentPosition.xyz / l_CurrentPosition.w;
+
+    // Store velocity
+    vec2 velocity = (l_CurrentPosition - l_PreviousPosition).xy/2f * 0.1f;*/
+
     vec4 colors = texture(blurBuffer, texCoord);
     vec2 textureC =  texCoord;
     textureC += velocity;
