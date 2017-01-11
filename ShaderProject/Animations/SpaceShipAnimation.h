@@ -7,6 +7,7 @@ class SpaceShipAnimation : public PathAnimation {
 public:
 
 	SpaceShipAnimation(Camera& camera, GameObject& spaceShip, GLfloat startTime) : PathAnimation(startTime), camera(camera), spaceShip(spaceShip) {
+
 		animation.push_back(AnimationSequence(
 			//path
 			Bezier(glm::vec3(-50, 0, 800), glm::vec3(0, 0, 80), glm::vec3(0, 0, 50), glm::vec3(0, 0, 20)),

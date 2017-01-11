@@ -140,6 +140,8 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="PointGenerator.h" />
     <ClInclude Include="PointLight.h" />
+    <ClInclude Include="PostProcessing\BlurPostProcess.h" />
+    <ClInclude Include="PostProcessing\PostProcessing.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Skybox.h" />

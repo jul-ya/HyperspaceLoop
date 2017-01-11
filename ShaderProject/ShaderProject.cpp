@@ -314,6 +314,7 @@ void loadModels()
 	//spaceShip = hyperspace->spaceShip;
 	
 	timeline = new Timeline();	
+	
 	timeline->addAnimation(new SpaceShipAnimation(camera, hyperspace->getSpaceShipObject(), 0.0f));
 	timeline->addAnimation(new AsteroidAnimation(3.0f, 10.0f, modelMatrices, 500, instanceBuffer));
 	timeline->play();

@@ -34,11 +34,11 @@ public:
 		return sceneLightColors;
 	}
 
-	std::vector<GameObject> getSceneObjects() {
+	std::vector<GameObject>& getSceneObjects() {
 		return sceneObjects;
 	}
 
-	GameObject getSpaceShipObject() {
+	GameObject& getSpaceShipObject() {
 		return sceneObjects[0];
 	}
 
@@ -78,6 +78,10 @@ private:
 		Model model = Model("../ShaderProject/Model/Spaceship/spaceship.obj");	
 		
 		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 0), glm::vec3(0.05f, 0.05f, 0.05f))));
+
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 100), glm::vec3(0.05f, 0.05f, 0.05f))));
+
+		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 200), glm::vec3(0.05f, 0.05f, 0.05f))));
 	}
 };
 

@@ -12,11 +12,11 @@ public:
 
 	~GameObject() {}
 
-	Model getModel() {
+	Model& getModel(){
 		return model;
 	}
 
-	Transform getTransform() {
+	Transform& getTransform(){
 		return transform;
 	}
 
