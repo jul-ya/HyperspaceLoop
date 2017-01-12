@@ -494,7 +494,7 @@ void postprocessingStep() {
 
 	
 	///light scattering 
-	glm::vec3 lightPos = MathUtils::normalizeScreenSpacePosition(glm::project(startLightPosition, view, projection, glm::vec4(0.0f, 0.0f, WIDTH, HEIGHT)), WIDTH, HEIGHT);
+	glm::vec4 lightPos = projection * view * glm::vec4(startLightPosition, 1.0);
 	lightScatterPostPro->execute(swapBuffer, gBuffer, screenQuad, lightPos, weight, density, rayDecay, true);
 
 	//blend black light scatter texture with bloom texture

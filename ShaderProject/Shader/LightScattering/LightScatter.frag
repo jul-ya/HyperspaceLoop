@@ -1,11 +1,11 @@
 #version 330 core
 
 in vec2 TexCoords;
+in vec2 screenSpacePos;
 
 uniform float weight;
 uniform float decay;
 uniform float density;
-uniform vec3 lightPositionScreenSpace;
 
 uniform sampler2D frameSampler;
 
@@ -14,10 +14,10 @@ out vec4 FragColor;
 int SAMPLE_SIZE = 128;
 
 void main(){
-	vec2 lightScreenSpaceCoords = lightPositionScreenSpace.xy;
+	vec2 lightScreenSpaceCoords = screenSpacePos;
 
 	vec2 textureCoords = TexCoords;
-	vec2 deltaLightVector = TexCoords - lightScreenSpaceCoords;
+	vec2 deltaLightVector = textureCoords - lightScreenSpaceCoords;
 	deltaLightVector *= 1.0 / float(SAMPLE_SIZE) * density;
 
 	vec3 colorResult = texture(frameSampler, textureCoords).rgb;
