@@ -141,6 +141,7 @@
     <ClInclude Include="PointGenerator.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="PostProcessing\AdditiveBlendPostProcess.h" />
+    <ClInclude Include="PostProcessing\AntiAliasingPostProcessing.h" />
     <ClInclude Include="PostProcessing\BloomPostProcessing.h" />
     <ClInclude Include="PostProcessing\BlurPostProcess.h" />
     <ClInclude Include="PostProcessing\LightScatterPostPro.h" />
@@ -156,6 +157,8 @@
     <ClInclude Include="TweenFunctions.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shader\AntiAliasing\FXAA.frag" />
+    <None Include="Shader\AntiAliasing\FXAA.vert" />
     <None Include="Shader\Bloom\AdditiveBlend.frag" />
     <None Include="Shader\Bloom\AdditiveBlend.vert" />
     <None Include="Shader\Bloom\Bloom.frag" />

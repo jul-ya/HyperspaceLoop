@@ -16,7 +16,7 @@ public:
 		
 			//bind the fBuffer
 			glBindFramebuffer(GL_FRAMEBUFFER, fBuffer);
-		
+			
 			//generate the color texture
 			glGenTextures(1, &fBufferTexture);
 			//bind the texture
@@ -26,6 +26,9 @@ public:
 			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			//setting the texture wrapping mode
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			//add the generated texture to the framebuffer at slot 0 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fBufferTexture, 0);
 			
@@ -39,6 +42,9 @@ public:
 			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			//setting the texture wrapping mode
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			//add the generated texture to the framebuffer at slot 0 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, fBufferBrightTexture, 0);
 

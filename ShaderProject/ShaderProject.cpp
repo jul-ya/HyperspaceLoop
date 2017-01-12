@@ -33,6 +33,7 @@
 #include "PostProcessing\MotionBlurPostProcessing.h"
 #include "PostProcessing\BloomPostProcessing.h"
 #include "PostProcessing\WarpPostProcessing.h"
+#include "PostProcessing\AntiAliasingPostProcessing.h"
 
 // GLM
 #include <glm/glm.hpp>
@@ -126,7 +127,7 @@ glm::mat4* modelMatrices;
 Model* asteroid;
 
 //hdr variables
-float exposure = 1.0f;
+float exposure = 2.0f;
 
 bool bloom = true;
 
@@ -153,6 +154,7 @@ AdditiveBlendPostProcessing* additiveBlendPostPro = new AdditiveBlendPostProcess
 MotionBlurPostProcessing* motionBlurPostPro = new MotionBlurPostProcessing();
 BloomPostProcessing* bloomPostPro = new BloomPostProcessing();
 WarpPostProcessing* warpPostPro = new WarpPostProcessing();
+AntiAliasingPostProcessing* antiAliasPostPro = new AntiAliasingPostProcessing();
 
 
 /**
@@ -235,6 +237,7 @@ void initShader()
 {
 	//skybox shader
 	skyboxShader = new Shader("../ShaderProject/Shader/Skybox/Skybox.vert", "../ShaderProject/Shader/Skybox/Skybox.frag");
+	//skyboxShader = new Shader("../ShaderProject/Shader/Skybox.vert", "../ShaderProject/Shader/Skybox.frag");
 
 	//deferred shaders
 	geometryShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/DeferredShading/GeometryPass.frag");
@@ -287,6 +290,7 @@ void initShader()
 	motionBlurPostPro->setup();
 	bloomPostPro->setup();
 	warpPostPro->setup();
+	antiAliasPostPro->setup();
 }
 
 /**
@@ -303,7 +307,7 @@ void loadModels()
 	timeline->addAnimation(new AsteroidAnimation(3.0f, 10.0f, modelMatrices, 500, instanceBuffer));
 	timeline->play();
 
-	starLight = new Model("../ShaderProject/Model/Teapot/Teapot.obj");
+	starLight = new Model("../ShaderProject/Model/Star/Star.obj");
 
 	skybox = new Skybox(skyboxShader);
 }
@@ -382,9 +386,6 @@ glm::mat4* generateModelInstanceMatrices(GLuint amount) {
 		glBindVertexArray(0);
 	}
 
-
-
-
 	return modelMatrices;
 }
 
@@ -407,7 +408,7 @@ void geometryStep() {
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model;
 
-		// glDepthRange(0.999, 1.0);
+		//glDepthRange(0.999, 1.0);
 		glDepthMask(GL_FALSE);
 		skyboxShader->Use();
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(glm::mat4(glm::mat3(camera.GetViewMatrix()))));
@@ -438,8 +439,8 @@ void geometryStep() {
 		}
 
 		model = glm::mat4();
-		model = glm::scale(model, glm::vec3(0.15f,0.15f,0.15f));
 		model = glm::translate(model, startLightPosition);
+		model = glm::scale(model, glm::vec3(10.0f,10.0f,10.0f));
 		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
 		starLight->Draw(*geometryShader);
@@ -491,6 +492,7 @@ void postprocessingStep() {
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
 	glm::mat4 view = camera.GetViewMatrix();
 
+	
 	///light scattering 
 	glm::vec3 lightPos = MathUtils::normalizeScreenSpacePosition(glm::project(startLightPosition, view, projection, glm::vec4(0.0f, 0.0f, WIDTH, HEIGHT)), WIDTH, HEIGHT);
 	lightScatterPostPro->execute(swapBuffer, gBuffer, screenQuad, lightPos, weight, density, rayDecay, true);
@@ -499,11 +501,14 @@ void postprocessingStep() {
 	additiveBlendPostPro->execute(swapBuffer2, fBuffer->fBufferBrightTexture, lightScatterPostPro->getOutputBuffer()->fBufferTexture, screenQuad, true);
 
 	///hdr + bloom
-	//horizontal blur
-	blurPostPro->execute(swapBuffer, swapBuffer2, screenQuad, true, true);
 
-	//vertical blur
-	blurPostPro->execute(swapBuffer2, blurPostPro->getOutputBuffer(), screenQuad, false, true);
+	for (int i = 0; i < 5; i++) {
+		//horizontal blur
+		blurPostPro->execute(swapBuffer, swapBuffer2, screenQuad, true, true);
+
+		//vertical blur
+		blurPostPro->execute(swapBuffer2, blurPostPro->getOutputBuffer(), screenQuad, false, true);
+	}
 
 	//blending the bloom and light scatter colours with the original colour output
 	bloomPostPro->execute(swapBuffer, fBuffer->fBufferTexture, blurPostPro->getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, true);
@@ -535,10 +540,14 @@ void postprocessingStep() {
 	glDisable(GL_BLEND);
 
 	///motion blur
-	motionBlurPostPro->execute(swapBuffer2, gBuffer->textures[3], swapBuffer->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, true);
+	//motionBlurPostPro->execute(swapBuffer2, gBuffer->textures[3], swapBuffer->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, false);
 
 	///warp
-	warpPostPro->execute(swapBuffer, motionBlurPostPro->getOutputBuffer(), screenQuad, glfwGetTime(), false);
+	//warpPostPro->execute(swapBuffer, motionBlurPostPro->getOutputBuffer(), screenQuad, glfwGetTime(), false);
+
+
+	///anti aliasing - 
+	antiAliasPostPro->execute(swapBuffer2, swapBuffer, screenQuad, false );
 
 	//save the view and projection for the motion blur calculation next frame
 	lastView = view;
@@ -756,4 +765,5 @@ void destroy()
 	delete motionBlurPostPro;
 	delete bloomPostPro;
 	delete warpPostPro;
+	delete antiAliasPostPro;
 }

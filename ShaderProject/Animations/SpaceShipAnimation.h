@@ -22,7 +22,7 @@ public:
 		animation.push_back(AnimationSequence(
 			Bezier(glm::vec3(0, 0, 20), glm::vec3(0, 5, -20), glm::vec3(0, 5, -60), glm::vec3(0, 0, -80)),
 			EaseTypes::EaseOutQuad,
-			Bezier(glm::vec3(0, 0, 0), glm::vec3(120, 0, 0), glm::vec3(240, 0, 0), glm::vec3(360, 0, 0)),
+			Bezier(glm::vec3(0, 0, 0), glm::vec3(120, 0, 130), glm::vec3(240, 0, -130), glm::vec3(360, 0, 0)),
 			EaseTypes::EaseOutQuad, 4.0f));
 		sequenceCount = animation.size();
 	}
