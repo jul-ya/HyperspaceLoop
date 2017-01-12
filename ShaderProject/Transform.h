@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "glm/gtc/matrix_transform.hpp"
+
 
 class Transform {
 public:
@@ -46,11 +48,11 @@ public:
 
 	glm::mat4 getModelMatrix() {
 		glm::mat4 model = glm::mat4();
-		model = glm::scale(model, scale);
-		model = glm::rotate(model, rotation.x, glm::vec3(1, 0, 0));
-		model = glm::rotate(model, rotation.y, glm::vec3(0, 1, 0));
-		model = glm::rotate(model, rotation.z, glm::vec3(0, 0, 1));
 		model = glm::translate(model, position);
+		model = glm::scale(model, scale);
+		model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0, 1, 0));
+		model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
 		cout << "position: " << model[0][3] << " : " << model[1][3] << " : " << model[2][3] << endl;
 		return model;
 	}
