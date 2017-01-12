@@ -78,9 +78,9 @@ private:
 		
 		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 0), glm::vec3(0.05f, 0.05f, 0.05f))));
 
-		Model model = Model("../ShaderProject/Model/Bigship/big_ship.obj");
+		Model model2 = Model("../ShaderProject/Model/Bigship/big_ship.obj");
 
-		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(100, 0, 0), glm::vec3(0.05f, 0.05f, 0.05f))));
+		sceneObjects.push_back(GameObject(model2, Transform(glm::vec3(100, 0, 0), glm::vec3(0.05f, 0.05f, 0.05f))));
 
 		/*sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 100), glm::vec3(0.05f, 0.05f, 0.05f))));
 
