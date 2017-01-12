@@ -514,29 +514,29 @@ void postprocessingStep() {
 	bloomPostPro->execute(swapBuffer, fBuffer->fBufferTexture, blurPostPro->getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, true);
 
 	///stars rendered forward
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT,
+		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
 	starShader->Use();
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniform3fv(glGetUniformLocation(starShader->Program, "cameraPosition"), 1, &camera.Position[0]);
 	glUniform1f(glGetUniformLocation(starShader->Program, "fadeOutDistance"), fadeOutDistance);
 
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	glBlitFramebuffer(0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT,
-		GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-
 	gBuffer->bindTexture(GBuffer::TextureType::Depth);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);
-	swapBuffer->bindBuffer();
+	//swapBuffer->bindBuffer();
 		for (int i = 0; i < starVector.size(); i++) {
 			glm::mat4 model = glm::mat4();
 			model = glm::translate(model, starVector[i]->centerPos);
 			glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 			starVector[i]->draw();
 		}		
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDisable(GL_BLEND);
 
 	///motion blur

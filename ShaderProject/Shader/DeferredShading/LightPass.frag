@@ -32,7 +32,7 @@ void main()
     float Specular = texture(gAlbedoSpec, TexCoords).a;
     
     // Then calculate lighting as usual
-    vec3 lighting  = Diffuse * 0.1; // hard-coded ambient component
+    vec3 lighting  = Diffuse * 0.05; // hard-coded ambient component
     vec3 viewDir  = normalize(viewPos - FragPos);
     for(int i = 0; i < NR_LIGHTS; ++i)
     {
@@ -42,6 +42,9 @@ void main()
         {
             // Diffuse
             vec3 lightDir = normalize(lights[i].Position - FragPos);
+			if(i==0){
+				lightDir = normalize(lights[i].Position);
+			}
             vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color;
             // Specular
             vec3 halfwayDir = normalize(lightDir + viewDir);  
@@ -49,17 +52,13 @@ void main()
             vec3 specular = lights[i].Color * spec * Specular;
             // Attenuation
             float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
-            diffuse *= attenuation;
-            specular *= attenuation;
+			if(i!=0){
+				diffuse *= attenuation;
+				specular *= attenuation;
+			}
             lighting += diffuse + specular;
         }
     }      
-
-	//float brightness = dot(lighting, vec3(0.2126, 0.7152, 0.0722));
- //   if(brightness > 1.0){
- //       BrightColor = vec4(lighting, 1.0);
-	//}
-
 
 	float brightness =  (lighting.r * 0.2126)+ (lighting.g * 0.7152) + (lighting.b * 0.0722);
 	BrightColor = vec4(lighting, 0.0) * brightness * brightness;
