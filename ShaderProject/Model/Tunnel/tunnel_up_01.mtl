@@ -1,8 +1,8 @@
 # 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
-# File Created: 10.01.2017 11:07:53
+# File Created: 12.01.2017 15:27:59
 
-newmtl Material__23
-	Ns 54.0000
+newmtl Material__332
+	Ns 10.0000
 	Ni 1.5000
 	d 1.0000
 	Tr 0.0000
@@ -10,7 +10,7 @@ newmtl Material__23
 	illum 2
 	Ka 0.5880 0.5880 0.5880
 	Kd 0.5880 0.5880 0.5880
-	Ks 0.9000 0.9000 0.9000
+	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka metal_diffuse.jpg
-	map_Kd metal_diffuse.jpg
+	map_Ka tunnel_texture.png
+	map_Kd tunnel_texture.png
