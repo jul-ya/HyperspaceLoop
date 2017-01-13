@@ -411,8 +411,8 @@ void geometryStep() {
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model;
 
-		glDepthRange(0.999, 1.0);
-		//glDepthMask(GL_FALSE);
+		//glDepthRange(0.999, 1.0);
+		glDepthMask(GL_FALSE);
 		skyboxShader->Use();
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(glm::mat4(glm::mat3(camera.GetViewMatrix()))));
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -421,8 +421,8 @@ void geometryStep() {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemapTexture);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
-		//glDepthMask(GL_TRUE);
-		glDepthRange(0.0, 1.0);
+		glDepthMask(GL_TRUE);
+		//glDepthRange(0.0, 1.0);
 
 
 		//set geometry pass shader as active
@@ -513,7 +513,7 @@ void postprocessingStep() {
 	}
 
 	//blending the bloom and light scatter colours with the original colour output
-	bloomPostPro->execute(swapBuffer, fBuffer->fBufferTexture, blurPostPro->getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, false);
+	bloomPostPro->execute(swapBuffer, fBuffer->fBufferTexture, blurPostPro->getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, true);
 
 	///stars rendered forward
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
@@ -527,18 +527,20 @@ void postprocessingStep() {
 	glUniform3fv(glGetUniformLocation(starShader->Program, "cameraPosition"), 1, &camera.Position[0]);
 	glUniform1f(glGetUniformLocation(starShader->Program, "fadeOutDistance"), fadeOutDistance);
 
-	gBuffer->bindTexture(GBuffer::TextureType::Depth);
+	//gBuffer->bindTexture(GBuffer::TextureType::Depth);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);
-	//swapBuffer->bindBuffer();
+	glDepthMask(GL_FALSE);
+	swapBuffer->bindBuffer();
 		for (int i = 0; i < starVector.size(); i++) {
 			glm::mat4 model = glm::mat4();
 			model = glm::translate(model, starVector[i]->centerPos);
 			glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 			starVector[i]->draw();
 		}		
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
 	///motion blur
@@ -549,7 +551,7 @@ void postprocessingStep() {
 
 
 	///anti aliasing - 
-	//antiAliasPostPro->execute(swapBuffer2, swapBuffer, screenQuad, false );
+	antiAliasPostPro->execute(swapBuffer2, swapBuffer, screenQuad, false );
 
 	//save the view and projection for the motion blur calculation next frame
 	lastView = view;

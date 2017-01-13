@@ -30,6 +30,7 @@ void main()
     vec3 Normal = texture(gNormal, TexCoords).rgb;
     vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;
     float Specular = texture(gAlbedoSpec, TexCoords).a;
+	//float Depth = texture(gDepth, TexCoords).r;
     
     // Then calculate lighting as usual
     vec3 lighting  = Diffuse * 0.05; // hard-coded ambient component
