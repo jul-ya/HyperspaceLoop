@@ -25,6 +25,7 @@
 #include "Animations\Animation.h"
 #include "Animations\AsteroidAnimation.h"
 #include "Animations\SpaceShipAnimation.h"
+#include "Animations\CameraAnimation.h"
 
 #include "PostProcessing\PostProcessing.h"
 #include "PostProcessing\BlurPostProcess.h"
@@ -71,7 +72,7 @@ void handleMovement();
 void postprocessingStep();
 
 // Camera
-Camera camera(glm::vec3(5.0f, 0.0f, 8.0f));
+Camera camera(glm::vec3(5.0f, 0.0f, 0.0f));
 
 /*====Input variables=====*/
 bool keys[1024];
@@ -302,9 +303,11 @@ void loadModels()
 	screenQuad = new Quad();
 	
 	timeline = new Timeline();	
+
 	
-	timeline->addAnimation(new SpaceShipAnimation(camera, hyperspace->getSpaceShipObject(), 0.0f));
-	timeline->addAnimation(new AsteroidAnimation(3.0f, 10.0f, modelMatrices, 500, instanceBuffer));
+	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 3.0f));
+	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 4.0f));
+	timeline->addAnimation(new AsteroidAnimation(10.0f, 10.0f, modelMatrices, 500, instanceBuffer));
 	timeline->play();
 
 	starLight = new Model("../ShaderProject/Model/Star/Star.obj");
@@ -408,8 +411,8 @@ void geometryStep() {
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model;
 
-		//glDepthRange(0.999, 1.0);
-		glDepthMask(GL_FALSE);
+		glDepthRange(0.999, 1.0);
+		//glDepthMask(GL_FALSE);
 		skyboxShader->Use();
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(glm::mat4(glm::mat3(camera.GetViewMatrix()))));
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -418,8 +421,8 @@ void geometryStep() {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemapTexture);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
-		glDepthMask(GL_TRUE);
-		//glDepthRange(0.0, 1.0);
+		//glDepthMask(GL_TRUE);
+		glDepthRange(0.0, 1.0);
 
 
 		//set geometry pass shader as active
@@ -501,7 +504,6 @@ void postprocessingStep() {
 	additiveBlendPostPro->execute(swapBuffer2, fBuffer->fBufferBrightTexture, lightScatterPostPro->getOutputBuffer()->fBufferTexture, screenQuad, true);
 
 	///hdr + bloom
-
 	for (int i = 0; i < 5; i++) {
 		//horizontal blur
 		blurPostPro->execute(swapBuffer, swapBuffer2, screenQuad, true, true);
@@ -511,7 +513,7 @@ void postprocessingStep() {
 	}
 
 	//blending the bloom and light scatter colours with the original colour output
-	bloomPostPro->execute(swapBuffer, fBuffer->fBufferTexture, blurPostPro->getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, true);
+	bloomPostPro->execute(swapBuffer, fBuffer->fBufferTexture, blurPostPro->getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, false);
 
 	///stars rendered forward
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
@@ -547,7 +549,7 @@ void postprocessingStep() {
 
 
 	///anti aliasing - 
-	antiAliasPostPro->execute(swapBuffer2, swapBuffer, screenQuad, false );
+	//antiAliasPostPro->execute(swapBuffer2, swapBuffer, screenQuad, false );
 
 	//save the view and projection for the motion blur calculation next frame
 	lastView = view;
@@ -625,9 +627,9 @@ int main()
 
 	// Stars Setup
 
-	for (int i = 0; i < 4; i++) {
-		Stars* star = new Stars(1000, glm::vec3(0, 0, -(-2+i)*100));
-		star->setupStarMesh(TubePointGenerator(500, 100));
+	for (int i = 0; i < 60; i++) {
+		Stars* star = new Stars(700, glm::vec3(0, 0, -(-2+i)*100));
+		star->setupStarMesh(TubePointGenerator(200, 100));
 		starVector.push_back(star);
 	}
 	

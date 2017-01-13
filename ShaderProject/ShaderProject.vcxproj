@@ -127,6 +127,7 @@
   <ItemGroup>
     <ClInclude Include="Animations\Animation.h" />
     <ClInclude Include="Animations\AsteroidAnimation.h" />
+    <ClInclude Include="Animations\CameraAnimation.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Animations\CameraAnimation.h" />
     <ClInclude Include="Cube.h" />

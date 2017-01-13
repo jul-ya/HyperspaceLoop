@@ -20,6 +20,6 @@ void main()
 		// calculate fragment brightness from distance to star center
 		float brightness = exp(1.0 / (20.0 * distToCenter)) - 1.05;
 		brightness = clamp(brightness, 0.0, 1.0) * starLum;
-		color = vec4(0.5, 0.5+(pointWorldPos.z+200)/600.0, 0.5+1.0 - ((pointWorldPos.z+200)/600.0), brightness * (1-(distFactor*distFactor))); //using quadratic falloff so the fading in and out is done in a shorter range
+		color = vec4(0.8, 0.8, 1.0, brightness * (1-(distFactor*distFactor))); //using quadratic falloff so the fading in and out is done in a shorter range
 	} 
 }
