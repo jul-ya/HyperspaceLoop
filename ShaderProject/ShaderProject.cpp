@@ -515,6 +515,9 @@ void postprocessingStep() {
 	//blending the bloom and light scatter colours with the original colour output
 	bloomPostPro->execute(swapBuffer, fBuffer->fBufferTexture, blurPostPro->getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, true);
 
+	///anti aliasing - 
+	antiAliasPostPro->execute(swapBuffer2, bloomPostPro->getOutputBuffer(), screenQuad, false);
+
 	///stars rendered forward
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
@@ -532,26 +535,27 @@ void postprocessingStep() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);
 	glDepthMask(GL_FALSE);
-	swapBuffer->bindBuffer();
+	//swapBuffer2->bindBuffer();
 		for (int i = 0; i < starVector.size(); i++) {
 			glm::mat4 model = glm::mat4();
 			model = glm::translate(model, starVector[i]->centerPos);
 			glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 			starVector[i]->draw();
 		}		
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
+	
+
 	///motion blur
-	//motionBlurPostPro->execute(swapBuffer2, gBuffer->textures[3], swapBuffer->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, false);
+	//motionBlurPostPro->execute(swapBuffer, gBuffer->textures[3], swapBuffer2->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, false);
 
 	///warp
 	//warpPostPro->execute(swapBuffer, motionBlurPostPro->getOutputBuffer(), screenQuad, glfwGetTime(), false);
 
 
-	///anti aliasing - 
-	antiAliasPostPro->execute(swapBuffer2, swapBuffer, screenQuad, false );
+	
 
 	//save the view and projection for the motion blur calculation next frame
 	lastView = view;
