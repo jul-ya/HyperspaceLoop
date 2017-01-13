@@ -80,8 +80,12 @@ private:
 
 		Model model2 = Model("../ShaderProject/Model/Bigship/big_ship.obj");
 
-		sceneObjects.push_back(GameObject(model2, Transform(glm::vec3(100, 0, 0), glm::vec3(0.05f, 0.05f, 0.05f))));
+		sceneObjects.push_back(GameObject(model2, Transform(glm::vec3(-900, -60, -5500), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0,90,0))));
 
+
+		Model tunnelEntrance = Model("../ShaderProject/Model/Tunnel/tunnel_masterfile.obj");
+
+		sceneObjects.push_back(GameObject(tunnelEntrance, Transform(glm::vec3(-900, -60, -5500), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0, 90, 0))));
 		/*sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 100), glm::vec3(0.05f, 0.05f, 0.05f))));
 
 		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 200), glm::vec3(0.05f, 0.05f, 0.05f))));*/

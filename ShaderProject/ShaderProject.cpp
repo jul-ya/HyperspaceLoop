@@ -305,8 +305,8 @@ void loadModels()
 	timeline = new Timeline();	
 
 	
-	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 3.0f));
-	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 4.0f));
+	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 0.0f));
+	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
 	timeline->addAnimation(new AsteroidAnimation(10.0f, 10.0f, modelMatrices, 500, instanceBuffer));
 	timeline->play();
 
@@ -633,7 +633,7 @@ int main()
 
 	// Stars Setup
 
-	for (int i = 0; i < 60; i++) {
+	for (int i = 0; i < 50; i++) {
 		Stars* star = new Stars(700, glm::vec3(0, 0, -(-2+i)*100));
 		star->setupStarMesh(TubePointGenerator(200, 400));
 		starVector.push_back(star);
