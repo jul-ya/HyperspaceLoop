@@ -22,8 +22,10 @@ public:
 		//fov and speed change - spaceship acceleration  (position is here used to change fov and speed);
 		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.1f, 30.0f, 0.0f), glm::vec3(45.3f, 30.0f, 0.0f), glm::vec3(45.6f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-90, 0, 0.25f), glm::vec3(-90, 0, 0.5f), glm::vec3(-90, 0, 1.0f)), EaseTypes::Linear, 14.0f));
 		//fov and speed change - spaceship deceleration  (position is here used to change fov and speed);
-		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.6f, 30.0f, 0.0f), glm::vec3(45.3f, 30.0f, 0.0f), glm::vec3(45.1f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-90, 0, 0.25f), glm::vec3(-90, 0, 0.5f), glm::vec3(-90, 0, 1.0f)), EaseTypes::Linear, 4.0f));
-		
+		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.6f, 30.0f, 0.0f), glm::vec3(45.3f, 30.0f, 0.0f), glm::vec3(45.1f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-90, 0, 0.25f), glm::vec3(-90, 0, 0.5f), glm::vec3(-90, 0, 1.0f)), EaseTypes::Linear, 2.0f));
+		//waiting
+		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-90, 0, 0.25f), glm::vec3(-90, 0, 0.5f), glm::vec3(-90, 0, 1.0f)), EaseTypes::Linear, 8.0f));
+
 		
 		
 		sequenceCount = animation.size();

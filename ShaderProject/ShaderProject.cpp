@@ -348,8 +348,8 @@ glm::mat4* generateModelInstanceMatrices(GLuint amount) {
 		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
 		GLfloat y = -2.5f + displacement * 0.4f; // Keep height of asteroid field smaller compared to width of x and z
 		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
-		GLfloat z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y, z));
+		GLfloat z =  cos(angle) * radius + displacement;
+		model = glm::translate(model, glm::vec3(x, y, z-5000));
 
 		// 2. Scale: Scale between 0.05 and 0.25f
 		GLfloat scale = (rand() % 3) / 100.0f + 0.05;
@@ -629,7 +629,7 @@ int main()
 
 	for (int i = 0; i < 60; i++) {
 		Stars* star = new Stars(700, glm::vec3(0, 0, -(-2+i)*100));
-		star->setupStarMesh(TubePointGenerator(200, 100));
+		star->setupStarMesh(TubePointGenerator(200, 400));
 		starVector.push_back(star);
 	}
 	

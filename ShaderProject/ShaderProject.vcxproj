@@ -129,7 +129,6 @@
     <ClInclude Include="Animations\AsteroidAnimation.h" />
     <ClInclude Include="Animations\CameraAnimation.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Animations\CameraAnimation.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="FBuffer.h" />
     <ClInclude Include="FrameBuffer.h" />
