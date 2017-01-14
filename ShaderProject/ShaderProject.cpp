@@ -13,7 +13,6 @@
 #include "PointLight.h"
 #include "Camera.h"
 #include "Skybox.h"
-#include "FrameBuffer.h"
 #include "Quad.h"
 #include "Stars.h"
 #include "Hyperspace.h"
@@ -441,7 +440,7 @@ void geometryStep() {
 		glBindVertexArray(0);
 	}
 
-	//unbind the g-buffer
+	// unbind the g-buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
