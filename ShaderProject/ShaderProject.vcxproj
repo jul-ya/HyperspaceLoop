@@ -133,8 +133,6 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="FBuffer.h" />
-    <ClInclude Include="FrameBuffer.h" />
-    <ClInclude Include="FreeFlyCamera.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="Hyperspace.h" />
