@@ -15,8 +15,6 @@ public:
 		return std::fmaxf(min, std::fminf(toClamp, max));
 	}
 
-
-
 	/*
 		http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
 		author: Herman Tulleken 

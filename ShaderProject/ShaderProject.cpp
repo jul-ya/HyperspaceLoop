@@ -229,7 +229,7 @@ void initShaders()
 
 	// deferred rendering shaders
 	geometryShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/DeferredShading/GeometryPass.frag");
-	lightingShader = new Shader("../ShaderProject/Shader/DeferredShading/LightPass.vert", "../ShaderProject/Shader/DeferredShading/LightPass.frag");
+	lightingShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/DeferredShading/LightPass.frag");
 
 	// set the position, normal and albedo samplers
 	lightingShader->Use();

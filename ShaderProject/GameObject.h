@@ -6,8 +6,6 @@
 class GameObject {
 public:
 
-	//GameObject(){}
-
 	GameObject(Model model, Transform transform) : model(model), transform(transform) {}
 
 	~GameObject() {}

@@ -1,7 +1,7 @@
 #version 330 core
 
 out vec4 color;
-in vec2 texCoord;
+in vec2 TexCoords;
 
 uniform sampler2D gPosition;
 uniform sampler2D gDepth;
@@ -20,10 +20,10 @@ uniform mat4 view;
 */
 void main()
 {
-    float depth = texture(gDepth, texCoord).r;
+    float depth = texture(gDepth, TexCoords).r;
 
 	// viewport position at this pixel in the range -1 to 1
-	vec4 viewportPos = vec4(texCoord.x * 2.0 - 1.0, (1.0 - texCoord.y) * 2.0 - 1.0, depth, 1.0);
+	vec4 viewportPos = vec4(TexCoords.x * 2.0 - 1.0, (1.0 - TexCoords.y) * 2.0 - 1.0, depth, 1.0);
 
 	// transform by the view-projection inverse & divide by w to get the world position 
 	vec4 D = inverse(projection * view) * viewportPos;
@@ -53,8 +53,8 @@ void main()
     // Store velocity
     vec2 velocity = (l_CurrentPosition - l_PreviousPosition).xy/2f * 0.1f;*/
 
-    vec4 colors = texture(blurBuffer, texCoord);
-    vec2 textureC =  texCoord;
+    vec4 colors = texture(blurBuffer, TexCoords);
+    vec2 textureC =  TexCoords;
     textureC += velocity;
 
     for(int i = 1; i < numSamples; ++i, textureC += velocity) {

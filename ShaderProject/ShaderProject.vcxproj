@@ -128,10 +128,13 @@
     <ClInclude Include="Animations\Animation.h" />
     <ClInclude Include="Animations\AsteroidAnimation.h" />
     <ClInclude Include="Animations\CameraAnimation.h" />
+    <ClInclude Include="Animations\PathAnimation.h" />
+    <ClInclude Include="Animations\SpaceShipAnimation.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="FBuffer.h" />
     <ClInclude Include="FrameBuffer.h" />
+    <ClInclude Include="FreeFlyCamera.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="Hyperspace.h" />
@@ -158,42 +161,23 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\AntiAliasing\FXAA.frag" />
-    <None Include="Shader\AntiAliasing\FXAA.vert" />
     <None Include="Shader\Bloom\AdditiveBlend.frag" />
-    <None Include="Shader\Bloom\AdditiveBlend.vert" />
     <None Include="Shader\Bloom\Bloom.frag" />
-    <None Include="Shader\Bloom\Bloom.vert" />
     <None Include="Shader\DeferredShading\GeometryPass.frag" />
     <None Include="Shader\DeferredShading\GeometryPass.vert" />
     <None Include="Shader\DeferredShading\InstancingGeometryPass.vert" />
     <None Include="Shader\DeferredShading\InstancingGeometryPass.frag" />
     <None Include="Shader\DeferredShading\LightPass.frag" />
-    <None Include="Shader\DeferredShading\LightPass.vert" />
     <None Include="Shader\GaussianBlur\GaussianBlur.frag" />
-    <None Include="Shader\GaussianBlur\GaussianBlur.vert" />
     <None Include="Shader\LightScattering\LightScatter.frag" />
     <None Include="Shader\LightScattering\LightScatter.vert" />
     <None Include="Shader\MotionBlur\MotionBlur.frag" />
-    <None Include="Shader\MotionBlur\MotionBlur.vert" />
-    <None Include="Shader\Refraction\Refraction.frag" />
-    <None Include="Shader\Refraction\Refraction.vert" />
-    <None Include="Shader\RenderToTexture\FrameBuffer.frag" />
-    <None Include="Shader\RenderToTexture\FrameBuffer.vert" />
-    <None Include="Shader\Skybox.frag" />
-    <None Include="Shader\Skybox.vert" />
+    <None Include="Shader\DeferredShading\PassThrough.vert" />
     <None Include="Shader\Skybox\Skybox.frag" />
     <None Include="Shader\Skybox\Skybox.vert" />
-    <None Include="Shader\Standard.frag">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="Shader\Standard.vert" />
-    <None Include="Shader\StandardNoTexture.frag" />
-    <None Include="Shader\StandardNoTextureReflection.frag" />
-    <None Include="Shader\StandardTextureReflection.frag" />
     <None Include="Shader\Stars\Stars.frag" />
     <None Include="Shader\Stars\Stars.vert" />
     <None Include="Shader\Warp\Warp.frag" />
-    <None Include="Shader\Warp\Warp.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

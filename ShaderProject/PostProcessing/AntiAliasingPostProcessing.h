@@ -12,7 +12,7 @@
 class AntiAliasingPostProcessing : public PostProcessing {
 public:
 	void setup() {
-		postProShader = new Shader("../ShaderProject/Shader/AntiAliasing/FXAA.vert", "../ShaderProject/Shader/AntiAliasing/FXAA.frag");
+		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/AntiAliasing/FXAA.frag");
 
 		postProShader->Use();
 		glUniform3fv(glGetUniformLocation(postProShader->Program, "inverseFilterTextureSize"), 1, &glm::vec3(1.0f/1280, 1.0f/720, 0.0f)[0]);	// TODO: resolution hardcoded -> change this later
