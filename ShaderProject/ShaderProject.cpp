@@ -336,8 +336,8 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(glfwGetTime()); // initialize random seed	
-	GLfloat radius = 30.0f;
-	GLfloat offset = 100.0f;
+	GLfloat radius = 50.0f;
+	GLfloat offset = 400.0f;
 	for (GLuint i = 0; i < amount; i++)
 	{
 		glm::mat4 model;
@@ -357,7 +357,7 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 
 		// rotation: add random rotation around a (semi)randomly picked rotation axis vector
 		GLfloat rotAngle = (rand() % 360);
-		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+		model = glm::rotate(model, rotAngle, glm::vec3(1.4f, 1.6f, 1.8f));
 
 		// now add to list of matrices
 		modelMatrices[i] = model;
