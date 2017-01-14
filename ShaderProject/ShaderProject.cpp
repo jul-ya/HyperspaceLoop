@@ -294,10 +294,18 @@ void setupScene()
 
 	timeline = new Timeline();
 
-
+	//offset -3.0
+	
 	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 0.0f));
 	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
-	timeline->addAnimation(new AsteroidAnimation(10.0f, 10.0f, modelMatrices, 500, instanceBuffer));
+
+	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 1.0f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(1), 1.1f, glm::vec3(-300, -200, -5520), glm::vec3(300, 200, -5340), glm::vec3(-450, 550, -660)));  /* + 19.0 offset*/
+	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 1.2f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 2.6f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 3.0f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 3.6f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	//timeline->addAnimation(new AsteroidAnimation(10.0f, 10.0f, modelMatrices, 500, instanceBuffer));
 	timeline->play();
 
 	starLight = new Model("../ShaderProject/Model/Star/Star.obj");

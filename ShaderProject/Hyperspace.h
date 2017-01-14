@@ -38,6 +38,10 @@ public:
 		return sceneObjects;
 	}
 
+	GameObject& getAsteroid(int index) {
+		return sceneObjects[index+3];
+	}
+
 	GameObject& getSpaceShipObject() {
 		return sceneObjects[0];
 	}
@@ -48,8 +52,9 @@ private:
 	std::vector<glm::vec3> sceneLightPositions;
 	std::vector<glm::vec3> sceneLightColors;
 
+	//contains all gameobjects
 	std::vector<GameObject> sceneObjects;
-
+	
 	void addSceneLights() {
 		const GLuint NR_LIGHTS = 64;
 
@@ -73,22 +78,32 @@ private:
 	}
 
 	void addSceneObjects() {
-		
+		//the space time jumping spacecraft that happens to be the primary actor
 		Model model = Model("../ShaderProject/Model/Spaceship/spaceship.obj");	
-		
 		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 0), glm::vec3(0.05f, 0.05f, 0.05f))));
 
+		//the destination ship
 		Model model2 = Model("../ShaderProject/Model/Bigship/big_ship.obj");
-
 		sceneObjects.push_back(GameObject(model2, Transform(glm::vec3(-900, -60, -5500), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0,90,0))));
 
-
+		//the labyrinth tunnel object
 		Model tunnelEntrance = Model("../ShaderProject/Model/Tunnel/tunnel_masterfile.obj");
-
 		sceneObjects.push_back(GameObject(tunnelEntrance, Transform(glm::vec3(-900, -60, -5500), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0, 90, 0))));
-		/*sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 100), glm::vec3(0.05f, 0.05f, 0.05f))));
 
-		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 200), glm::vec3(0.05f, 0.05f, 0.05f))));*/
+		//animated asteroids
+		Model asteroid1 = Model("../ShaderProject/Model/Asteroids/big_asteroid01.obj");
+		Model asteroid2 = Model("../ShaderProject/Model/Asteroids/big_asteroid02.obj");
+		Model asteroid3 = Model("../ShaderProject/Model/Asteroids/big_asteroid03.obj");
+		for (int i = 0; i < 2; i++) {
+			GameObject a1 = GameObject(asteroid1, Transform(glm::vec3(-400 +(i*100) , -60, -5300), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0, 90, 0)));
+			sceneObjects.push_back(a1);
+
+			GameObject a2 = GameObject(asteroid2, Transform(glm::vec3(-400 + (i * 100), -60, -5350), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0, 90, 0)));
+			sceneObjects.push_back(a2);
+
+			GameObject a3 = GameObject(asteroid3, Transform(glm::vec3(-400 + (i * 100), -60, -5400), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0, 90, 0)));
+			sceneObjects.push_back(a3);
+		}
 	}
 };
 
