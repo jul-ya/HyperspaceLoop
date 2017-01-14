@@ -84,11 +84,11 @@ private:
 
 		//the destination ship
 		Model model2 = Model("../ShaderProject/Model/Bigship/big_ship.obj");
-		sceneObjects.push_back(GameObject(model2, Transform(glm::vec3(-900, -60, -5500), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0,90,0))));
+		sceneObjects.push_back(GameObject(model2, Transform(glm::vec3(-900, -60, -5750), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0,0,0))));
 
 		//the labyrinth tunnel object
 		Model tunnelEntrance = Model("../ShaderProject/Model/Tunnel/tunnel_masterfile.obj");
-		sceneObjects.push_back(GameObject(tunnelEntrance, Transform(glm::vec3(-900, -60, -5500), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0, 90, 0))));
+		sceneObjects.push_back(GameObject(tunnelEntrance, Transform(glm::vec3(-900, -60, -5750), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0, 90, 0))));
 
 		//animated asteroids
 		Model asteroid1 = Model("../ShaderProject/Model/Asteroids/big_asteroid01.obj");

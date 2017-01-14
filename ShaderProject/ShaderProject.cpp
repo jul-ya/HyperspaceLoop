@@ -25,6 +25,7 @@
 #include "Animations\AsteroidAnimation.h"
 #include "Animations\SpaceShipAnimation.h"
 #include "Animations\CameraAnimation.h"
+#include "Animations\SpaceStationAnimation.h"
 
 #include "PostProcessing\PostProcessing.h"
 #include "PostProcessing\BlurPostProcess.h"
@@ -294,10 +295,12 @@ void setupScene()
 
 	timeline = new Timeline();
 
-	//offset -3.0
+	//global offset -3.0
 	
 	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 0.0f));
 	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
+
+	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], 1.0f)); /*+ 19.0 offset */
 
 	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 1.0f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
 	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(1), 1.1f, glm::vec3(-300, -200, -5520), glm::vec3(300, 200, -5340), glm::vec3(-450, 550, -660)));  /* + 19.0 offset*/

@@ -20,7 +20,7 @@ public:
 		////@13s : even more acceleration
 		//animation.push_back(AnimationSequence(Bezier(glm::vec3(0, 0, -480), glm::vec3(0, 0, -960), glm::vec3(0, 0, -1920), glm::vec3(0, 0, -3840)),	EaseTypes::Linear, Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)), EaseTypes::EaseOutQuad, 6.0f));
 		//@19s : dramatic slowdown
-		animation.push_back(AnimationSequence(Bezier(glm::vec3(0, 0, -3840), glm::vec3(0, 0, -4400), glm::vec3(0, 0, -4800), glm::vec3(0, 0, -5000)), EaseTypes::Linear, Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)), EaseTypes::EaseOutQuad, 2.0f));
+		animation.push_back(AnimationSequence(Bezier(glm::vec3(0, 0, -3840), glm::vec3(0, 0, -4400), glm::vec3(0, 0, -4800), glm::vec3(0, 0, -5000)), EaseTypes::Linear, Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)), EaseTypes::EaseOutQuad, 3.0f));
 		//@21s : slow cruisin'
 		animation.push_back(AnimationSequence(
 			Bezier(glm::vec3(0, 0, -5000), glm::vec3(0, 0, -5140), glm::vec3(0, 0, -5180), glm::vec3(0, 0, -5220)),
@@ -32,13 +32,22 @@ public:
 			Bezier(glm::vec3(0, 0, -5220), glm::vec3(0, 0, -5260), glm::vec3(0, 0, -5300), glm::vec3(0, 0, -5340)),
 			EaseTypes::Linear,
 			Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, -130), glm::vec3(0, 0, -190), glm::vec3(0, 0, 0)),
-			EaseTypes::EaseInOutQuad, 2.0f));
+			EaseTypes::EaseInOutQuad, 3.0f));
 		animation.push_back(AnimationSequence(
+			Bezier(glm::vec3(0, 0, -5340), glm::vec3(0, 0, -5440), glm::vec3(0, 0, -5540), glm::vec3(0, 0, -5640)),
+			EaseTypes::Linear,
+			Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)),
+			EaseTypes::EaseInOutQuad, 7.0f));
+		animation.push_back(AnimationSequence(
+			Bezier(glm::vec3(0, 0, -5640), glm::vec3(20, 0, -5680), glm::vec3(-10, 0, -5720), glm::vec3(-70, 0, -5750)),
+			EaseTypes::EaseOutQuad,
+			Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 80), glm::vec3(0, 90, 120), glm::vec3(0, 90, 0)),
+			EaseTypes::EaseInOutQuad, 4.0f));
+		/*animation.push_back(AnimationSequence(
 			Bezier(glm::vec3(0, 0, -5340), glm::vec3(20, 0, -5380), glm::vec3(-10, 0, -5420), glm::vec3(-20, 0, -5450)),
 			EaseTypes::EaseOutQuad,
 			Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 40), glm::vec3(0, 0, 60), glm::vec3(0, 0, 60)),
-			EaseTypes::EaseInOutQuad, 4.0f));
-
+			EaseTypes::EaseInOutQuad, 4.0f));*/
 		sequenceCount = animation.size();
 	}
 

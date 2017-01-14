@@ -130,6 +130,7 @@
     <ClInclude Include="Animations\CameraAnimation.h" />
     <ClInclude Include="Animations\PathAnimation.h" />
     <ClInclude Include="Animations\SpaceShipAnimation.h" />
+    <ClInclude Include="Animations\SpaceStationAnimation.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="FBuffer.h" />
