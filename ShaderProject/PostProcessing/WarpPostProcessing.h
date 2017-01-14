@@ -11,7 +11,7 @@
 class WarpPostProcessing : public PostProcessing {
 public:
 	void setup() {
-		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/Warp/Warp.frag");
+		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/PostProcessing/Warp.frag");
 
 		postProShader->Use();
 		glUniform1i(glGetUniformLocation(postProShader->Program, "scene"), 0);

@@ -12,7 +12,7 @@ class MotionBlurPostProcessing : public PostProcessing {
 public:
 
 	void setup() {
-		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/MotionBlur/MotionBlur.frag");
+		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/PostProcessing/MotionBlur.frag");
 
 		postProShader->Use();
 		glUniform1i(glGetUniformLocation(postProShader->Program, "gDepth"), 3);

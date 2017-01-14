@@ -11,7 +11,7 @@ class LightScatterPostProcessing : public PostProcessing {
 public:
 
 	virtual void setup() {
-		postProShader = new Shader("../ShaderProject/Shader/LightScattering/LightScatter.vert", "../ShaderProject/Shader/LightScattering/LightScatter.frag");
+		postProShader = new Shader("../ShaderProject/Shader/PostProcessing/LightScatter.vert", "../ShaderProject/Shader/PostProcessing/LightScatter.frag");
 	}
 
 	virtual void execute(FBuffer* outputBuffer, GBuffer* inputBuffer, Quad* screenQuad, glm::vec4 lightScreenSpacePosition, float weight, float density, float rayDecay, bool drawToBuffer){

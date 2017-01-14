@@ -11,7 +11,7 @@ class BlurPostProcessing : public PostProcessing {
 public:
 
 	virtual void setup() {
-		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/GaussianBlur/GaussianBlur.frag");
+		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/PostProcessing/GaussianBlur.frag");
 	}
 
 	virtual void execute(FBuffer* outputBuffer, FBuffer* inputBuffer, Quad* screenQuad, bool horizontal, bool drawToBuffer) {

@@ -8,7 +8,7 @@ class AdditiveBlendPostProcessing : public PostProcessing {
 
 public:
 	void setup() {
-		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/Bloom/AdditiveBlend.frag");
+		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/PostProcessing/AdditiveBlend.frag");
 		postProShader->Use();
 		glUniform1i(glGetUniformLocation(postProShader->Program, "texture1"), 0);
 		glUniform1i(glGetUniformLocation(postProShader->Program, "texture2"), 1);

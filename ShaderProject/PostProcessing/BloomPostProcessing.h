@@ -11,7 +11,7 @@
 class BloomPostProcessing : public PostProcessing {
 public:
 	void setup() {
-		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/Bloom/Bloom.frag");
+		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/PostProcessing/Bloom.frag");
 
 		postProShader->Use();
 		glUniform1i(glGetUniformLocation(postProShader->Program, "scene"), 0);
