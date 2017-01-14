@@ -318,7 +318,6 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 	asteroid = new Model("../ShaderProject/Model/Sphere/sphere.obj");
 
 	// forward declare the buffer
-
 	glGenBuffers(1, &instanceBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
 	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
@@ -390,11 +389,6 @@ void geometryStep() {
 	// clear the buffer
 	glClearColor(0, 0, 0, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// back face culling
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW);
 
 	// get required matrices
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
@@ -500,7 +494,7 @@ void postprocessingStep() {
 	// anti aliasing
 	antiAliasPostPro.execute(swapBuffer2, bloomPostPro.getOutputBuffer(), screenQuad, false);
 
-	// stars are rendered forward
+	// stars are rendered forward - so write the depth back into the standard depth buffer
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer(0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
@@ -588,7 +582,14 @@ int main()
 
 	// set viewport
 	glViewport(0, 0, WIDTH, HEIGHT);
+
+	// set some opengl context states
+	// enable depth test
 	glEnable(GL_DEPTH_TEST);
+	// back face culling
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 	// perform instancing setup
 	modelMatrices = setupInstanceMatrices(500);
