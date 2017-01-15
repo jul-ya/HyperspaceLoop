@@ -25,6 +25,8 @@
 #include "Animations\AsteroidAnimation.h"
 #include "Animations\SpaceShipAnimation.h"
 #include "Animations\CameraAnimation.h"
+#include "Animations\SpaceStationAnimation.h"
+#include "Animations\LightScatterAnimation.h"
 
 #include "PostProcessing\PostProcessing.h"
 #include "PostProcessing\BlurPostProcess.h"
@@ -130,8 +132,12 @@ glm::mat4 lastProjection = glm::mat4();
 glm::mat4 lastView = glm::mat4();
 
 // light scattering variables
-glm::vec3 startLightPosition = glm::vec3(-30.0f, -100.0f, -300.0f);
+glm::vec3 startLightPosition = glm::vec3(1500.0f, 50.0f, -7000.0f);
+glm::vec3 relayStart = glm::vec3(-50, 0, 700);
+glm::vec3 relayEnd = glm::vec3(-1050, 2, -5687);
+
 Model* starLight;
+Model* relay;
 
 float weight = 0.6f;
 float density = 1.85f;
@@ -237,26 +243,6 @@ void initShaders()
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gAlbedoSpec"), 2);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gDepth"), 3);
 
-	//pass in the lights
-	for (GLuint i = 0; i < sceneLightPositions.size(); i++)
-	{
-		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLightPositions[i][0]);
-		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLightColors[i][0]);
-
-		// Update attenuation parameters and calculate radius
-		const GLfloat constant = 1.0; // Note that we don't send this to the shader, we assume it is always 1.0 (in our case)
-		const GLfloat linear = 0.7;
-		const GLfloat quadratic = 1.8;
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Linear").c_str()), linear);
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
-
-
-		const GLfloat maxBrightness = std::fmaxf(std::fmaxf(sceneLightColors[i].r, sceneLightColors[i].g), sceneLightColors[i].b);
-		GLfloat radius = (-linear + std::sqrtf(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * maxBrightness))) / (2 * quadratic);
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Radius").c_str()), radius);
-		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].isDirectional").c_str()), i == sceneLightPositions.size() - 2 ? true : false);
-	}
-
 	// asteroid instancing shader
 	instancingShader = new Shader("../ShaderProject/Shader/DeferredShading/InstancingGeometryPass.vert", "../ShaderProject/Shader/DeferredShading/InstancingGeometryPass.frag");
 
@@ -294,13 +280,26 @@ void setupScene()
 
 	timeline = new Timeline();
 
-
+	//global offset -3.0
+	
 	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 0.0f));
 	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
-	timeline->addAnimation(new AsteroidAnimation(10.0f, 10.0f, modelMatrices, 500, instanceBuffer));
+
+	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f));
+
+	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], 1.0f)); /*+ 19.0 offset */
+
+	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f, glm::vec3(400, 50, -5520), glm::vec3(-580, -20, -4980), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(1), 7.9f, glm::vec3(-300, -200, -5820), glm::vec3(300, 200, -5650), glm::vec3(-45, 55, -60)));  /* + 19.0 offset*/
+	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 1.2f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 2.6f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 3.0f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 3.6f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	//timeline->addAnimation(new AsteroidAnimation(10.0f, 10.0f, modelMatrices, 500, instanceBuffer));
 	timeline->play();
 
 	starLight = new Model("../ShaderProject/Model/Star/Star.obj");
+	relay = new Model("../ShaderProject/Model/SpaceTimeRelay/Star.obj");
 
 	skybox = new Skybox(skyboxShader);
 
@@ -308,6 +307,33 @@ void setupScene()
 		Stars* star = new Stars(700, glm::vec3(0, 0, -(-2 + i) * 100));
 		star->setupStarMesh(TubePointGenerator(200, 400));
 		starVector.push_back(star);
+	}
+
+	Stars* star = new Stars(2000, glm::vec3(0, 0, -5000));
+	star->setupStarMesh(SpherePointGenerator(1000, false));
+	starVector.push_back(star);
+
+
+
+	//pass in the lights
+	lightingShader->Use();
+	for (GLuint i = 0; i < sceneLightPositions.size(); i++)
+	{
+		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLightPositions[i][0]);
+		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLightColors[i][0]);
+
+		// Update attenuation parameters and calculate radius
+		const GLfloat constant = 1.0; // Note that we don't send this to the shader, we assume it is always 1.0 (in our case)
+		const GLfloat linear = 0.7;
+		const GLfloat quadratic = 1.8;
+		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Linear").c_str()), linear);
+		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
+
+
+		const GLfloat maxBrightness = std::fmaxf(std::fmaxf(sceneLightColors[i].r, sceneLightColors[i].g), sceneLightColors[i].b);
+		GLfloat radius = (-linear + std::sqrtf(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * maxBrightness))) / (2 * quadratic);
+		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Radius").c_str()), radius);
+		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].isDirectional").c_str()), i == sceneLightPositions.size() - 2 ? true : false);
 	}
 }
 
@@ -325,8 +351,8 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(glfwGetTime()); // initialize random seed	
-	GLfloat radius = 30.0f;
-	GLfloat offset = 100.0f;
+	GLfloat radius = 50.0f;
+	GLfloat offset = 800.0f;
 	for (GLuint i = 0; i < amount; i++)
 	{
 		glm::mat4 model;
@@ -338,15 +364,15 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 		GLfloat y = -2.5f + displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
 		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
 		GLfloat z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y, z - 5000));
+		model = glm::translate(model, glm::vec3(x, y, z - 5700));
 
 		// scale: scale between 0.05 and 0.25f
-		GLfloat scale = (rand() % 3) / 100.0f + 0.05;
+		GLfloat scale = (rand() % 3) / 2.0f + 0.05;
 		model = glm::scale(model, glm::vec3(scale));
 
 		// rotation: add random rotation around a (semi)randomly picked rotation axis vector
 		GLfloat rotAngle = (rand() % 360);
-		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
+		model = glm::rotate(model, rotAngle, glm::vec3(1.4f, 1.6f, 1.8f));
 
 		// now add to list of matrices
 		modelMatrices[i] = model;
@@ -385,60 +411,77 @@ void geometryStep() {
 	// bind the g-buffer
 	gBuffer->bindBuffer();
 
-	// clear the buffer
-	glClearColor(0, 0, 0, 0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// clear the buffer
+		glClearColor(0, 0, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// get required matrices
-	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
-	glm::mat4 view = camera.GetViewMatrix();
-	glm::mat4 model;
+		// get required matrices
+		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 model;
 
-	// skybox cube
-	glDepthMask(GL_FALSE);
-	skyboxShader->Use();
-	glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(glm::mat4(glm::mat3(camera.GetViewMatrix()))));
-	glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glBindVertexArray(skybox->skyboxModel->meshes[0].VAO);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemapTexture);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
-	glDepthMask(GL_TRUE);
-
-	//set the matrices 
-	geometryShader->Use();
-	glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
-	vector<GameObject> sceneObjects = hyperspace->getSceneObjects();
-	for (GLuint i = 0; i < sceneObjects.size(); i++)
-	{
-		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(sceneObjects[i].getTransform().getModelMatrix()));
-		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), false);
-		sceneObjects[i].getModel().Draw(*geometryShader);
-	}
-
-	model = glm::mat4();
-	model = glm::translate(model, startLightPosition);
-	model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
-	glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-	glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
-	starLight->Draw(*geometryShader);
-
-	instancingShader->Use();
-	glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
-
-	// draw asteroids
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, asteroid->textures_loaded[0].id);
-	for (GLuint i = 0; i < asteroid->meshes.size(); i++)
-	{
-		glUniform3f(glGetUniformLocation(instancingShader->Program, "startPos"), asteroid->meshes[i].startPos.x, asteroid->meshes[i].startPos.y, asteroid->meshes[i].startPos.z);
-		glBindVertexArray(asteroid->meshes[i].VAO);
-		glDrawElementsInstanced(GL_TRIANGLES, asteroid->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
+		// skybox cube
+		glDepthMask(GL_FALSE);
+		skyboxShader->Use();
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(glm::mat4(glm::mat3(camera.GetViewMatrix()))));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glBindVertexArray(skybox->skyboxModel->meshes[0].VAO);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
-	}
+		glDepthMask(GL_TRUE);
+
+		//set the matrices 
+		geometryShader->Use();
+		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+
+		vector<GameObject> sceneObjects = hyperspace->getSceneObjects();
+		for (GLuint i = 0; i < sceneObjects.size(); i++)
+		{
+			glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(sceneObjects[i].getTransform().getModelMatrix()));
+			glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), false);
+			sceneObjects[i].getModel().Draw(*geometryShader);
+		}
+
+		//light sources for scattering
+		model = glm::mat4();
+		model = glm::translate(model, startLightPosition);
+		model = glm::scale(model, glm::vec3(100.0f, 100.0f, 100.0f));
+		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
+		starLight->Draw(*geometryShader);
+
+		model = glm::mat4();
+		model = glm::translate(model, relayStart);
+		model = glm::scale(model, glm::vec3(2, 2, 2));
+		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
+		relay->Draw(*geometryShader);
+
+		model = glm::mat4();
+		model = glm::translate(model, relayEnd);
+		model = glm::scale(model, glm::vec3(2, 2, 2));
+		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
+		relay->Draw(*geometryShader);
+
+
+		//instancing
+		instancingShader->Use();
+		glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
+
+		// draw asteroids
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, asteroid->textures_loaded[0].id);
+		for (GLuint i = 0; i < asteroid->meshes.size(); i++)
+		{
+			glUniform3f(glGetUniformLocation(instancingShader->Program, "startPos"), asteroid->meshes[i].startPos.x, asteroid->meshes[i].startPos.y, asteroid->meshes[i].startPos.z);
+			glBindVertexArray(asteroid->meshes[i].VAO);
+			glDrawElementsInstanced(GL_TRIANGLES, asteroid->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
+			glBindVertexArray(0);
+		}
 
 	// unbind the g-buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -448,19 +491,19 @@ void lightingStep() {
 
 	swapBuffer->bindBuffer();
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	lightingShader->Use();
+		lightingShader->Use();
 
-	// bind g-buffer textures
-	gBuffer->bindTexture(GBuffer::TextureType::Position);
-	gBuffer->bindTexture(GBuffer::TextureType::Normal);
-	gBuffer->bindTexture(GBuffer::TextureType::Color);
-	gBuffer->bindTexture(GBuffer::TextureType::Depth);
+		// bind g-buffer textures
+		gBuffer->bindTexture(GBuffer::TextureType::Position);
+		gBuffer->bindTexture(GBuffer::TextureType::Normal);
+		gBuffer->bindTexture(GBuffer::TextureType::Color);
+		gBuffer->bindTexture(GBuffer::TextureType::Depth);
 
-	glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
+		glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
 
-	screenQuad->render();
+		screenQuad->render();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -486,12 +529,12 @@ void postprocessingStep() {
 		// vertical blur
 		blurPostPro.execute(swapBuffer2, blurPostPro.getOutputBuffer(), screenQuad, false, true);
 	}
+	// anti aliasing
+	antiAliasPostPro.execute(swapBuffer1, swapBuffer, screenQuad, true);
 
 	// blending the bloom and light scatter colours with the original colour output
-	bloomPostPro.execute(swapBuffer1, swapBuffer->fBufferTexture, blurPostPro.getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, true);
+	bloomPostPro.execute(swapBuffer2, antiAliasPostPro.getOutputBuffer()->fBufferTexture, blurPostPro.getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, false);
 
-	// anti aliasing
-	antiAliasPostPro.execute(swapBuffer2, bloomPostPro.getOutputBuffer(), screenQuad, false);
 
 	// stars are rendered forward - so write the depth back into the standard depth buffer
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
@@ -593,11 +636,12 @@ int main()
 	// perform instancing setup
 	modelMatrices = setupInstanceMatrices(500);
 
+	// init shaders
+	initShaders();
+
 	// perform scene setup
 	setupScene();
 
-	// init shaders
-	initShaders();
 
 	// init framebuffers
 	initBuffers();

@@ -1,44 +1,36 @@
 #pragma once
 
-#include "Animation.h"
-#include <GLFW\glfw3.h>
-#include <iostream>
-#include "..\TweenFunctions.h"
-#include "..\MathUtils.h"
-#include "..\Camera.h"
+#include "PathAnimation.h"
 
 
-
-
-class AsteroidAnimation : public Animation {
-
+class AsteroidAnimation : public PathAnimation {
 public:
-	AsteroidAnimation(GLfloat startTime, GLfloat duration, glm::mat4* modelMatrices, int size, GLuint instanceBuffer) : Animation(startTime), duration(duration), modelMatrices(modelMatrices), size(size), instanceBuffer(instanceBuffer) {
+	AsteroidAnimation(GameObject& asteroid, GLfloat startTime, glm::vec3 start, glm::vec3 end, glm::vec3 rotation) : PathAnimation(startTime), asteroid(asteroid), start(start), end(end), rotation(rotation) {
+		glm::vec3 onethird = (end - start) / 3.0f;
+		glm::vec3 rotationthird = rotation / 3.0f;
+
+		//asteroid fly by
+		animation.push_back(AnimationSequence(
+			Bezier(start, start+onethird, start+(onethird*2.0f), end),
+			EaseTypes::Linear,
+			Bezier(glm::vec3(0, 0, 0), rotationthird, rotationthird*2.0f, rotation),
+			EaseTypes::Linear, 12.0f));
+		sequenceCount = animation.size();
 	}
 
-	virtual void update(GLfloat deltaTime) {
-		activeTime += deltaTime;
+	virtual void animate() {
+		float easedValue = TweenFunctions::ease(animation[currentIndex].pathEaseType, activeTime, 0.0f, 1.0f, animation[currentIndex].duration);
+		glm::vec3 tweenPosition = MathUtils::calculateBezierPoint(easedValue, animation[currentIndex].path.p0, animation[currentIndex].path.p1, animation[currentIndex].path.p2, animation[currentIndex].path.p3);
+		asteroid.getTransform().setPosition(tweenPosition);
 
-		if (activeTime >= duration) {
-
-			isDone = true;
-		}
-		else {
-			for (int i = 0; i < size; i++) {
-				modelMatrices[i] = glm::rotate(modelMatrices[i], 0.005f, glm::vec3(0.5f, 0.5f, 0.5f));
-				modelMatrices[i] = glm::translate(modelMatrices[i], glm::vec3(0.0f, 0.0f, 0.5f));
-			}
-			glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
-			glBufferData(GL_ARRAY_BUFFER, size * sizeof(glm::mat4), &modelMatrices[0], GL_STATIC_DRAW);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-		}
+		easedValue = TweenFunctions::ease(animation[currentIndex].rotationEaseType, activeTime, 0.0f, 1.0f, animation[currentIndex].duration);
+		glm::vec3 rot = MathUtils::calculateBezierPoint(easedValue, animation[currentIndex].rotation.p0, animation[currentIndex].rotation.p1, animation[currentIndex].rotation.p2, animation[currentIndex].rotation.p3);
+		asteroid.getTransform().setRotation(rot);
 	}
+	
 private:
-
-	GLfloat duration = 0.0f;
-	GLfloat activeTime = 0.0f;
-	GLuint instanceBuffer;
-
-	glm::mat4* modelMatrices;
-	int size;
+	glm::vec3 start;
+	glm::vec3 end;
+	glm::vec3 rotation;
+	GameObject& asteroid;
 };

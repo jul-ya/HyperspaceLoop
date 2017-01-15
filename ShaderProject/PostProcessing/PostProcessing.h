@@ -6,9 +6,13 @@
 class PostProcessing {
 public:
 	virtual void setup() = 0;
-	virtual FBuffer* getOutputBuffer() {
+	FBuffer* getOutputBuffer() {
 		return outputBuffer;
 	}
+	Shader* getPostProShader() {
+		return postProShader;
+	}
+
 protected:
 	void render(Quad* screenQuad, bool drawToBuffer) {
 		if (drawToBuffer) {
