@@ -6,6 +6,7 @@ in vec2 screenSpacePos;
 uniform float weight;
 uniform float decay;
 uniform float density;
+uniform vec2 scatterOrigin;
 
 uniform sampler2D frameSampler;
 
@@ -15,6 +16,7 @@ int SAMPLE_SIZE = 128;
 
 void main(){
 	vec2 lightScreenSpaceCoords = screenSpacePos;
+	lightScreenSpaceCoords = scatterOrigin;
 
 	vec2 textureCoords = TexCoords;
 	vec2 deltaLightVector = textureCoords - lightScreenSpaceCoords;

@@ -23,15 +23,15 @@ public:
 		//animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.1f, 30.0f, 0.0f), glm::vec3(45.3f, 30.0f, 0.0f), glm::vec3(45.6f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-90, 0, 0.0f), glm::vec3(-90, 0, 0.0f), glm::vec3(-90, 0, 0.0f)), EaseTypes::Linear, 14.0f));
 		////fov and speed change - spaceship deceleration  (position is here used to change fov and speed);
 		//animation.push_back(AnimationSequence(Bezier(glm::vec3(45.6f, 30.0f, 0.0f), glm::vec3(45.3f, 30.0f, 0.0f), glm::vec3(45.1f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-90, 0, 0.0.0f), glm::vec3(-90, 0, 0.0f), glm::vec3(-90, 0, 0.0f)), EaseTypes::Linear, 2.0f));
-		////waiting
-		//animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-25, 0, 0.0f), glm::vec3(-25, 0, 0.0f), glm::vec3(-90, 0, 0.0f)), EaseTypes::EaseInOutQuad, 7.0f));
-		////
-		//animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-90, 0, 0.0f), glm::vec3(-90, 0, 0.0f), glm::vec3(-90, 0, 0.0f)), EaseTypes::EaseInOutQuad, 3.0f));
-		////
-		//animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-110, 0, 0.0f), glm::vec3(-180, 0, 0.0f), glm::vec3(-270, 0, 0.0f)), EaseTypes::EaseInOutQuad, 14.0f));
-		////camera rotation with spaceship
-		//animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-270, 0, 0), glm::vec3(-360, 0, 0.0f), glm::vec3(-450, 0, 0.0f), glm::vec3(-540, 0, 0.0f)), EaseTypes::EaseInOutQuad, 7.5f));
-		////camera rotation with spaceship
+		//waiting
+		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-25, 0, 0.0f), glm::vec3(-25, 0, 0.0f), glm::vec3(-90, 0, 0.0f)), EaseTypes::EaseInOutQuad, 7.0f));
+		//
+		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-90, 0, 0.0f), glm::vec3(-90, 0, 0.0f), glm::vec3(-90, 0, 0.0f)), EaseTypes::EaseInOutQuad, 3.0f));
+		//
+		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-110, 0, 0.0f), glm::vec3(-180, 0, 0.0f), glm::vec3(-270, 0, 0.0f)), EaseTypes::EaseInOutQuad, 14.0f));
+		//camera rotation with spaceship
+		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-270, 0, 0), glm::vec3(-360, 0, 0.0f), glm::vec3(-450, 0, 0.0f), glm::vec3(-540, 0, 0.0f)), EaseTypes::EaseInOutQuad, 7.5f));
+		//camera rotation with spaceship
 		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-180, 0, 0), glm::vec3(-180,0 , 0.0f), glm::vec3(-180, 0, 0.0f), glm::vec3(-180, 0, 0.0f)), EaseTypes::EaseInOutQuad, 37.5f));
 
 

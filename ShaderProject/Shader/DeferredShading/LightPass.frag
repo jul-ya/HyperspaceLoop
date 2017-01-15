@@ -46,7 +46,7 @@ void main()
 			if(i==0){
 				lightDir = normalize(lights[i].Position);
 			}
-            vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color;
+            vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color *2;
             // Specular
             vec3 halfwayDir = normalize(lightDir + viewDir);  
             float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);

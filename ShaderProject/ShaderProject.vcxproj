@@ -128,6 +128,7 @@
     <ClInclude Include="Animations\Animation.h" />
     <ClInclude Include="Animations\AsteroidAnimation.h" />
     <ClInclude Include="Animations\CameraAnimation.h" />
+    <ClInclude Include="Animations\LightScatterAnimation.h" />
     <ClInclude Include="Animations\PathAnimation.h" />
     <ClInclude Include="Animations\SpaceShipAnimation.h" />
     <ClInclude Include="Animations\SpaceStationAnimation.h" />

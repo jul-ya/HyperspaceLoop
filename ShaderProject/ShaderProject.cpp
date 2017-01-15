@@ -26,6 +26,7 @@
 #include "Animations\SpaceShipAnimation.h"
 #include "Animations\CameraAnimation.h"
 #include "Animations\SpaceStationAnimation.h"
+#include "Animations\LightScatterAnimation.h"
 
 #include "PostProcessing\PostProcessing.h"
 #include "PostProcessing\BlurPostProcess.h"
@@ -131,7 +132,7 @@ glm::mat4 lastProjection = glm::mat4();
 glm::mat4 lastView = glm::mat4();
 
 // light scattering variables
-glm::vec3 startLightPosition = glm::vec3(-30.0f, -100.0f, -300.0f);
+glm::vec3 startLightPosition = glm::vec3(1500.0f, 50.0f, -7000.0f);
 Model* starLight;
 
 float weight = 0.6f;
@@ -300,6 +301,8 @@ void setupScene()
 	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 0.0f));
 	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
 
+	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f));
+
 	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], 1.0f)); /*+ 19.0 offset */
 
 	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 1.0f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
@@ -320,6 +323,10 @@ void setupScene()
 		star->setupStarMesh(TubePointGenerator(200, 400));
 		starVector.push_back(star);
 	}
+
+	Stars* star = new Stars(2000, glm::vec3(0, 0, -5000));
+	star->setupStarMesh(SpherePointGenerator(1000, false));
+	starVector.push_back(star);
 }
 
 
@@ -337,7 +344,7 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 	modelMatrices = new glm::mat4[amount];
 	srand(glfwGetTime()); // initialize random seed	
 	GLfloat radius = 50.0f;
-	GLfloat offset = 400.0f;
+	GLfloat offset = 800.0f;
 	for (GLuint i = 0; i < amount; i++)
 	{
 		glm::mat4 model;
@@ -349,10 +356,10 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 		GLfloat y = -2.5f + displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
 		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
 		GLfloat z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y, z - 5000));
+		model = glm::translate(model, glm::vec3(x, y, z - 6000));
 
 		// scale: scale between 0.05 and 0.25f
-		GLfloat scale = (rand() % 3) / 100.0f + 0.05;
+		GLfloat scale = (rand() % 3) / 20.0f + 0.05;
 		model = glm::scale(model, glm::vec3(scale));
 
 		// rotation: add random rotation around a (semi)randomly picked rotation axis vector
@@ -431,7 +438,7 @@ void geometryStep() {
 
 	model = glm::mat4();
 	model = glm::translate(model, startLightPosition);
-	model = glm::scale(model, glm::vec3(10.0f, 10.0f, 10.0f));
+	model = glm::scale(model, glm::vec3(100.0f, 100.0f, 100.0f));
 	glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
 	starLight->Draw(*geometryShader);
@@ -604,11 +611,12 @@ int main()
 	// perform instancing setup
 	modelMatrices = setupInstanceMatrices(500);
 
+	// init shaders
+	initShaders();
+
 	// perform scene setup
 	setupScene();
 
-	// init shaders
-	initShaders();
 
 	// init framebuffers
 	initBuffers();

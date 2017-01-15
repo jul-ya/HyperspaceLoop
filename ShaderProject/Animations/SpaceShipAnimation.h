@@ -21,45 +21,45 @@ public:
 		//animation.push_back(AnimationSequence(Bezier(glm::vec3(0, 0, -480), glm::vec3(0, 0, -960), glm::vec3(0, 0, -1920), glm::vec3(0, 0, -3840)),	EaseTypes::Linear, Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)), EaseTypes::EaseOutQuad, 6.0f));
 		////@19s : dramatic slowdown
 		//animation.push_back(AnimationSequence(Bezier(glm::vec3(0, 0, -3840), glm::vec3(0, 0, -4800), glm::vec3(0, 0, -4945), glm::vec3(0, 0, -5000)), EaseTypes::Linear, Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)), EaseTypes::EaseOutQuad, 3.0f));
-		////@21s : slow cruisin'
-		//animation.push_back(AnimationSequence(
-		//	Bezier(glm::vec3(0, 0, -5000), glm::vec3(0, 0, -5073), glm::vec3(0, 0, -5146), glm::vec3(0, 0, -5220)),
-		//	EaseTypes::Linear,
-		//	Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)),
-		//	EaseTypes::EaseOutQuad, 4.0f));
-		////@21s : evade astroids
-		//animation.push_back(AnimationSequence(
-		//	Bezier(glm::vec3(0, 0, -5220), glm::vec3(0, 0, -5275), glm::vec3(0, 0, -5330), glm::vec3(0, 0, -5385)),
-		//	EaseTypes::Linear,
-		//	Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, -140), glm::vec3(0, 0, 30), glm::vec3(0, 0, 0)),
-		//	EaseTypes::EaseInOutQuad, 3.0f));
-		////@24s : 
-		//animation.push_back(AnimationSequence(
-		//	Bezier(glm::vec3(0, 0, -5385), glm::vec3(0, 0, -5440), glm::vec3(0, 0, -5540), glm::vec3(0, 0, -5640)),
-		//	EaseTypes::Linear,
-		//	Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)),
-		//	EaseTypes::EaseInOutQuad, 5.5f));
-		////@29.9s
-		//animation.push_back(AnimationSequence(
-		//	Bezier(glm::vec3(0, 0, -5640), glm::vec3(0, 0, -5680), glm::vec3(-10, 0, -5720), glm::vec3(-70, 0, -5750)),
-		//	EaseTypes::Linear,
-		//	Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 80), glm::vec3(0, 90, 120), glm::vec3(0, 90, 0)),
-		//	EaseTypes::EaseInOutQuad, 4.0f));
-		////@33.9s
-		//animation.push_back(AnimationSequence(
-		//	Bezier(glm::vec3(-70, 0, -5750), glm::vec3(-235, 5, -5750), glm::vec3(-400, 5, -5750), glm::vec3(-565, 0, -5750)),
-		//	EaseTypes::Linear,
-		//	Bezier(glm::vec3(0, 90, 0), glm::vec3(0, 90, 10), glm::vec3(360, 90, 0), glm::vec3(360, 90, 0)),
-		//	EaseTypes::EaseInOutQuad, 12.0f));
+		//@21s : slow cruisin'
+		animation.push_back(AnimationSequence(
+			Bezier(glm::vec3(0, 0, -5000), glm::vec3(0, 0, -5073), glm::vec3(0, 0, -5146), glm::vec3(0, 0, -5220)),
+			EaseTypes::Linear,
+			Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)),
+			EaseTypes::EaseOutQuad, 4.0f));
+		//@21s : evade astroids
+		animation.push_back(AnimationSequence(
+			Bezier(glm::vec3(0, 0, -5220), glm::vec3(0, 0, -5275), glm::vec3(0, 0, -5330), glm::vec3(0, 0, -5385)),
+			EaseTypes::Linear,
+			Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, -140), glm::vec3(0, 0, 30), glm::vec3(0, 0, 0)),
+			EaseTypes::EaseInOutQuad, 3.0f));
+		//@24s : 
+		animation.push_back(AnimationSequence(
+			Bezier(glm::vec3(0, 0, -5385), glm::vec3(0, 0, -5440), glm::vec3(0, 0, -5540), glm::vec3(0, 0, -5640)),
+			EaseTypes::Linear,
+			Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)),
+			EaseTypes::EaseInOutQuad, 5.5f));
+		//@29.9s
+		animation.push_back(AnimationSequence(
+			Bezier(glm::vec3(0, 0, -5640), glm::vec3(0, 0, -5680), glm::vec3(-10, 0, -5720), glm::vec3(-70, 0, -5750)),
+			EaseTypes::Linear,
+			Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 80), glm::vec3(0, 90, 120), glm::vec3(0, 90, 0)),
+			EaseTypes::EaseInOutQuad, 4.0f));
+		//@33.9s
+		animation.push_back(AnimationSequence(
+			Bezier(glm::vec3(-70, 0, -5750), glm::vec3(-235, 5, -5750), glm::vec3(-400, 5, -5750), glm::vec3(-565, 0, -5750)),
+			EaseTypes::Linear,
+			Bezier(glm::vec3(0, 90, 0), glm::vec3(0, 90, 10), glm::vec3(360, 90, 0), glm::vec3(360, 90, 0)),
+			EaseTypes::EaseInOutQuad, 12.0f));
 		//@45.9s
 		animation.push_back(AnimationSequence(
-			Bezier(glm::vec3(-565, 0, -5750), glm::vec3(-685, -2, -5765), glm::vec3(-835, 2, -5780), glm::vec3(-855, 2, -5780)),
+			Bezier(glm::vec3(-565, 0, -5750), glm::vec3(-780, -2, -5765), glm::vec3(-835, 2, -5780), glm::vec3(-855, 2, -5780)),
 			EaseTypes::Linear,
 			Bezier(glm::vec3(0, 90, 0), glm::vec3(-20, 90, 0), glm::vec3(-20, 90, 0), glm::vec3(0, 90, 0)),
 			EaseTypes::EaseInOutQuad, 8.0f));
 		//@53.9s
 		animation.push_back(AnimationSequence(
-			Bezier(glm::vec3(-855, 2, -5780), glm::vec3(-875, 2, -5780), glm::vec3(-882, 2, -5765), glm::vec3(-882, 2, -5750)),
+			Bezier(glm::vec3(-855, 2, -5780), glm::vec3(-870, 2, -5780), glm::vec3(-882, 2, -5765), glm::vec3(-882, 2, -5750)),
 			EaseTypes::Linear,
 			Bezier(glm::vec3(0, 90, 0), glm::vec3(0, 160, 80), glm::vec3(0, 180, 90), glm::vec3(0, 180, 0)),
 			EaseTypes::EaseInOutQuad, 3.0f));

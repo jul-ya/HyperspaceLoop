@@ -26,7 +26,7 @@ public:
 		glUniform1f(glGetUniformLocation(postProShader->Program, "weight"), weight);
 		glUniform1f(glGetUniformLocation(postProShader->Program, "density"), density);
 		glUniform1f(glGetUniformLocation(postProShader->Program, "decay"), rayDecay);
-		glUniform4fv(glGetUniformLocation(postProShader->Program, "lightPositionScreenSpace"), 1, &lightScreenSpacePosition[0]);
+		glUniform2fv(glGetUniformLocation(postProShader->Program, "lightPositionScreenSpace"), 1, &lightScreenSpacePosition[0]);
 
 		//render to output buffer
 		render(screenQuad, drawToBuffer);

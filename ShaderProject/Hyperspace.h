@@ -56,10 +56,10 @@ private:
 	std::vector<GameObject> sceneObjects;
 	
 	void addSceneLights() {
-		const GLuint NR_LIGHTS = 64;
+		const GLuint NR_LIGHTS = 24;
 
 		srand(13);
-		for (GLuint i = 0; i < NR_LIGHTS; i++)
+		for (GLuint i = 0; i < NR_LIGHTS-2; i++)
 		{
 			// Calculate slightly random offsets
 			GLfloat xPos = ((rand() % 100) / 100.0) * 9 - 3.0;
@@ -75,6 +75,14 @@ private:
 			sceneLightColors.push_back(glm::vec3(rColor, bColor, gColor));
 			sceneLights.push_back(PointLight(glm::vec3(xPos, yPos, zPos), glm::vec3(rColor, gColor, bColor)));
 		}
+
+		sceneLightPositions.push_back(glm::vec3(-882, 2, -5750));
+		sceneLightColors.push_back(glm::vec3(0.0, 1.0, 0.0));
+		sceneLights.push_back(PointLight(glm::vec3(-882, 2, -5750), glm::vec3(0.0, 1.0, 0.0)));
+
+		sceneLightPositions.push_back(glm::vec3(-882, 4, -5750));
+		sceneLightColors.push_back(glm::vec3(0.0, 1.0, 0.0));
+		sceneLights.push_back(PointLight(glm::vec3(-882, 4, -5750), glm::vec3(0.0, 1.0, 0.0)));
 	}
 
 	void addSceneObjects() {
