@@ -140,8 +140,8 @@ glm::vec3 relayEnd = glm::vec3(-1050, 2, -5687);
 Model* starLight;
 Model* relay;
 
-float weight = 0.6f;
-float density = 1.85f;
+float weight = 0.075f;
+float density = 1.8f;
 float rayDecay = 0.89f;
 
 // skybox 
@@ -290,7 +290,7 @@ void setupScene()
 
 	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f +22));
 
-	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], 1.0f + 22)); /*+ 19.0 offset */
+	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], hyperspace->getSceneObjects()[2], glm::vec3(-900, -60, -5750), 1.0f + 22)); /*+ 19.0 offset */
 
 	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f + 22, glm::vec3(400, 50, -5520), glm::vec3(-580, -20, -4980), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
 	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(2), 1.2f + 22, glm::vec3(300, -160, -5820), glm::vec3(450, 160, -5940), glm::vec3(300, -80, 80)));  /* + 19.0 offset*/
@@ -302,13 +302,13 @@ void setupScene()
 
 	skybox = new Skybox(skyboxShader);
 
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i < 20; i++) {
 		Stars* star = new Stars(700, glm::vec3(0, 0, -(-2 + i) * 400));
-		star->setupStarMesh(TubePointGenerator(400, 400));
+		star->setupStarMesh(TubePointGenerator(500, 400));
 		starVector.push_back(star);
 	}
 
-	Stars* star = new Stars(2000, glm::vec3(0, 0, -5000));
+	Stars* star = new Stars(300, glm::vec3(0, 0, -5000));
 	star->setupStarMesh(SpherePointGenerator(1000, false));
 	starVector.push_back(star);
 
@@ -363,7 +363,9 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 		GLfloat y = -2.5f + displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
 		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
 		GLfloat z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y, z));
+		model = glm::translate(model, glm::vec3(x, y, z-5000));
+		if(i==0)
+		std::cout << x << " : " << y << " : " << z << std::endl;
 
 		// scale: scale between 0.05 and 0.25f
 		GLfloat scale = (rand() % 3) / 100.0f + 0.05;
@@ -415,7 +417,7 @@ void geometryStep() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// get required matrices
-		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
+		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 2500.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model;
 
@@ -510,7 +512,7 @@ void lightingStep() {
 void postprocessingStep() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
+	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 2500.0f);
 	glm::mat4 view = camera.GetViewMatrix();
 
 	// light scattering 

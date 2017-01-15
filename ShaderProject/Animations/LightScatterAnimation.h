@@ -9,6 +9,8 @@ public:
 
 		lightScatterShader->Use();
 		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 1.85f);
+		position = glm::vec2(1.0, 0.9);
+		glUniform2fv(glGetUniformLocation(lightScatterShader->Program, "scatterOrigin"), 1, &position[0]);
 
 		animation.push_back(AnimationSequence(
 			Bezier(glm::vec3(1.0, 0.9, 0), glm::vec3(0.2, 0.7, 0), glm::vec3(0.2, 0.7, 0), glm::vec3(1.0, 0.9, 0)),
