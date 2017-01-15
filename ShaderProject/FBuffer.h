@@ -22,7 +22,7 @@ public:
 			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, fBufferTexture);
 			//set texture attributes: size correspondes to the window dimensions, float precision and no alpha 
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
 			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -38,7 +38,7 @@ public:
 			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, fBufferBrightTexture);
 			//set texture attributes: size correspondes to the window dimensions, float precision and no alpha 
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
 			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

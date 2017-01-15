@@ -32,7 +32,7 @@ public:
 			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, textures[0]);
 			//set texture attributes: size correspondes to the window dimensions, float precision and no alpha 
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
 			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -45,7 +45,7 @@ public:
 			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, textures[1]);
 			//set texture attributes: size correspondes to the window dimensions, float precision and no alpha
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
 			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -58,7 +58,7 @@ public:
 			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, textures[2]);
 			//set texture attributes: size correspondes to the window dimensions, unsigned byte for displaying color values is enough, alpha required
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, windowWidth, windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -85,7 +85,7 @@ public:
 			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, textures[4]);
 			//set texture attributes: size correspondes to the window dimensions, unsigned byte for displaying color values is enough, alpha required
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, windowWidth, windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, windowWidth, windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

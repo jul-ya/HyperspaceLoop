@@ -192,7 +192,7 @@ private:
 			if (!skip)
 			{   // If texture hasn't been loaded already, load it
 				Texture texture;
-				texture.id = TextureFromFile(str.C_Str(), this->directory);
+				texture.id = TextureFromFile(str.C_Str(), this->directory, true);
 				texture.type = typeName;
 				texture.path = str;
 				textures.push_back(texture);

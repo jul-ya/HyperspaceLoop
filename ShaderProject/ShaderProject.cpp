@@ -632,6 +632,8 @@ int main()
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
+	// gamma correction
+	glEnable(GL_FRAMEBUFFER_SRGB);
 
 	// perform instancing setup
 	modelMatrices = setupInstanceMatrices(500);
