@@ -33,7 +33,7 @@ void main()
 	//float Depth = texture(gDepth, TexCoords).r;
     
     // Then calculate lighting as usual
-    vec3 lighting  = Diffuse * 0.05; // hard-coded ambient component
+    vec3 lighting  = Diffuse * 0.075; // hard-coded ambient component
     vec3 viewDir  = normalize(viewPos - FragPos);
     for(int i = 0; i < NR_LIGHTS; ++i)
     {
@@ -46,7 +46,7 @@ void main()
 			if(i==0){
 				lightDir = normalize(lights[i].Position);
 			}
-            vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color *2;
+            vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color;
             // Specular
             vec3 halfwayDir = normalize(lightDir + viewDir);  
             float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);

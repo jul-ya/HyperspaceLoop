@@ -72,7 +72,7 @@ private:
 			GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
 
 			sceneLightPositions.push_back(glm::vec3(xPos, yPos, zPos));
-			sceneLightColors.push_back(glm::vec3(rColor, bColor, gColor));
+			sceneLightColors.push_back(glm::vec3(rColor, gColor, bColor));
 			sceneLights.push_back(PointLight(glm::vec3(xPos, yPos, zPos), glm::vec3(rColor, gColor, bColor)));
 		}
 
