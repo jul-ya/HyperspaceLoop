@@ -24,7 +24,7 @@ public:
 		//activate the light scatter shader and pass the properties
 		postProShader->Use();
 		glUniform1f(glGetUniformLocation(postProShader->Program, "weight"), weight);
-		glUniform1f(glGetUniformLocation(postProShader->Program, "density"), density);
+		//glUniform1f(glGetUniformLocation(postProShader->Program, "density"), density);
 		glUniform1f(glGetUniformLocation(postProShader->Program, "decay"), rayDecay);
 		glUniform2fv(glGetUniformLocation(postProShader->Program, "lightPositionScreenSpace"), 1, &lightScreenSpacePosition[0]);
 
