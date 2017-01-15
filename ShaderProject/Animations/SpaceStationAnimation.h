@@ -22,17 +22,9 @@ public:
 			Bezier(glm::vec3(0, 80, 0), glm::vec3(0,83,0), glm::vec3(0,86,0), glm::vec3(0, 90, 0)),
 			EaseTypes::EaseInOutQuad, 12.0f));
 		//waiting for the ship to reach the station
-		animation.push_back(AnimationSequence(
-			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
-			EaseTypes::Linear,
-			Bezier(glm::vec3(0, 90, 0), glm::vec3(0, 90, 0), glm::vec3(0, 90, 0), glm::vec3(0, 90, 0)),
-			EaseTypes::EaseInOutQuad, 27.5f));
+		animation.push_back(AnimationSequence( 25.2f));
 		//entry point for the tunnel - station switch
-		animation.push_back(AnimationSequence(
-			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
-			EaseTypes::Linear,
-			Bezier(glm::vec3(0, 90, 0), glm::vec3(0, 90, 0), glm::vec3(0, 90, 0), glm::vec3(0, 90, 0)),
-			EaseTypes::EaseInOutQuad, 12.0f));
+		animation.push_back(AnimationSequence( 2.0f));
 		sequenceCount = animation.size();
 	}
 
@@ -43,11 +35,11 @@ public:
 			spaceStation.getTransform().setRotation(rot);
 		}
 		else if (currentIndex == 2) {
-			spaceStation.getTransform().setPosition(distantPosition);
 			tunnel.getTransform().setPosition(position);
-
 		}
-
+		else if (currentIndex == 3) {
+			spaceStation.getTransform().setPosition(distantPosition);
+		}
 	}
 
 

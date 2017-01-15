@@ -288,7 +288,7 @@ void setupScene()
 	timeline->addAnimation(new MotionBlurAnimation(motionBlurPostPro.getPostProShader(), 0.0f));
 	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
 
-	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f +22));
+	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f +18.0f));
 
 	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], hyperspace->getSceneObjects()[2], glm::vec3(-900, -60, -5750), 1.0f + 22)); /*+ 19.0 offset */
 

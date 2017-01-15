@@ -11,6 +11,9 @@
 
 struct Bezier {
 public:
+	Bezier(){
+		p0 = glm::vec3(); p1 = glm::vec3(); p2 = glm::vec3(); p3 = glm::vec3();
+	}
 	Bezier(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3  p3) : p0(p0), p1(p1), p2(p2), p3(p3) {}
 	glm::vec3 p0;
 	glm::vec3 p1;
@@ -22,6 +25,11 @@ public:
 struct AnimationSequence {
 public:
 	AnimationSequence(Bezier path, EaseTypes pathEaseType, Bezier rotation, EaseTypes rotationEaseType, float duration): path(path), pathEaseType(pathEaseType), rotation(rotation), rotationEaseType(rotationEaseType), duration(duration){}
+	AnimationSequence(float duration): duration(duration) {
+		
+	
+	}
+	
 	Bezier path;
 	Bezier rotation;
 	EaseTypes pathEaseType;
