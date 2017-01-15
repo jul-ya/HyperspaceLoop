@@ -133,7 +133,11 @@ glm::mat4 lastView = glm::mat4();
 
 // light scattering variables
 glm::vec3 startLightPosition = glm::vec3(1500.0f, 50.0f, -7000.0f);
+glm::vec3 relayStart = glm::vec3(-50, 0, 700);
+glm::vec3 relayEnd = glm::vec3(-1050, 2, -5687);
+
 Model* starLight;
+Model* relay;
 
 float weight = 0.6f;
 float density = 1.85f;
@@ -285,8 +289,8 @@ void setupScene()
 
 	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], 1.0f)); /*+ 19.0 offset */
 
-	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 1.0f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
-	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(1), 1.1f, glm::vec3(-300, -200, -5520), glm::vec3(300, 200, -5340), glm::vec3(-450, 550, -660)));  /* + 19.0 offset*/
+	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f, glm::vec3(400, 50, -5520), glm::vec3(-580, -20, -4980), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(1), 7.9f, glm::vec3(-300, -200, -5820), glm::vec3(300, 200, -5650), glm::vec3(-45, 55, -60)));  /* + 19.0 offset*/
 	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 1.2f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
 	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 2.6f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
 	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 3.0f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
@@ -295,6 +299,7 @@ void setupScene()
 	timeline->play();
 
 	starLight = new Model("../ShaderProject/Model/Star/Star.obj");
+	relay = new Model("../ShaderProject/Model/SpaceTimeRelay/Star.obj");
 
 	skybox = new Skybox(skyboxShader);
 
@@ -406,60 +411,77 @@ void geometryStep() {
 	// bind the g-buffer
 	gBuffer->bindBuffer();
 
-	// clear the buffer
-	glClearColor(0, 0, 0, 0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// clear the buffer
+		glClearColor(0, 0, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// get required matrices
-	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
-	glm::mat4 view = camera.GetViewMatrix();
-	glm::mat4 model;
+		// get required matrices
+		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 model;
 
-	// skybox cube
-	glDepthMask(GL_FALSE);
-	skyboxShader->Use();
-	glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(glm::mat4(glm::mat3(camera.GetViewMatrix()))));
-	glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glBindVertexArray(skybox->skyboxModel->meshes[0].VAO);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemapTexture);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
-	glDepthMask(GL_TRUE);
-
-	//set the matrices 
-	geometryShader->Use();
-	glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-
-	vector<GameObject> sceneObjects = hyperspace->getSceneObjects();
-	for (GLuint i = 0; i < sceneObjects.size(); i++)
-	{
-		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(sceneObjects[i].getTransform().getModelMatrix()));
-		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), false);
-		sceneObjects[i].getModel().Draw(*geometryShader);
-	}
-
-	model = glm::mat4();
-	model = glm::translate(model, startLightPosition);
-	model = glm::scale(model, glm::vec3(100.0f, 100.0f, 100.0f));
-	glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-	glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
-	starLight->Draw(*geometryShader);
-
-	instancingShader->Use();
-	glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
-
-	// draw asteroids
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, asteroid->textures_loaded[0].id);
-	for (GLuint i = 0; i < asteroid->meshes.size(); i++)
-	{
-		glUniform3f(glGetUniformLocation(instancingShader->Program, "startPos"), asteroid->meshes[i].startPos.x, asteroid->meshes[i].startPos.y, asteroid->meshes[i].startPos.z);
-		glBindVertexArray(asteroid->meshes[i].VAO);
-		glDrawElementsInstanced(GL_TRIANGLES, asteroid->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
+		// skybox cube
+		glDepthMask(GL_FALSE);
+		skyboxShader->Use();
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(glm::mat4(glm::mat3(camera.GetViewMatrix()))));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glBindVertexArray(skybox->skyboxModel->meshes[0].VAO);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox->cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
-	}
+		glDepthMask(GL_TRUE);
+
+		//set the matrices 
+		geometryShader->Use();
+		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+
+		vector<GameObject> sceneObjects = hyperspace->getSceneObjects();
+		for (GLuint i = 0; i < sceneObjects.size(); i++)
+		{
+			glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(sceneObjects[i].getTransform().getModelMatrix()));
+			glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), false);
+			sceneObjects[i].getModel().Draw(*geometryShader);
+		}
+
+		//light sources for scattering
+		model = glm::mat4();
+		model = glm::translate(model, startLightPosition);
+		model = glm::scale(model, glm::vec3(100.0f, 100.0f, 100.0f));
+		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
+		starLight->Draw(*geometryShader);
+
+		model = glm::mat4();
+		model = glm::translate(model, relayStart);
+		model = glm::scale(model, glm::vec3(2, 2, 2));
+		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
+		relay->Draw(*geometryShader);
+
+		model = glm::mat4();
+		model = glm::translate(model, relayEnd);
+		model = glm::scale(model, glm::vec3(2, 2, 2));
+		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
+		relay->Draw(*geometryShader);
+
+
+		//instancing
+		instancingShader->Use();
+		glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
+
+		// draw asteroids
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, asteroid->textures_loaded[0].id);
+		for (GLuint i = 0; i < asteroid->meshes.size(); i++)
+		{
+			glUniform3f(glGetUniformLocation(instancingShader->Program, "startPos"), asteroid->meshes[i].startPos.x, asteroid->meshes[i].startPos.y, asteroid->meshes[i].startPos.z);
+			glBindVertexArray(asteroid->meshes[i].VAO);
+			glDrawElementsInstanced(GL_TRIANGLES, asteroid->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
+			glBindVertexArray(0);
+		}
 
 	// unbind the g-buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -469,19 +491,19 @@ void lightingStep() {
 
 	swapBuffer->bindBuffer();
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	lightingShader->Use();
+		lightingShader->Use();
 
-	// bind g-buffer textures
-	gBuffer->bindTexture(GBuffer::TextureType::Position);
-	gBuffer->bindTexture(GBuffer::TextureType::Normal);
-	gBuffer->bindTexture(GBuffer::TextureType::Color);
-	gBuffer->bindTexture(GBuffer::TextureType::Depth);
+		// bind g-buffer textures
+		gBuffer->bindTexture(GBuffer::TextureType::Position);
+		gBuffer->bindTexture(GBuffer::TextureType::Normal);
+		gBuffer->bindTexture(GBuffer::TextureType::Color);
+		gBuffer->bindTexture(GBuffer::TextureType::Depth);
 
-	glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
+		glUniform3fv(glGetUniformLocation(lightingShader->Program, "viewPos"), 1, &camera.Position[0]);
 
-	screenQuad->render();
+		screenQuad->render();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -507,12 +529,12 @@ void postprocessingStep() {
 		// vertical blur
 		blurPostPro.execute(swapBuffer2, blurPostPro.getOutputBuffer(), screenQuad, false, true);
 	}
+	// anti aliasing
+	antiAliasPostPro.execute(swapBuffer1, swapBuffer, screenQuad, true);
 
 	// blending the bloom and light scatter colours with the original colour output
-	bloomPostPro.execute(swapBuffer1, swapBuffer->fBufferTexture, blurPostPro.getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, true);
+	bloomPostPro.execute(swapBuffer2, antiAliasPostPro.getOutputBuffer()->fBufferTexture, blurPostPro.getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, false);
 
-	// anti aliasing
-	antiAliasPostPro.execute(swapBuffer2, bloomPostPro.getOutputBuffer(), screenQuad, false);
 
 	// stars are rendered forward - so write the depth back into the standard depth buffer
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);

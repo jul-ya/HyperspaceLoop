@@ -35,6 +35,16 @@ public:
 			EaseTypes::Linear,
 			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
 			EaseTypes::EaseInOutQuad, 5.0f));
+		animation.push_back(AnimationSequence(
+			Bezier(glm::vec3(1.0, 0.9, 0), glm::vec3(1.0, 0.9, 0), glm::vec3(1.0, 0.9, 0), glm::vec3(1.0, 0.9, 0)),
+			EaseTypes::Linear,
+			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
+			EaseTypes::EaseInOutQuad, 5.0f));
+		animation.push_back(AnimationSequence(
+			Bezier(glm::vec3(0, 0.3, 0), glm::vec3(0, 0.3, 0), glm::vec3(0, 0.3, 0), glm::vec3(0, 0.3, 0)),
+			EaseTypes::Linear,
+			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
+			EaseTypes::EaseInOutQuad, 5.0f));
 		sequenceCount = animation.size();
 	}
 
