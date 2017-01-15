@@ -27,6 +27,7 @@
 #include "Animations\CameraAnimation.h"
 #include "Animations\SpaceStationAnimation.h"
 #include "Animations\LightScatterAnimation.h"
+#include "Animations\MotionBlurAnimation.h"
 
 #include "PostProcessing\PostProcessing.h"
 #include "PostProcessing\BlurPostProcess.h"
@@ -283,19 +284,17 @@ void setupScene()
 	//global offset -3.0
 	
 	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 0.0f));
+
+	timeline->addAnimation(new MotionBlurAnimation(motionBlurPostPro.getPostProShader(), 0.0f));
 	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
 
-	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f));
+	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f +22));
 
-	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], 1.0f)); /*+ 19.0 offset */
+	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], 1.0f + 22)); /*+ 19.0 offset */
 
-	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f, glm::vec3(400, 50, -5520), glm::vec3(-580, -20, -4980), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
-	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(1), 7.9f, glm::vec3(-300, -200, -5820), glm::vec3(300, 200, -5650), glm::vec3(-45, 55, -60)));  /* + 19.0 offset*/
-	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 1.2f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
-	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 2.6f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
-	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 3.0f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
-	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 3.6f, glm::vec3(300, 0, -5520), glm::vec3(-300, 0, -5340), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
-	//timeline->addAnimation(new AsteroidAnimation(10.0f, 10.0f, modelMatrices, 500, instanceBuffer));
+	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f + 22, glm::vec3(400, 50, -5520), glm::vec3(-580, -20, -4980), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(2), 1.2f + 22, glm::vec3(300, -160, -5820), glm::vec3(450, 160, -5940), glm::vec3(300, -80, 80)));  /* + 19.0 offset*/
+	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(1), 7.9f + 22, glm::vec3(-300, -250, -5820), glm::vec3(300, 250, -5650), glm::vec3(-45, 55, -60)));  /* + 19.0 offset*/
 	timeline->play();
 
 	starLight = new Model("../ShaderProject/Model/Star/Star.obj");
@@ -304,8 +303,8 @@ void setupScene()
 	skybox = new Skybox(skyboxShader);
 
 	for (int i = 0; i < 50; i++) {
-		Stars* star = new Stars(700, glm::vec3(0, 0, -(-2 + i) * 100));
-		star->setupStarMesh(TubePointGenerator(200, 400));
+		Stars* star = new Stars(700, glm::vec3(0, 0, -(-2 + i) * 400));
+		star->setupStarMesh(TubePointGenerator(400, 400));
 		starVector.push_back(star);
 	}
 
@@ -351,8 +350,8 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(glfwGetTime()); // initialize random seed	
-	GLfloat radius = 50.0f;
-	GLfloat offset = 800.0f;
+	GLfloat radius = 30.0f;
+	GLfloat offset = 100.0f;
 	for (GLuint i = 0; i < amount; i++)
 	{
 		glm::mat4 model;
@@ -364,10 +363,10 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 		GLfloat y = -2.5f + displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
 		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
 		GLfloat z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y, z - 5700));
+		model = glm::translate(model, glm::vec3(x, y, z));
 
 		// scale: scale between 0.05 and 0.25f
-		GLfloat scale = (rand() % 3) / 2.0f + 0.05;
+		GLfloat scale = (rand() % 3) / 100.0f + 0.05;
 		model = glm::scale(model, glm::vec3(scale));
 
 		// rotation: add random rotation around a (semi)randomly picked rotation axis vector
@@ -533,8 +532,10 @@ void postprocessingStep() {
 	antiAliasPostPro.execute(swapBuffer1, swapBuffer, screenQuad, true);
 
 	// blending the bloom and light scatter colours with the original colour output
-	bloomPostPro.execute(swapBuffer2, antiAliasPostPro.getOutputBuffer()->fBufferTexture, blurPostPro.getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, false);
+	bloomPostPro.execute(swapBuffer2, antiAliasPostPro.getOutputBuffer()->fBufferTexture, blurPostPro.getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, true);
 
+	// motion blur
+	motionBlurPostPro.execute(swapBuffer, gBuffer->textures[3], bloomPostPro.getOutputBuffer()->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, false);
 
 	// stars are rendered forward - so write the depth back into the standard depth buffer
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
@@ -562,8 +563,7 @@ void postprocessingStep() {
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
-	// motion blur
-	//motionBlurPostPro.execute(swapBuffer, gBuffer->textures[3], swapBuffer2->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, false);
+	
 
 	// warp effect
 	//warpPostPro.execute(swapBuffer, motionBlurPostPro.getOutputBuffer(), screenQuad, glfwGetTime(), false);

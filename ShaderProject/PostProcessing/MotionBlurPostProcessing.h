@@ -17,7 +17,7 @@ public:
 		postProShader->Use();
 		glUniform1i(glGetUniformLocation(postProShader->Program, "gDepth"), 3);
 		glUniform1i(glGetUniformLocation(postProShader->Program, "blurBuffer"), 0);
-		glUniform1i(glGetUniformLocation(postProShader->Program, "numSamples"), 10);
+		glUniform1i(glGetUniformLocation(postProShader->Program, "numSamples"), 12);
 	}
 
 	virtual void execute(FBuffer* outputBuffer, GLuint depthTexture, GLuint texture2, Quad* screenQuad, glm::mat4& view, glm::mat4& projection, glm::mat4& lastView, glm::mat4& lastProjection, bool drawToBuffer) {

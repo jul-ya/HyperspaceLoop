@@ -14,6 +14,7 @@ uniform mat4 lastView;
 uniform mat4 projection;
 uniform mat4 view;
 
+uniform float intensity;
 /*
 * basic screen-space motion-blur technique from Nvidia GPUGems3:
 * http://http.developer.nvidia.com/GPUGems3/gpugems3_ch27.html
@@ -35,7 +36,7 @@ void main()
     // convert to nonhomogeneous points [-1,1] by dividing by w 
 	previousPos /= previousPos.w;
     // use this frame's position and last frame's to compute the pixel velocity  
-	vec2 velocity = ((currentPos - previousPos)/2.f).xy;
+	vec2 velocity = -(((currentPos - previousPos)/2.f).xy) * intensity;
 
 	/*mat4 l_PreviousModelViewProjection = lastProjection * lastView;
     mat4 l_CurrentModelViewProjection = projection * view;
@@ -57,14 +58,15 @@ void main()
     vec2 textureC =  TexCoords;
     textureC += velocity;
 
-    for(int i = 1; i < numSamples; ++i, textureC += velocity) {
+	vec4 motionColor;
+    for(int i = 1; i < numSamples; ++i, textureC += velocity ) {
         // center the blur with offset and sample the color buffer along the velocity vector  
 		vec2 offset = velocity * (float(i) / float(numSamples - 1) - 0.5);
 		vec4 currentColor = texture(blurBuffer, textureC + offset);
-        colors += currentColor;
+        motionColor += currentColor * intensity;
     }
-  
-
-    color = vec4(colors / numSamples);
+	motionColor /= numSamples-1 ;
+	
+    color = vec4(colors + motionColor);
 }
 
