@@ -61,15 +61,27 @@ public:
 		animation.push_back(AnimationSequence(
 			Bezier(glm::vec3(-855, 2, -5780), glm::vec3(-875, 2, -5780), glm::vec3(-882, 2, -5765), glm::vec3(-882, 2, -5750)),
 			EaseTypes::Linear,
-			Bezier(glm::vec3(0, 90, 0), glm::vec3(0, 160, 45), glm::vec3(0, 180, 45), glm::vec3(0, 180, 0)),
+			Bezier(glm::vec3(0, 90, 0), glm::vec3(0, 160, 80), glm::vec3(0, 180, 90), glm::vec3(0, 180, 0)),
 			EaseTypes::EaseInOutQuad, 3.0f));
-		//@53.9s
+		//@56.9s
 		animation.push_back(AnimationSequence(
 			Bezier(glm::vec3(-882, 2, -5750), glm::vec3(-882, 2, -5735), glm::vec3(-882, 2, -5720), glm::vec3(-882, 2, -5705)),
 			EaseTypes::Linear,
 			Bezier(glm::vec3(0, 180, 0), glm::vec3(0, 180, 0), glm::vec3(0, 180, 0), glm::vec3(0, 180, 0)),
 			EaseTypes::EaseInOutQuad, 3.0f));
-		
+		//@59.9s
+		animation.push_back(AnimationSequence(
+			Bezier(glm::vec3(-882, 2, -5705), glm::vec3(-882, 2, -5695), glm::vec3(-882, 2, -5687), glm::vec3(-897, 2, -5687)),
+			EaseTypes::Linear,
+			Bezier(glm::vec3(0, 180, 0), glm::vec3(0, 180, 0), glm::vec3(0, 90, -100), glm::vec3(0, 90, 0)),
+			EaseTypes::EaseInOutQuad, 3.0f));
+		sequenceCount = animation.size();
+		//@62.9s
+		animation.push_back(AnimationSequence(
+			Bezier(glm::vec3(-897, 2, -5687), glm::vec3(-942, 2, -5687), glm::vec3(-1000, 2, -5687), glm::vec3(-1050, 2, -5687)),
+			EaseTypes::Linear,
+			Bezier(glm::vec3(0, 90, 0), glm::vec3(0, 90, 0), glm::vec3(0, 90, 0), glm::vec3(0, 90, 0)),
+			EaseTypes::EaseInOutQuad, 10.0f));
 		sequenceCount = animation.size();
 	}
 
