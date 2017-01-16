@@ -87,6 +87,7 @@ Shader* lightingShader;
 Shader* starShader;
 Shader* instancingShader;
 Shader* skyboxShader;
+Shader* lightBoxShader;
 
 // models
 vector<Model> models;
@@ -156,6 +157,9 @@ MotionBlurPostProcessing motionBlurPostPro = MotionBlurPostProcessing();
 BloomPostProcessing bloomPostPro = BloomPostProcessing();
 WarpPostProcessing warpPostPro = WarpPostProcessing();
 AntiAliasingPostProcessing antiAliasPostPro = AntiAliasingPostProcessing();
+
+//light model
+Model* lightBulb;
 
 
 /**
@@ -258,6 +262,9 @@ void initShaders()
 	glUniform1i(glGetUniformLocation(starShader->Program, "size"), 3);
 	glUniform1i(glGetUniformLocation(starShader->Program, "cameraPosition"), 4);
 
+	// lightbox shader
+	lightBoxShader = new Shader("../ShaderProject/Shader/LightBox/LightBox.vert", "../ShaderProject/Shader/LightBox/LightBox.frag");
+
 	// set up postpro effects
 	blurPostPro.setup();
 	lightScatterPostPro.setup();
@@ -299,6 +306,7 @@ void setupScene()
 
 	starLight = new Model("../ShaderProject/Model/Star/Star.obj");
 	relay = new Model("../ShaderProject/Model/SpaceTimeRelay/Star.obj");
+	//lightBulb = new Model("../ShaderProject/Model/Cube/cube.obj");
 
 	skybox = new Skybox(skyboxShader);
 
@@ -329,10 +337,9 @@ void setupScene()
 		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
 
 
-		const GLfloat maxBrightness = std::fmaxf(std::fmaxf(sceneLightColors[i].r, sceneLightColors[i].g), sceneLightColors[i].b);
-		GLfloat radius = (-linear + std::sqrtf(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * maxBrightness))) / (2 * quadratic);
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Radius").c_str()), radius);
-		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].isDirectional").c_str()), i == sceneLightPositions.size() - 2 ? true : false);
+		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Intensity").c_str()), (i == 0 || i == 1)? 10.0f: 1.0f);
+		//2 directional lights - rest point lights
+		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].IsDirectional").c_str()), (i == 0 || i == 1) ? true : false);
 	}
 }
 
@@ -562,10 +569,25 @@ void postprocessingStep() {
 		starVector[i]->draw();
 	}
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//light geometry
+	lightBoxShader->Use();
+	glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+
+	
+	for (int i = 0; i < sceneLightPositions.size(); i++) {
+		glm::mat4 model = glm::mat4();
+		model = glm::translate(model, sceneLightPositions[i]);
+		model = glm::scale(model, glm::vec3(1));
+		glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(glGetUniformLocation(lightBoxShader->Program, "lightColor"), 1, &sceneLightColors[i][0]);
+		relay->Draw(*lightBoxShader);
+	}
+
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
-	
 
 	// warp effect
 	//warpPostPro.execute(swapBuffer, motionBlurPostPro.getOutputBuffer(), screenQuad, glfwGetTime(), false);

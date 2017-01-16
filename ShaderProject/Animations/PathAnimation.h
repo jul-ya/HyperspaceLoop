@@ -25,10 +25,7 @@ public:
 struct AnimationSequence {
 public:
 	AnimationSequence(Bezier path, EaseTypes pathEaseType, Bezier rotation, EaseTypes rotationEaseType, float duration): path(path), pathEaseType(pathEaseType), rotation(rotation), rotationEaseType(rotationEaseType), duration(duration){}
-	AnimationSequence(float duration): duration(duration) {
-		
-	
-	}
+	AnimationSequence(float duration): duration(duration) {	}
 	
 	Bezier path;
 	Bezier rotation;
