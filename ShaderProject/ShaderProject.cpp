@@ -37,6 +37,7 @@
 #include "PostProcessing\BloomPostProcessing.h"
 #include "PostProcessing\WarpPostProcessing.h"
 #include "PostProcessing\AntiAliasingPostProcessing.h"
+#include "PostProcessing\TextPostProcessing.h"
 
 // GLM
 #include <glm/glm.hpp>
@@ -157,6 +158,7 @@ MotionBlurPostProcessing motionBlurPostPro = MotionBlurPostProcessing();
 BloomPostProcessing bloomPostPro = BloomPostProcessing();
 WarpPostProcessing warpPostPro = WarpPostProcessing();
 AntiAliasingPostProcessing antiAliasPostPro = AntiAliasingPostProcessing();
+TextPostProcessing textPostPro = TextPostProcessing();
 
 //light model
 Model* lightBulb;
@@ -273,6 +275,7 @@ void initShaders()
 	bloomPostPro.setup();
 	warpPostPro.setup();
 	antiAliasPostPro.setup();
+	textPostPro.setup();
 }
 
 /**
@@ -544,7 +547,11 @@ void postprocessingStep() {
 	bloomPostPro.execute(swapBuffer2, antiAliasPostPro.getOutputBuffer()->fBufferTexture, blurPostPro.getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, true);
 
 	// motion blur
-	motionBlurPostPro.execute(swapBuffer, gBuffer->textures[3], bloomPostPro.getOutputBuffer()->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, false);
+	motionBlurPostPro.execute(swapBuffer, gBuffer->textures[3], bloomPostPro.getOutputBuffer()->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, true);
+
+	// text rendering
+	textPostPro.execute(swapBuffer1, swapBuffer, screenQuad, 0.0, true); //starting at 0.0 -> one step += 0.1 -> last text is at 0.8
+	additiveBlendPostPro.execute(swapBuffer2, swapBuffer1->fBufferTexture, swapBuffer->fBufferTexture, screenQuad, false);
 
 	// stars are rendered forward - so write the depth back into the standard depth buffer
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
@@ -557,18 +564,17 @@ void postprocessingStep() {
 	glUniform3fv(glGetUniformLocation(starShader->Program, "cameraPosition"), 1, &camera.Position[0]);
 	glUniform1f(glGetUniformLocation(starShader->Program, "fadeOutDistance"), fadeOutDistance);
 
+	//swapBuffer2->bindBuffer();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);
 	glDepthMask(GL_FALSE);
-	//swapBuffer2->bindBuffer();
 	for (int i = 0; i < starVector.size(); i++) {
 		glm::mat4 model = glm::mat4();
 		model = glm::translate(model, starVector[i]->centerPos);
 		glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		starVector[i]->draw();
 	}
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//light geometry
 	lightBoxShader->Use();
@@ -587,7 +593,7 @@ void postprocessingStep() {
 
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
-
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// warp effect
 	//warpPostPro.execute(swapBuffer, motionBlurPostPro.getOutputBuffer(), screenQuad, glfwGetTime(), false);

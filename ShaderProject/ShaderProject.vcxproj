@@ -154,6 +154,7 @@
     <ClInclude Include="PostProcessing\WarpPostProcessing.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="PostProcessing\TextPostProcessing.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Stars.h" />
     <ClInclude Include="Timeline.h" />
@@ -176,6 +177,7 @@
     <None Include="Shader\PostProcessing\LightScatter.vert" />
     <None Include="Shader\PostProcessing\MotionBlur.frag" />
     <None Include="Shader\DeferredShading\PassThrough.vert" />
+    <None Include="Shader\PostProcessing\TextRender.frag" />
     <None Include="Shader\Skybox\Skybox.frag" />
     <None Include="Shader\Skybox\Skybox.vert" />
     <None Include="Shader\Stars\Stars.frag" />
