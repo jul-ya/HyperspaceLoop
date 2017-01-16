@@ -85,6 +85,7 @@ GLfloat lastFrame = 0.0f;
 
 // shader
 Shader* geometryShader;
+Shader* alphaThrustShader;
 Shader* lightingShader;
 Shader* starShader;
 Shader* instancingShader;
@@ -248,6 +249,9 @@ void initShaders()
 	// deferred rendering shaders
 	geometryShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/DeferredShading/GeometryPass.frag");
 	lightingShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/DeferredShading/LightPass.frag");
+
+	// engine exhaust = thrust
+	alphaThrustShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/Thrust/AlphaThrust.frag");
 
 	// set the position, normal and albedo samplers
 	lightingShader->Use();
@@ -449,20 +453,20 @@ void geometryStep() {
 		glBindVertexArray(0);
 		glDepthMask(GL_TRUE);
 
-		//set the matrices 
+		// set the matrices 
 		geometryShader->Use();
 		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
 		vector<GameObject> sceneObjects = hyperspace->getSceneObjects();
-		for (GLuint i = 0; i < sceneObjects.size(); i++)
+		for (GLuint i = 0; i < sceneObjects.size() - 1; i++)
 		{
 			glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(sceneObjects[i].getTransform().getModelMatrix()));
 			glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), false);
 			sceneObjects[i].getModel().Draw(*geometryShader);
 		}
 
-		//light sources for scattering
+		// light sources for scattering
 		model = glm::mat4();
 		model = glm::translate(model, startLightPosition);
 		model = glm::scale(model, glm::vec3(100.0f, 100.0f, 100.0f));
@@ -484,8 +488,7 @@ void geometryStep() {
 		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
 		relay->Draw(*geometryShader);
 
-
-		//instancing
+		// instancing
 		instancingShader->Use();
 		glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(instancingShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(camera.GetViewMatrix()));
@@ -586,7 +589,7 @@ void postprocessingStep() {
 		starVector[i]->draw();
 	}
 
-	//light geometry
+	// light geometry
 	lightBoxShader->Use();
 	glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -600,6 +603,14 @@ void postprocessingStep() {
 		glUniform3fv(glGetUniformLocation(lightBoxShader->Program, "lightColor"), 1, &sceneLightColors[i][0]);
 		relay->Draw(*lightBoxShader);
 	}
+
+	// draw the last model (thrust) with alpha
+	alphaThrustShader->Use();
+	glUniformMatrix4fv(glGetUniformLocation(alphaThrustShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(alphaThrustShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	// use ship model matrix (cheating here)
+	glUniformMatrix4fv(glGetUniformLocation(alphaThrustShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(hyperspace->getSceneObjects()[0].getTransform().getModelMatrix()));
+	hyperspace->getSceneObjects()[hyperspace->getSceneObjects().size() - 1].getModel().Draw(*alphaThrustShader);
 
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);

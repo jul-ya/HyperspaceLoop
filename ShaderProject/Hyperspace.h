@@ -46,6 +46,10 @@ public:
 		return sceneObjects[0];
 	}
 
+	GameObject& getSpaceShipThrust() {
+		return sceneObjects[9];
+	}
+
 private:
 	
 	std::vector<PointLight> sceneLights;
@@ -130,6 +134,14 @@ private:
 			GameObject a3 = GameObject(asteroid3, Transform(glm::vec3(-400 + (i * 100), -60, -5400), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0, 90, 0)));
 			sceneObjects.push_back(a3);
 		}
+
+		//the aircraft thrust
+		//Model model0 = Model("../ShaderProject/Model/Spaceship/thrust.obj");
+		//sceneObjects.push_back(GameObject(model0, Transform(glm::vec3(0, 0, 0), glm::vec3(0.04f, 0.04f, 0.04f))));
+
+		// the aircraft thrust alpha
+		Model model1 = Model("../ShaderProject/Model/Spaceship/thrust.obj");
+		sceneObjects.push_back(GameObject(model1, Transform(glm::vec3(0, 0, 0), glm::vec3(0.05f, 0.05f, 0.05f))));
 	}
 };
 
