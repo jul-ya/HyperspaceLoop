@@ -57,9 +57,23 @@ private:
 	
 	void addSceneLights() {
 		const GLuint NR_LIGHTS = 24;
+		
+		//orange directional light, index 0
+		sceneLightColors.push_back(glm::vec3(255 / 255.0f, 208 / 255.0f, 120 / 255.0f));
+		sceneLightPositions.push_back(glm::vec3(15.0f, 0.5f, -70.0f));
+
+		//blueish directional light, index 1
+		sceneLightColors.push_back(glm::vec3(182 / 255.0f, 233 / 255.0f, 255 / 255.0f));
+		sceneLightPositions.push_back(glm::vec3(-15.0f, 0.5f, -70.0f));
+
+		for (int i = 0; i < 10; i++) {
+			sceneLightPositions.push_back(glm::vec3(-882, 2, -5750 + (i * 20)));
+			sceneLightColors.push_back(glm::vec3(0.0, 1.0, 0.0));
+			sceneLights.push_back(PointLight(glm::vec3(-882, 2, -5750 + (i * 20)), glm::vec3(0.0, 1.0, 0.0)));
+		}
 
 		srand(13);
-		for (GLuint i = 0; i < NR_LIGHTS-2; i++)
+		for (GLuint i = 0; i < NR_LIGHTS-10; i++)
 		{
 			// Calculate slightly random offsets
 			GLfloat xPos = ((rand() % 100) / 100.0) * 9 - 3.0;
@@ -82,13 +96,11 @@ private:
 			}
 		}
 
-		sceneLightPositions.push_back(glm::vec3(-882, 2, -5750));
-		sceneLightColors.push_back(glm::vec3(0.0, 1.0, 0.0));
-		sceneLights.push_back(PointLight(glm::vec3(-882, 2, -5750), glm::vec3(0.0, 1.0, 0.0)));
-
-		sceneLightPositions.push_back(glm::vec3(-882, 4, -5750));
-		sceneLightColors.push_back(glm::vec3(0.0, 1.0, 0.0));
-		sceneLights.push_back(PointLight(glm::vec3(-882, 4, -5750), glm::vec3(0.0, 1.0, 0.0)));
+		for (int i = 0; i < 10; i++) {
+			sceneLightPositions.push_back(glm::vec3(-882, 2, -5750 + (i*20)));
+			sceneLightColors.push_back(glm::vec3(0.0, 1.0, 0.0));
+			sceneLights.push_back(PointLight(glm::vec3(-882, 2, -5750 + (i * 20)), glm::vec3(0.0, 1.0, 0.0)));
+		}
 	}
 
 	void addSceneObjects() {

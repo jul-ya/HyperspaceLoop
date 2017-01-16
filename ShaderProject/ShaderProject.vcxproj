@@ -161,6 +161,8 @@
     <ClInclude Include="TweenFunctions.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shader\LightBox\LightBox.frag" />
+    <None Include="Shader\LightBox\LightBox.vert" />
     <None Include="Shader\PostProcessing\FXAA.frag" />
     <None Include="Shader\PostProcessing\AdditiveBlend.frag" />
     <None Include="Shader\PostProcessing\Bloom.frag" />

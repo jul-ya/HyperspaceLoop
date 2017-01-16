@@ -87,6 +87,7 @@ Shader* lightingShader;
 Shader* starShader;
 Shader* instancingShader;
 Shader* skyboxShader;
+Shader* lightBoxShader;
 
 // models
 vector<Model> models;
@@ -140,8 +141,8 @@ glm::vec3 relayEnd = glm::vec3(-1050, 2, -5687);
 Model* starLight;
 Model* relay;
 
-float weight = 0.6f;
-float density = 1.85f;
+float weight = 0.075f;
+float density = 1.8f;
 float rayDecay = 0.89f;
 
 // skybox 
@@ -156,6 +157,9 @@ MotionBlurPostProcessing motionBlurPostPro = MotionBlurPostProcessing();
 BloomPostProcessing bloomPostPro = BloomPostProcessing();
 WarpPostProcessing warpPostPro = WarpPostProcessing();
 AntiAliasingPostProcessing antiAliasPostPro = AntiAliasingPostProcessing();
+
+//light model
+Model* lightBulb;
 
 
 /**
@@ -258,6 +262,9 @@ void initShaders()
 	glUniform1i(glGetUniformLocation(starShader->Program, "size"), 3);
 	glUniform1i(glGetUniformLocation(starShader->Program, "cameraPosition"), 4);
 
+	// lightbox shader
+	lightBoxShader = new Shader("../ShaderProject/Shader/LightBox/LightBox.vert", "../ShaderProject/Shader/LightBox/LightBox.frag");
+
 	// set up postpro effects
 	blurPostPro.setup();
 	lightScatterPostPro.setup();
@@ -288,9 +295,9 @@ void setupScene()
 	timeline->addAnimation(new MotionBlurAnimation(motionBlurPostPro.getPostProShader(), 0.0f));
 	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
 
-	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f +22));
+	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f +18.0f));
 
-	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], 1.0f + 22)); /*+ 19.0 offset */
+	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], hyperspace->getSceneObjects()[2], glm::vec3(-900, -60, -5750), 1.0f + 22)); /*+ 19.0 offset */
 
 	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f + 22, glm::vec3(400, 50, -5520), glm::vec3(-580, -20, -4980), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
 	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(2), 1.2f + 22, glm::vec3(300, -160, -5820), glm::vec3(450, 160, -5940), glm::vec3(300, -80, 80)));  /* + 19.0 offset*/
@@ -299,16 +306,17 @@ void setupScene()
 
 	starLight = new Model("../ShaderProject/Model/Star/Star.obj");
 	relay = new Model("../ShaderProject/Model/SpaceTimeRelay/Star.obj");
+	//lightBulb = new Model("../ShaderProject/Model/Cube/cube.obj");
 
 	skybox = new Skybox(skyboxShader);
 
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i < 20; i++) {
 		Stars* star = new Stars(700, glm::vec3(0, 0, -(-2 + i) * 400));
-		star->setupStarMesh(TubePointGenerator(400, 400));
+		star->setupStarMesh(TubePointGenerator(500, 400));
 		starVector.push_back(star);
 	}
 
-	Stars* star = new Stars(2000, glm::vec3(0, 0, -5000));
+	Stars* star = new Stars(300, glm::vec3(0, 0, -5000));
 	star->setupStarMesh(SpherePointGenerator(1000, false));
 	starVector.push_back(star);
 
@@ -329,10 +337,9 @@ void setupScene()
 		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
 
 
-		const GLfloat maxBrightness = std::fmaxf(std::fmaxf(sceneLightColors[i].r, sceneLightColors[i].g), sceneLightColors[i].b);
-		GLfloat radius = (-linear + std::sqrtf(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * maxBrightness))) / (2 * quadratic);
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Radius").c_str()), radius);
-		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].isDirectional").c_str()), i == sceneLightPositions.size() - 2 ? true : false);
+		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Intensity").c_str()), (i == 0 || i == 1)? 10.0f: 1.0f);
+		//2 directional lights - rest point lights
+		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].IsDirectional").c_str()), (i == 0 || i == 1) ? true : false);
 	}
 }
 
@@ -363,7 +370,9 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 		GLfloat y = -2.5f + displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
 		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
 		GLfloat z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y, z));
+		model = glm::translate(model, glm::vec3(x, y, z-5000));
+		if(i==0)
+		std::cout << x << " : " << y << " : " << z << std::endl;
 
 		// scale: scale between 0.05 and 0.25f
 		GLfloat scale = (rand() % 3) / 100.0f + 0.05;
@@ -415,7 +424,7 @@ void geometryStep() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// get required matrices
-		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
+		glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 2500.0f);
 		glm::mat4 view = camera.GetViewMatrix();
 		glm::mat4 model;
 
@@ -510,7 +519,7 @@ void lightingStep() {
 void postprocessingStep() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f);
+	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 2500.0f);
 	glm::mat4 view = camera.GetViewMatrix();
 
 	// light scattering 
@@ -560,10 +569,25 @@ void postprocessingStep() {
 		starVector[i]->draw();
 	}
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//light geometry
+	lightBoxShader->Use();
+	glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+
+	
+	for (int i = 0; i < sceneLightPositions.size(); i++) {
+		glm::mat4 model = glm::mat4();
+		model = glm::translate(model, sceneLightPositions[i]);
+		model = glm::scale(model, glm::vec3(1));
+		glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+		glUniform3fv(glGetUniformLocation(lightBoxShader->Program, "lightColor"), 1, &sceneLightColors[i][0]);
+		relay->Draw(*lightBoxShader);
+	}
+
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
-	
 
 	// warp effect
 	//warpPostPro.execute(swapBuffer, motionBlurPostPro.getOutputBuffer(), screenQuad, glfwGetTime(), false);

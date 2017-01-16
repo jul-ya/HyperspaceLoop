@@ -17,7 +17,8 @@ struct Light {
     
     float Linear;
     float Quadratic;
-    float Radius;
+    float Intensity;
+	bool IsDirectional;
 };
 const int NR_LIGHTS = 24;
 uniform Light lights[NR_LIGHTS];
@@ -43,7 +44,7 @@ void main()
         {
             // Diffuse
             vec3 lightDir = normalize(lights[i].Position - FragPos);
-			if(i==0){
+			if(lights[i].IsDirectional){
 				lightDir = normalize(lights[i].Position);
 			}
             vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color;
@@ -53,11 +54,11 @@ void main()
             vec3 specular = lights[i].Color * spec * Specular;
             // Attenuation
             float attenuation = 1.0 / (1.0 + lights[i].Linear * distance + lights[i].Quadratic * distance * distance);
-			if(i!=0){
+			if(!lights[i].IsDirectional){
 				diffuse *= attenuation;
 				specular *= attenuation;
 			}
-            lighting += diffuse + specular;
+            lighting += (diffuse + specular) * lights[i].Intensity;
         }
     }      
 
