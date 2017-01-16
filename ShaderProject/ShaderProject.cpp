@@ -38,6 +38,7 @@
 #include "PostProcessing\WarpPostProcessing.h"
 #include "PostProcessing\AntiAliasingPostProcessing.h"
 #include "PostProcessing\TextPostProcessing.h"
+#include "PostProcessing\FadePostProcess.h"
 
 // GLM
 #include <glm/glm.hpp>
@@ -149,6 +150,10 @@ float rayDecay = 0.89f;
 // skybox 
 Skybox* skybox;
 
+// fade variables
+float maskWeight = 0.0f;
+float maskSpread = 0.5f;
+
 // postpro objects
 
 BlurPostProcessing blurPostPro = BlurPostProcessing();
@@ -159,6 +164,7 @@ BloomPostProcessing bloomPostPro = BloomPostProcessing();
 WarpPostProcessing warpPostPro = WarpPostProcessing();
 AntiAliasingPostProcessing antiAliasPostPro = AntiAliasingPostProcessing();
 TextPostProcessing textPostPro = TextPostProcessing();
+FadePostProcess fadePostPro = FadePostProcess();
 
 //light model
 Model* lightBulb;
@@ -276,6 +282,7 @@ void initShaders()
 	warpPostPro.setup();
 	antiAliasPostPro.setup();
 	textPostPro.setup();
+	fadePostPro.setup();
 }
 
 /**
@@ -550,8 +557,11 @@ void postprocessingStep() {
 	motionBlurPostPro.execute(swapBuffer, gBuffer->textures[3], bloomPostPro.getOutputBuffer()->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, true);
 
 	// text rendering
-	textPostPro.execute(swapBuffer1, swapBuffer, screenQuad, 0.0, true); //starting at 0.0 -> one step += 0.1 -> last text is at 0.8
-	additiveBlendPostPro.execute(swapBuffer2, swapBuffer1->fBufferTexture, swapBuffer->fBufferTexture, screenQuad, false);
+	textPostPro.execute(swapBuffer1, screenQuad, 0.0, true); // starting at 0.0 -> one step += 0.1 -> last text is at 0.8
+	additiveBlendPostPro.execute(swapBuffer2, swapBuffer1->fBufferTexture, swapBuffer->fBufferTexture, screenQuad, true);
+
+	// masked fade
+	fadePostPro.execute(swapBuffer, swapBuffer2, screenQuad, maskWeight, maskSpread, glm::vec4(1.0, 1.0, 1.0, 1.0), false); // currently weight and spread are controlled by keys: UIOP
 
 	// stars are rendered forward - so write the depth back into the standard depth buffer
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
@@ -753,6 +763,22 @@ void handleMovement()
 	if (keys[GLFW_KEY_0]) {
 		fadeOutDistance -= 1.0f;
 		std::cout << "fadeOutDistance: " << fadeOutDistance << std::endl;
+	}
+	if (keys[GLFW_KEY_U]) {
+		maskWeight += 0.01f;
+		std::cout << "maskWeight: " << maskWeight << std::endl;
+	}
+	if (keys[GLFW_KEY_I]) {
+		maskWeight -= 0.01f;
+		std::cout << "maskWeight: " << maskWeight << std::endl;
+	}
+	if (keys[GLFW_KEY_O]) {
+		maskSpread += 0.01f;
+		std::cout << "maskSpread " << maskSpread << std::endl;
+	}
+	if (keys[GLFW_KEY_P]) {
+		maskSpread -= 0.01f;
+		std::cout << "maskSpread " << maskSpread << std::endl;
 	}
 }
 

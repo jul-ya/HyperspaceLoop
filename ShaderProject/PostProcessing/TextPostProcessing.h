@@ -15,7 +15,7 @@ public:
 		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/PostProcessing/TextRender.frag");
 
 		//Generate texture ID and load texture data 
-		string filename = string("../ShaderProject/Texture/Text/text.jpg");
+		std::string filename = std::string("../ShaderProject/Texture/Text/text.jpg");
 		glGenTextures(1, &textTexture);
 		int width, height;
 		unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
@@ -37,7 +37,7 @@ public:
 		glUniform1i(glGetUniformLocation(postProShader->Program, "text"), 0);
 	}
 
-	virtual void execute(FBuffer* outputBuffer, FBuffer* inputBuffer, Quad* screenQuad, GLfloat id, bool drawToBuffer) {
+	virtual void execute(FBuffer* outputBuffer, Quad* screenQuad, GLfloat id, bool drawToBuffer) {
 		this->outputBuffer = outputBuffer;
 
 		glActiveTexture(GL_TEXTURE0);

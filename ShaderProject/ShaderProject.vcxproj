@@ -148,6 +148,7 @@
     <ClInclude Include="PostProcessing\AntiAliasingPostProcessing.h" />
     <ClInclude Include="PostProcessing\BloomPostProcessing.h" />
     <ClInclude Include="PostProcessing\BlurPostProcess.h" />
+    <ClInclude Include="PostProcessing\FadePostProcess.h" />
     <ClInclude Include="PostProcessing\LightScatterPostPro.h" />
     <ClInclude Include="PostProcessing\MotionBlurPostProcessing.h" />
     <ClInclude Include="PostProcessing\PostProcessing.h" />
@@ -177,6 +178,7 @@
     <None Include="Shader\PostProcessing\LightScatter.vert" />
     <None Include="Shader\PostProcessing\MotionBlur.frag" />
     <None Include="Shader\DeferredShading\PassThrough.vert" />
+    <None Include="Shader\PostProcessing\MaskedFade.frag" />
     <None Include="Shader\PostProcessing\TextRender.frag" />
     <None Include="Shader\Skybox\Skybox.frag" />
     <None Include="Shader\Skybox\Skybox.vert" />
