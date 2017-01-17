@@ -588,6 +588,7 @@ void postprocessingStep() {
 		glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		starVector[i]->draw();
 	}
+	glDepthMask(GL_TRUE);
 
 	// light geometry
 	lightBoxShader->Use();
@@ -612,7 +613,6 @@ void postprocessingStep() {
 	glUniformMatrix4fv(glGetUniformLocation(alphaThrustShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(hyperspace->getSceneObjects()[0].getTransform().getModelMatrix()));
 	hyperspace->getSceneObjects()[hyperspace->getSceneObjects().size() - 1].getModel().Draw(*alphaThrustShader);
 
-	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
