@@ -14,7 +14,7 @@ void main()
     if(bloom) 
         hdrColor += bloomColor; // additive blending
     // tone mapping
-    vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
-	//vec3 result = hdrColor / (hdrColor + vec3(1.0)); --> reinhard tone mapping
+    vec3 result = vec3(1.0) - exp(-hdrColor * exposure); //--> exposure tone mapping
+	//vec3 result = hdrColor / (hdrColor + vec3(1.0)); //--> reinhard tone mapping
     FragColor = vec4(result, 1.0f);
 }
