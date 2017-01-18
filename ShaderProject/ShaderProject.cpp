@@ -382,8 +382,6 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
 		GLfloat z = cos(angle) * radius + displacement;
 		model = glm::translate(model, glm::vec3(x, y, z-5000));
-		if(i==0)
-		std::cout << x << " : " << y << " : " << z << std::endl;
 
 		// scale: scale between 0.05 and 0.25f
 		GLfloat scale = (rand() % 3) / 100.0f + 0.05;
