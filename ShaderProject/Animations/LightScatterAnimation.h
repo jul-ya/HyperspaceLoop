@@ -63,7 +63,7 @@ public:
 		position.y = tweenedPosition.y;
 
 		lightScatterShader->Use();
-		if (currentIndex >= 3) {
+		if (currentIndex >= 4) {
 			glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 1.2f);
 		}
 		glUniform2fv(glGetUniformLocation(lightScatterShader->Program, "scatterOrigin"), 1, &position[0]);

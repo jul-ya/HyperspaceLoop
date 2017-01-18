@@ -17,6 +17,7 @@ public:
 		return isDone;
 	}
 
+
 protected:
 
 	GLfloat startTime;

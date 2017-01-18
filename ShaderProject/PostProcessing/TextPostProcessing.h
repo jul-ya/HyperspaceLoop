@@ -37,7 +37,7 @@ public:
 		glUniform1i(glGetUniformLocation(postProShader->Program, "text"), 0);
 	}
 
-	virtual void execute(FBuffer* outputBuffer, Quad* screenQuad, GLfloat id, bool rendered, bool drawToBuffer) {
+	virtual void execute(FBuffer* outputBuffer, Quad* screenQuad, bool drawToBuffer) {
 		this->outputBuffer = outputBuffer;
 
 		glActiveTexture(GL_TEXTURE0);
@@ -50,7 +50,17 @@ public:
 		render(screenQuad, drawToBuffer);
 	}
 
-private:
-	GLuint textTexture;
+	void setId(GLfloat id) {
+		this->id = id;
+	}
 
+	void setRenderStatus(bool rendered) {
+		this->rendered = rendered;
+	}
+
+private:
+	GLfloat id = 0.1f;
+	bool rendered = true;
+
+	GLuint textTexture;
 };

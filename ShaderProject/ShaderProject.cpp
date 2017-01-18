@@ -28,6 +28,7 @@
 #include "Animations\SpaceStationAnimation.h"
 #include "Animations\LightScatterAnimation.h"
 #include "Animations\MotionBlurAnimation.h"
+#include "Animations\TextAnimation.h"
 
 #include "PostProcessing\PostProcessing.h"
 #include "PostProcessing\BlurPostProcess.h"
@@ -300,6 +301,7 @@ void setupScene()
 	//global offset -3.0
 	
 	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 0.0f));
+	timeline->addAnimation(new TextAnimation(textPostPro, 0.0f));
 
 	timeline->addAnimation(new MotionBlurAnimation(motionBlurPostPro.getPostProShader(), 0.0f));
 	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
@@ -555,7 +557,7 @@ void postprocessingStep() {
 	motionBlurPostPro.execute(swapBuffer, gBuffer->textures[3], bloomPostPro.getOutputBuffer()->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, true);
 
 	// text rendering
-	textPostPro.execute(swapBuffer1, screenQuad, 0.0, true, true); // starting at 0.0 -> one step += 0.1 -> last text is at 0.8
+	textPostPro.execute(swapBuffer1, screenQuad, true); // starting at 0.0 -> one step += 0.1 -> last text is at 0.8
 	additiveBlendPostPro.execute(swapBuffer2, swapBuffer1->fBufferTexture, swapBuffer->fBufferTexture, screenQuad, true);
 
 	// masked fade
@@ -594,7 +596,7 @@ void postprocessingStep() {
 	for (int i = 0; i < sceneLightPositions.size(); i++) {
 		glm::mat4 model = glm::mat4();
 		model = glm::translate(model, sceneLightPositions[i]);
-		model = glm::scale(model, glm::vec3(1));
+		model = glm::scale(model, glm::vec3(0.05f));
 		glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(glGetUniformLocation(lightBoxShader->Program, "lightColor"), 1, &sceneLightColors[i][0]);
 		relay->Draw(*lightBoxShader);
