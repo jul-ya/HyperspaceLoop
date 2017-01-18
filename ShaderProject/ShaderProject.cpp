@@ -508,6 +508,7 @@ void lightingStep() {
 	swapBuffer->bindBuffer();
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearDepth(1.0);
 
 		lightingShader->Use();
 
@@ -527,6 +528,8 @@ void lightingStep() {
 void postprocessingStep() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearDepth(1.0);
+
 	glm::mat4 projection = glm::perspective(camera.Zoom, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 2500.0f);
 	glm::mat4 view = camera.GetViewMatrix();
 
@@ -565,6 +568,7 @@ void postprocessingStep() {
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer(0, 0, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	starShader->Use();
 	glUniformMatrix4fv(glGetUniformLocation(starShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -572,7 +576,6 @@ void postprocessingStep() {
 	glUniform3fv(glGetUniformLocation(starShader->Program, "cameraPosition"), 1, &camera.Position[0]);
 	glUniform1f(glGetUniformLocation(starShader->Program, "fadeOutDistance"), fadeOutDistance);
 
-	//swapBuffer2->bindBuffer();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBlendEquation(GL_FUNC_ADD);
@@ -607,9 +610,7 @@ void postprocessingStep() {
 	// use ship model matrix (cheating here)
 	glUniformMatrix4fv(glGetUniformLocation(alphaThrustShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(hyperspace->getSceneObjects()[0].getTransform().getModelMatrix()));
 	hyperspace->getSceneObjects()[hyperspace->getSceneObjects().size() - 1].getModel().Draw(*alphaThrustShader);
-
 	glDisable(GL_BLEND);
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// save the view and projection for the motion blur calculation next frame
 	lastView = view;
@@ -671,6 +672,7 @@ int main()
 	// set some opengl context states
 	// enable depth test
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
 	// back face culling
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
