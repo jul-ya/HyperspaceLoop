@@ -555,7 +555,7 @@ void postprocessingStep() {
 	motionBlurPostPro.execute(swapBuffer, gBuffer->textures[3], bloomPostPro.getOutputBuffer()->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, true);
 
 	// text rendering
-	textPostPro.execute(swapBuffer1, screenQuad, 0.0, true); // starting at 0.0 -> one step += 0.1 -> last text is at 0.8
+	textPostPro.execute(swapBuffer1, screenQuad, 0.0, true, true); // starting at 0.0 -> one step += 0.1 -> last text is at 0.8
 	additiveBlendPostPro.execute(swapBuffer2, swapBuffer1->fBufferTexture, swapBuffer->fBufferTexture, screenQuad, true);
 
 	// masked fade

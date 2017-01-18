@@ -37,7 +37,7 @@ public:
 		glUniform1i(glGetUniformLocation(postProShader->Program, "text"), 0);
 	}
 
-	virtual void execute(FBuffer* outputBuffer, Quad* screenQuad, GLfloat id, bool drawToBuffer) {
+	virtual void execute(FBuffer* outputBuffer, Quad* screenQuad, GLfloat id, bool rendered, bool drawToBuffer) {
 		this->outputBuffer = outputBuffer;
 
 		glActiveTexture(GL_TEXTURE0);
@@ -45,6 +45,7 @@ public:
 
 		postProShader->Use();
 		glUniform1f(glGetUniformLocation(postProShader->Program, "id"), id);
+		glUniform1i(glGetUniformLocation(postProShader->Program, "rendered"), rendered);
 
 		render(screenQuad, drawToBuffer);
 	}
