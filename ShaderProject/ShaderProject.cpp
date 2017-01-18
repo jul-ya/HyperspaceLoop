@@ -317,7 +317,7 @@ void setupScene()
 
 	starLight = new Model("../ShaderProject/Model/Star/Star.obj");
 	relay = new Model("../ShaderProject/Model/SpaceTimeRelay/Star.obj");
-	//lightBulb = new Model("../ShaderProject/Model/Cube/cube.obj");
+	lightBulb = new Model("../ShaderProject/Model/Star/Star.obj"); // Light/Light.obj is the cube
 
 	skybox = new Skybox(skyboxShader);
 
@@ -479,6 +479,7 @@ void geometryStep() {
 		model = glm::mat4();
 		model = glm::translate(model, relayEnd);
 		model = glm::scale(model, glm::vec3(2, 2, 2));
+		model = glm::rotate(model, (glm::mediump_float)90, glm::vec3(0, 1, 0));
 		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
 		relay->Draw(*geometryShader);
@@ -599,7 +600,7 @@ void postprocessingStep() {
 		model = glm::scale(model, glm::vec3(0.05f));
 		glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniform3fv(glGetUniformLocation(lightBoxShader->Program, "lightColor"), 1, &sceneLightColors[i][0]);
-		relay->Draw(*lightBoxShader);
+		lightBulb->Draw(*lightBoxShader);
 	}
 
 	// draw the last model (thrust) with alpha
