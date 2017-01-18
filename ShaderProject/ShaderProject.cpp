@@ -607,6 +607,7 @@ void postprocessingStep() {
 	alphaThrustShader->Use();
 	glUniformMatrix4fv(glGetUniformLocation(alphaThrustShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(glGetUniformLocation(alphaThrustShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniform1f(glGetUniformLocation(alphaThrustShader->Program, "alpha"), 1.0);
 	// use ship model matrix (cheating here)
 	glUniformMatrix4fv(glGetUniformLocation(alphaThrustShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(hyperspace->getSceneObjects()[0].getTransform().getModelMatrix()));
 	hyperspace->getSceneObjects()[hyperspace->getSceneObjects().size() - 1].getModel().Draw(*alphaThrustShader);
