@@ -13,7 +13,7 @@ void main()
 	vec4 color = texture(scene, TexCoords);
 	vec4 masked = texture(mask, TexCoords);
 
-	//scale alpha to 0...254
+	// scale alpha to 0...254
 	float alpha = masked.r * (1.0 - 1.0/255.0);
 	
 	// if mask value > alpha we draw the mask

@@ -15,6 +15,11 @@ in vec3 TexCoords3D;
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
 
+/*
+	https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+	simplex 3d noise by Ian McEwan
+*/
+
 vec4 permute( vec4 x ) {
     return mod( ( ( x * 34.0 ) + 1.0 ) * x, 289.0 );
 }
@@ -104,21 +109,18 @@ float heightMap( vec3 coord ) {
 
 void main()
 {
-     // Store the fragment position vector in the first gbuffer texture
     gPosition = FragPos;
-    // Also store the per-fragment normals into the gbuffer
 	const float e = 0.001;
 
+	// recalculate normals
 	float nx = heightMap( TexCoords3D + vec3( e, 0.0, 0.0 ) );
 	float ny = heightMap( TexCoords3D + vec3( 0.0, e, 0.0 ) );
 	float nz = heightMap( TexCoords3D + vec3( 0.0, 0.0, e ) );
 
 	gNormal = normalize( Normal + 0.05 * vec3( Noise - nx, Noise - ny, Noise - nz ) / e );
 
-    // And the diffuse per-fragment color
     gAlbedoSpec.rgb = mix(vec3(1.5-Noise, 1.0-Noise, 0.8-Noise),texture(texture_diffuse1, TexCoords).rgb,0.7);
-    // Store specular intensity in gAlbedoSpec's alpha component
-    gAlbedoSpec.a = Noise;//texture(texture_specular1, TexCoords).r;
+    gAlbedoSpec.a = Noise;
 
 	gBlackColor = vec4(0.0,0.0,0.0,1.0);
 }

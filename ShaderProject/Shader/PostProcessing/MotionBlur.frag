@@ -16,8 +16,8 @@ uniform mat4 view;
 
 uniform float intensity;
 /*
-* basic screen-space motion-blur technique from Nvidia GPUGems3:
-* http://http.developer.nvidia.com/GPUGems3/gpugems3_ch27.html
+	basic screen-space motion-blur technique from Nvidia GPUGems3:
+	http://http.developer.nvidia.com/GPUGems3/gpugems3_ch27.html
 */
 void main()
 {
@@ -37,22 +37,6 @@ void main()
 	previousPos /= previousPos.w;
     // use this frame's position and last frame's to compute the pixel velocity  
 	vec2 velocity = -(((currentPos - previousPos)/2.f).xy) * intensity;
-
-	/*mat4 l_PreviousModelViewProjection = lastProjection * lastView;
-    mat4 l_CurrentModelViewProjection = projection * view;
-    
-    // Transform old vertex position into homogenous screen-space.
-    vec4 l_PreviousPosition = l_PreviousModelViewProjection * texture(gPosition, texCoord);
-
-    // Transform current vertex position into homogenous screen-space.
-    vec4 l_CurrentPosition = l_CurrentModelViewProjection * texture(gPosition, texCoord);
-    
-    // Compute window-space velocity
-    vec3 l_PreviousPosition3 = l_PreviousPosition.xyz / l_PreviousPosition.w;
-    vec3 l_CurrentPosition3 = l_CurrentPosition.xyz / l_CurrentPosition.w;
-
-    // Store velocity
-    vec2 velocity = (l_CurrentPosition - l_PreviousPosition).xy/2f * 0.1f;*/
 
     vec4 colors = texture(blurBuffer, TexCoords);
     vec2 textureC =  TexCoords;

@@ -8,6 +8,11 @@ uniform sampler2D texture_diffuse1;
 
 out vec4 FragColor;
 
+/*
+	https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+	simplex 3d noise by Ian McEwan
+*/
+
 vec4 permute( vec4 x ) {
     return mod( ( ( x * 34.0 ) + 1.0 ) * x, 289.0 );
 }
