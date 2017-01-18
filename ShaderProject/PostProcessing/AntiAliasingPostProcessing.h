@@ -21,11 +21,11 @@ public:
 	virtual void execute(FBuffer* outputBuffer, FBuffer* inputBuffer, Quad* screenQuad, bool drawToBuffer) {
 		this->outputBuffer = outputBuffer;
 
-		//set color texture
+		// set color texture
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, inputBuffer->fBufferTexture);
 		
-		//exposure and bloom intensity
+		// exposure and bloom intensity
 		postProShader->Use();
 
 		render(screenQuad, drawToBuffer);

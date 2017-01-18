@@ -16,18 +16,15 @@ public:
 		postProShader->Use();
 		glUniform1i(glGetUniformLocation(postProShader->Program, "scene"), 0);
 
-		//Generate texture ID and load texture data 
 		std::string filename = std::string("../ShaderProject/Texture/Fade/circular.jpg");
 		glGenTextures(1, &fadeTexture);
 		int width, height;
 		unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
 
-		// Assign texture to ID
 		glBindTexture(GL_TEXTURE_2D, fadeTexture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
-		// Parameters
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);

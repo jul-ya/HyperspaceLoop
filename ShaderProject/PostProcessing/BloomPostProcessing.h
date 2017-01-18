@@ -22,13 +22,13 @@ public:
 		this->outputBuffer = outputBuffer;
 
 
-		//set color texture and bright color texture
+		// set color texture and bright color texture
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, brightTexture);
 
-		//exposure and bloom intensity
+		// exposure and bloom intensity
 		postProShader->Use();
 		glUniform1f(glGetUniformLocation(postProShader->Program, "bloom"), bloom);
 		glUniform1f(glGetUniformLocation(postProShader->Program, "exposure"), exposure);

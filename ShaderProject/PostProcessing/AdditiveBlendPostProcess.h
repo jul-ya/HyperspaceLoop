@@ -17,16 +17,16 @@ public:
 	virtual void execute(FBuffer* outputBuffer, GLuint texture1, GLuint texture2, Quad* screenQuad, bool drawToBuffer) {
 		this->outputBuffer = outputBuffer;
 
-		//activate and bind textures channel 0 and 1
+		// activate and bind textures channel 0 and 1
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture1);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture2);
 
-		//activate blend shader
+		// activate blend shader
 		postProShader->Use();
 
-		//render to buffer
+		// render to buffer
 		render(screenQuad, drawToBuffer);
 	}
 };
