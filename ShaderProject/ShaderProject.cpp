@@ -35,7 +35,6 @@
 #include "PostProcessing\AdditiveBlendPostProcess.h"
 #include "PostProcessing\MotionBlurPostProcessing.h"
 #include "PostProcessing\BloomPostProcessing.h"
-#include "PostProcessing\WarpPostProcessing.h"
 #include "PostProcessing\AntiAliasingPostProcessing.h"
 #include "PostProcessing\TextPostProcessing.h"
 #include "PostProcessing\FadePostProcess.h"
@@ -110,7 +109,6 @@ vector<glm::vec3> sceneLightColors;
 FBuffer* swapBuffer;
 FBuffer* swapBuffer1;
 FBuffer* swapBuffer2;
-FBuffer* swapBuffer3;
 
 // stars
 vector<Stars*> starVector;
@@ -162,7 +160,6 @@ LightScatterPostProcessing lightScatterPostPro = LightScatterPostProcessing();
 AdditiveBlendPostProcessing additiveBlendPostPro = AdditiveBlendPostProcessing();
 MotionBlurPostProcessing motionBlurPostPro = MotionBlurPostProcessing();
 BloomPostProcessing bloomPostPro = BloomPostProcessing();
-WarpPostProcessing warpPostPro = WarpPostProcessing();
 AntiAliasingPostProcessing antiAliasPostPro = AntiAliasingPostProcessing();
 TextPostProcessing textPostPro = TextPostProcessing();
 FadePostProcess fadePostPro = FadePostProcess();
@@ -234,7 +231,6 @@ void initBuffers() {
 	swapBuffer = new FBuffer(WIDTH, HEIGHT);
 	swapBuffer1 = new FBuffer(WIDTH, HEIGHT);
 	swapBuffer2 = new FBuffer(WIDTH, HEIGHT);
-	swapBuffer3 = new FBuffer(WIDTH, HEIGHT);
 }
 
 
@@ -283,7 +279,6 @@ void initShaders()
 	additiveBlendPostPro.setup();
 	motionBlurPostPro.setup();
 	bloomPostPro.setup();
-	warpPostPro.setup();
 	antiAliasPostPro.setup();
 	textPostPro.setup();
 	fadePostPro.setup();
@@ -616,9 +611,6 @@ void postprocessingStep() {
 	glDisable(GL_BLEND);
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// warp effect
-	//warpPostPro.execute(swapBuffer, motionBlurPostPro.getOutputBuffer(), screenQuad, glfwGetTime(), false);
-
 	// save the view and projection for the motion blur calculation next frame
 	lastView = view;
 	lastProjection = projection;
@@ -845,7 +837,6 @@ void destroy()
 	delete swapBuffer;
 	delete swapBuffer1;
 	delete swapBuffer2;
-	delete swapBuffer3;
 
 	delete screenQuad;
 	delete stars;

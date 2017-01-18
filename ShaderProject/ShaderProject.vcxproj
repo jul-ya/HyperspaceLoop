@@ -152,7 +152,6 @@
     <ClInclude Include="PostProcessing\LightScatterPostPro.h" />
     <ClInclude Include="PostProcessing\MotionBlurPostProcessing.h" />
     <ClInclude Include="PostProcessing\PostProcessing.h" />
-    <ClInclude Include="PostProcessing\WarpPostProcessing.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="PostProcessing\TextPostProcessing.h" />
@@ -185,7 +184,6 @@
     <None Include="Shader\Skybox\Skybox.vert" />
     <None Include="Shader\Stars\Stars.frag" />
     <None Include="Shader\Stars\Stars.vert" />
-    <None Include="Shader\PostProcessing\Warp.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
