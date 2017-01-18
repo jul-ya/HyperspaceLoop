@@ -7,8 +7,6 @@
 #include "GameObject.h"
 #include <iostream>
 
-
-//glm includes
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -56,17 +54,17 @@ private:
 	std::vector<glm::vec3> sceneLightPositions;
 	std::vector<glm::vec3> sceneLightColors;
 
-	//contains all gameobjects
+	// contains all gameobjects
 	std::vector<GameObject> sceneObjects;
 	
 	void addSceneLights() {
 		const GLuint NR_LIGHTS = 24;
 		
-		//orange directional light, index 0
+		// orange directional light, index 0
 		sceneLightColors.push_back(glm::vec3(255 / 255.0f, 208 / 255.0f, 120 / 255.0f));
 		sceneLightPositions.push_back(glm::vec3(15.0f, 0.5f, -70.0f));
 
-		//blueish directional light, index 1
+		// blueish directional light, index 1
 		sceneLightColors.push_back(glm::vec3(182 / 255.0f, 233 / 255.0f, 255 / 255.0f));
 		sceneLightPositions.push_back(glm::vec3(-15.0f, 0.5f, -70.0f));
 
@@ -79,15 +77,15 @@ private:
 		srand(13);
 		for (GLuint i = 0; i < NR_LIGHTS-10; i++)
 		{
-			// Calculate slightly random offsets
+			// calculate slightly random offsets
 			GLfloat xPos = ((rand() % 100) / 100.0) * 9 - 3.0;
 			GLfloat yPos = ((rand() % 100) / 100.0) * 9 - 4.0;
 			GLfloat zPos = ((rand() % 100) / 100.0) * 9 - 3.0;
 
-			// Also calculate random color
-			GLfloat rColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
-			GLfloat gColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
-			GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // Between 0.5 and 1.0
+			// also calculate random color
+			GLfloat rColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
+			GLfloat gColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
+			GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
 
 			sceneLightPositions.push_back(glm::vec3(xPos, yPos, zPos));
 			if (i == 0) {
@@ -108,19 +106,19 @@ private:
 	}
 
 	void addSceneObjects() {
-		//the space time jumping spacecraft that happens to be the primary actor
+		// the space time jumping spacecraft that happens to be the primary actor
 		Model model = Model("../ShaderProject/Model/Spaceship/spaceship.obj");	
 		sceneObjects.push_back(GameObject(model, Transform(glm::vec3(0, 0, 0), glm::vec3(0.05f, 0.05f, 0.05f))));
 
-		//the destination ship
+		// the destination ship
 		Model model2 = Model("../ShaderProject/Model/Bigship/big_ship.obj");
 		sceneObjects.push_back(GameObject(model2, Transform(glm::vec3(-900, -60, -5750), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0,0,0))));
 
-		//the labyrinth tunnel object
+		// the labyrinth tunnel object
 		Model tunnelEntrance = Model("../ShaderProject/Model/Tunnel/tunnel_masterfile.obj");
 		sceneObjects.push_back(GameObject(tunnelEntrance, Transform(glm::vec3(-900, -60, -5750), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0, 90, 0))));
 
-		//animated asteroids
+		// animated asteroids
 		Model asteroid1 = Model("../ShaderProject/Model/Asteroids/big_asteroid01.obj");
 		Model asteroid2 = Model("../ShaderProject/Model/Asteroids/big_asteroid02.obj");
 		Model asteroid3 = Model("../ShaderProject/Model/Asteroids/big_asteroid03.obj");
@@ -135,7 +133,7 @@ private:
 			sceneObjects.push_back(a3);
 		}
 
-		//the aircraft thrust
+		// the aircraft thrust
 		//Model model0 = Model("../ShaderProject/Model/Spaceship/thrust.obj");
 		//sceneObjects.push_back(GameObject(model0, Transform(glm::vec3(0, 0, 0), glm::vec3(0.04f, 0.04f, 0.04f))));
 

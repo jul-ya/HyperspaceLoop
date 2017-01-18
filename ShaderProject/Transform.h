@@ -6,7 +6,6 @@
 
 class Transform {
 public:
-	//Transform(){}
 
 	Transform(glm::vec3 position) : position(position){}
 
@@ -17,17 +16,16 @@ public:
 	~Transform(){}
 
 
-	//position
+	// position
 	glm::vec3 getPosition() {
 		return position;
 	}
 
 	void setPosition(glm::vec3 position) {
 		this->position = position;
-		//cout << "position: " << this->position.x << " : " << this->position.y << " : " << this->position.z << endl;
 	}
 
-	//rotation
+	// rotation
 	glm::vec3 getRotation() {
 		return rotation;
 	}
@@ -36,7 +34,7 @@ public:
 		this->rotation = rotation;
 	}
 
-	//scale
+	// scale
 	glm::vec3 getScale() {
 		return scale;
 	}

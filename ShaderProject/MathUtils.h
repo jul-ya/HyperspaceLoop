@@ -17,7 +17,7 @@ public:
 
 	/*
 		http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
-		author: Herman Tulleken 
+		bezier function by Herman Tulleken 
 	*/
 	static glm::vec3 calculateBezierPoint(float currentTime, glm::vec3 p0, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 	{
@@ -27,10 +27,10 @@ public:
 		float uuu = uu * u;
 		float ttt = tt * currentTime;
 
-		glm::vec3 p = uuu * p0; //first term
-		p += 3 * uu * currentTime * p1; //second term
-		p += 3 * u * tt * p2; //third term
-		p += ttt * p3; //fourth term
+		glm::vec3 p = uuu * p0; // first term
+		p += 3 * uu * currentTime * p1; // second term
+		p += 3 * u * tt * p2; // third term
+		p += ttt * p3; // fourth term
 
 		return p;
 	}

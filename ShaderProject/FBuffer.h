@@ -1,7 +1,7 @@
 #pragma once
 #include <sstream>
 #include <iostream>
-#include <GL/glew.h> // Contains all the necessery OpenGL includes
+#include <GL/glew.h>
 
 class FBuffer
 {
@@ -11,52 +11,42 @@ public:
 	GLuint fBufferBrightTexture;
 
 	FBuffer(unsigned int windowWidth, unsigned int windowHeight){
-			//generate the fBuffer 
+			// generate the fBuffer 
 			glGenFramebuffers(1, &fBuffer);
 		
-			//bind the fBuffer
+			// bind the fBuffer
 			glBindFramebuffer(GL_FRAMEBUFFER, fBuffer);
 			
-			//generate the color texture
+			// generate the color texture
 			glGenTextures(1, &fBufferTexture);
-			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, fBufferTexture);
-			//set texture attributes: size correspondes to the window dimensions, float precision and no alpha 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
-			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			//setting the texture wrapping mode
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			//add the generated texture to the framebuffer at slot 0 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fBufferTexture, 0);
 			
 			
-			//generate the bright color texture (used for bloom)
+			// generate the bright color texture (used for bloom)
 			glGenTextures(1, &fBufferBrightTexture);
-			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, fBufferBrightTexture);
-			//set texture attributes: size correspondes to the window dimensions, float precision and no alpha 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
-			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			//setting the texture wrapping mode
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			//add the generated texture to the framebuffer at slot 0 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, fBufferBrightTexture, 0);
 
 
 			GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 			glDrawBuffers(2, attachments);
 		
-			// - Finally check if framebuffer is complete
+			// finally check if framebuffer is complete
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 				std::cout << "Framebuffer not complete!" << std::endl;
 		
-			//unbind the fBuffer
+			// unbind the fBuffer
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -73,8 +63,5 @@ public:
 		glActiveTexture(GL_TEXTURE0 + textureID);
 		glBindTexture(GL_TEXTURE_2D, fBufferTexture);
 	}
-private:
-	
-	
 };
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GL/glew.h> // Contains all the necessery OpenGL includes
+#include <GL/glew.h>
 #include <glm/glm.hpp>
 
 class PointLight

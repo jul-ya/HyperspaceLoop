@@ -6,8 +6,7 @@
 #include <ctime>
 using namespace std;
 
-// >>>>>>>>>>>>>>>>>> Base class <<<<<<<<<<<<<<<<<<<
-
+// base class
 class PointGenerator {
 
 public:
@@ -21,17 +20,15 @@ public:
 protected:
 	unsigned int spread;
 
-	// Creates a random float number between 0 and 1, inclusive
+	// creates a random float number between 0 and 1, inclusive
 	float randomFloat() {
 		return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	}
 };
 
-// >>>>>>>>>>>>>>>>>> Derived classes <<<<<<<<<<<<<<<<<<<
+// derived classes
 
-/**
-* Generates a random position inside a sphere specified by spread.
-*/
+// generates a random position inside a sphere specified by spread
 class SpherePointGenerator : virtual public PointGenerator {
 
 public:
@@ -60,9 +57,7 @@ private:
 };
 
 
-/**
-* Generates a random position inside a cube specified by spread.
-*/
+// generates a random position inside a cube specified by spread
 class CubePointGenerator : virtual public PointGenerator {
 
 public:
@@ -74,9 +69,7 @@ public:
 };
 
 
-/**
-* Generates a random position in a cylindric tube specified by spread and length.
-*/
+// generates a random position in a cylindric tube specified by spread and length
 class TubePointGenerator : virtual public PointGenerator {
 
 public:

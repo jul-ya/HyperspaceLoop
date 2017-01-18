@@ -1,9 +1,7 @@
 #pragma once
 
-// Std. Includes
 #include <vector>
 
-// GL Includes
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -21,10 +19,10 @@ public:
 	{
 		skyboxModel = new Model("../ShaderProject/Model/Skybox/Skybox.obj", shader);
 		
-		// Assign shader
+		// assign shader
 		this->shader = shader;
 
-		// Assign faces
+		// assign faces
 		vector<const GLchar*> faces;
 		faces.push_back("../ShaderProject/Texture/Skyboxes/BlueGalaxy/blue_galaxy_right1.jpg");
 		faces.push_back("../ShaderProject/Texture/Skyboxes/BlueGalaxy/blue_galaxy_left2.jpg");
@@ -35,14 +33,11 @@ public:
 		cubemapTexture = loadCubemap(faces);
 	}
 		
-	/**
-	* Loads the cubemap.
-	*/
+	// loads the cubemap
 	GLuint loadCubemap(vector<const GLchar*> faces)
 	{
 		GLuint textureID;
 		glGenTextures(1, &textureID);
-		//glActiveTexture(GL_TEXTURE0);
 
 		int width, height;
 		unsigned char* image;
@@ -67,9 +62,7 @@ public:
 		return textureID;
 	}
 
-	/**
-	* Draws the skybox.
-	*/
+	// draws the skybox
 	void Draw(Shader* shader)
 	{
 		skyboxModel->Draw(*shader);

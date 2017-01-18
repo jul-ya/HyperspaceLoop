@@ -1,7 +1,7 @@
 #pragma once
 #include <sstream>
 #include <iostream>
-#include <GL/glew.h> // Contains all the necessery OpenGL includes
+#include <GL/glew.h>
 
 class GBuffer
 {
@@ -21,90 +21,66 @@ public:
 	GLuint textures[TextureAmount];
 
 	GBuffer(unsigned int windowWidth, unsigned int windowHeight){
-			//generate the gBuffer 
+			// generate the gBuffer 
 			glGenFramebuffers(1, &gBuffer);
 		
-			//bind the gBuffer
+			// bind the gBuffer
 			glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
 		
-			//generate the position texture
+			// generate the position texture
 			glGenTextures(1, &textures[0]);
-			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, textures[0]);
-			//set texture attributes: size correspondes to the window dimensions, float precision and no alpha 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
-			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			//add the generated texture to the framebuffer at slot 0 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textures[0], 0);
 		
 		
-			//generate the normal texture
+			// generate the normal texture
 			glGenTextures(1, &textures[1]);
-			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, textures[1]);
-			//set texture attributes: size correspondes to the window dimensions, float precision and no alpha
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
-			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			//add the generated texture to the framebuffer at slot 1 
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, textures[1], 0);
 		
 		
-			//generate the color texture
+			// generate the color texture
 			glGenTextures(1, &textures[2]);
-			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, textures[2]);
-			//set texture attributes: size correspondes to the window dimensions, unsigned byte for displaying color values is enough, alpha required
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, windowWidth, windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			//add the generated texture to the framebuffer at slot 2
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, textures[2], 0);
 
-			
-		
-			//generate the depth texture
+			// generate the depth texture
 			glGenTextures(1, &textures[3]);
-			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, textures[3]);
-			//set texture attributes: size correspondes to the window dimensions, unsigned byte for displaying color values is enough, alpha required
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
-			//setting min and mag filter
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			//add the generated texture to the framebuffer at slot 3
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textures[3], 0);
 
-
-			//generate the black draw texture
+			// generate the black draw texture
 			glGenTextures(1, &textures[4]);
-			//bind the texture
 			glBindTexture(GL_TEXTURE_2D, textures[4]);
-			//set texture attributes: size correspondes to the window dimensions, unsigned byte for displaying color values is enough, alpha required
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, windowWidth, windowHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-			//setting min and mag filter
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			//add the generated texture to the framebuffer at slot 2
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, textures[4], 0);
 
-			//set the 3 buffers into which outputs from the fragment shader data will be written
+			// set the 4 buffers into which outputs from the fragment shader data will be written
 			GLuint attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3  };
 			glDrawBuffers(4, attachments);
 		
-			// - Finally check if framebuffer is complete
+			// finally check if framebuffer is complete
 			if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 				std::cout << "Framebuffer not complete!" << std::endl;
 		
-			//unbind the gBuffer
+			// unbind the gBuffer
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		
 			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
 	}
 
 	~GBuffer(){}	
@@ -117,7 +93,6 @@ public:
 		glActiveTexture(GL_TEXTURE0 + textureType);
 		glBindTexture(GL_TEXTURE_2D, textures[textureType]);
 	}
-private:
-	
+
 };
 

@@ -493,7 +493,6 @@ void geometryStep() {
 		glBindTexture(GL_TEXTURE_2D, asteroid->textures_loaded[0].id);
 		for (GLuint i = 0; i < asteroid->meshes.size(); i++)
 		{
-			glUniform3f(glGetUniformLocation(instancingShader->Program, "startPos"), asteroid->meshes[i].startPos.x, asteroid->meshes[i].startPos.y, asteroid->meshes[i].startPos.z);
 			glBindVertexArray(asteroid->meshes[i].VAO);
 			glDrawElementsInstanced(GL_TRIANGLES, asteroid->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, 500);
 			glBindVertexArray(0);

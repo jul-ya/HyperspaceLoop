@@ -1,6 +1,8 @@
 #pragma once
 
-/*	https://github.com/jesusgollonet/ofpennereasing
+/*	
+	https://github.com/jesusgollonet/ofpennereasing
+	easing functions by Jesus Gollonet
 */
 
 enum EaseTypes {
@@ -26,13 +28,13 @@ public:
 	}
 
 private:
-	//linear ease
+	// linear ease
 	static float linear(float currentTime, float beginValue, float changeInValue, float duration) {
 		return changeInValue * currentTime / duration + beginValue;
 	}
 
 
-	//quadratic ease
+	// quadratic ease
 	static float easeInOutQuad(float currentTime, float beginValue, float changeInValue, float duration) {
 		if ((currentTime /= duration / 2) < 1) return ((changeInValue / 2)*(currentTime*currentTime)) + beginValue;
 		return -changeInValue / 2 * (((currentTime - 2)*(--currentTime)) - 1) + beginValue;
@@ -48,7 +50,7 @@ private:
 	}
 
 
-	//circular ease
+	// circular ease
 	static float easeInOutCirc(float currentTime, float beginValue, float changeInValue, float duration) {
 		if ((currentTime /= duration / 2) < 1) return -changeInValue / 2 * (sqrt(1 - currentTime*currentTime) - 1) + beginValue;
 		return changeInValue / 2 * (sqrt(1 - currentTime*(currentTime -= 2)) + 1) + beginValue;
