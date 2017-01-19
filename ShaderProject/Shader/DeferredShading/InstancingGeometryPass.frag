@@ -117,7 +117,7 @@ void main()
 	float ny = heightMap( TexCoords3D + vec3( 0.0, e, 0.0 ) );
 	float nz = heightMap( TexCoords3D + vec3( 0.0, 0.0, e ) );
 
-	gNormal = normalize( Normal + 0.05 * vec3( Noise - nx, Noise - ny, Noise - nz ) / e );
+	gNormal = normalize( Normal );
 
     gAlbedoSpec.rgb = mix(vec3(1.5-Noise, 1.0-Noise, 0.8-Noise),texture(texture_diffuse1, TexCoords).rgb,0.7);
     gAlbedoSpec.a = Noise;

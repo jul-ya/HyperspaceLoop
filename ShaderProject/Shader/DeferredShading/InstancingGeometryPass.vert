@@ -112,7 +112,7 @@ void main()
     Normal = normalMatrix * normal;
     Noise = heightMap(worldPos.xyz);
 	TexCoords3D = worldPos.xyz;
-    float dispFactor = 0.8 /* = displacement scale factor*/ * Noise + 0.4 /* = displacement bias*/;
+    float dispFactor = 3.6 /* = displacement scale factor*/ * Noise + 1.8 /* = displacement bias*/;
     vec4 dispPos = vec4( normal.x, normal.y, normal.z, 0)*dispFactor + worldPos;
 	
     FragPos = dispPos.xyz;

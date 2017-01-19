@@ -364,7 +364,7 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 	modelMatrices = new glm::mat4[amount];
 	srand(glfwGetTime()); // initialize random seed	
 	GLfloat radius = 150.0f;
-	GLfloat offset = 300.0f;
+	GLfloat offset = 400.0f;
 	for (GLuint i = 0; i < amount; i++)
 	{
 		glm::mat4 model;
@@ -376,15 +376,11 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 		GLfloat y = -2.5f + displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
 		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
 		GLfloat z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x+200, y+70, z-5300));
+		model = glm::translate(model, glm::vec3(x+300+displacement, y+300+displacement, z-5300));
 
 		// scale: scale 
 		GLfloat scale = (rand() % 3) / 100.0f + 0.05;
 		model = glm::scale(model, glm::vec3(scale));
-
-		// rotation: add random rotation around a (semi)randomly picked rotation axis vector
-		GLfloat rotAngle = (rand() % 360);
-		model = glm::rotate(model, rotAngle, glm::vec3(0.4f, 0.6f, 0.8f));
 
 		// now add to list of matrices
 		modelMatrices[i] = model;
@@ -686,7 +682,7 @@ int main()
 	glEnable(GL_FRAMEBUFFER_SRGB);
 
 	// perform instancing setup
-	modelMatrices = setupInstanceMatrices(500);
+	modelMatrices = setupInstanceMatrices(250);
 
 	// init shaders
 	initShaders();
