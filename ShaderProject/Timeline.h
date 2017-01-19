@@ -73,7 +73,6 @@ private:
 			if ((*i)->animationDone())
 			{
 				i = activeAnimations.erase(i);
-				std::cout << activeAnimations.size() << std::endl;
 			}
 			else
 			{

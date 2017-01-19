@@ -8,7 +8,7 @@ public:
 	LightScatterAnimation(Shader* lightScatterShader, GLfloat startTime) : PathAnimation(startTime), lightScatterShader(lightScatterShader) {
 
 		lightScatterShader->Use();
-		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 1.85f);
+		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 1.65f);
 		position = glm::vec2(0.0, 0.5);
 		glUniform2fv(glGetUniformLocation(lightScatterShader->Program, "scatterOrigin"), 1, &position[0]);
 
@@ -16,7 +16,7 @@ public:
 			Bezier(glm::vec3(0.0, 0.5, 0), glm::vec3(0.4, 0.6, 0), glm::vec3(0.7, 0.7, 0), glm::vec3(1.0, 0.9, 0)),
 			EaseTypes::EaseInOutQuad,
 			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
-			EaseTypes::EaseInOutQuad, 4.0f));
+			EaseTypes::EaseInOutQuad, 8.0f));
 		animation.push_back(AnimationSequence(
 			Bezier(glm::vec3(1.0, 0.9, 0), glm::vec3(0.2, 0.7, 0), glm::vec3(0.2, 0.7, 0), glm::vec3(1.0, 0.9, 0)),
 			EaseTypes::EaseInOutQuad,
@@ -36,7 +36,7 @@ public:
 			Bezier(glm::vec3(1.2, 0.9, 0), glm::vec3(1.2, 0.9, 0), glm::vec3(1.2, 0.9, 0), glm::vec3(1.2, 0.9, 0)),
 			EaseTypes::EaseInOutQuad,
 			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
-			EaseTypes::EaseInOutQuad, 5.0f));
+			EaseTypes::EaseInOutQuad, 4.0f));
 		animation.push_back(AnimationSequence(
 			Bezier(glm::vec3(0.0, 0.9, 0), glm::vec3(0.33, 0.9, 0), glm::vec3(0.66, 0.9, 0), glm::vec3(1.0, 0.9, 0)),
 			EaseTypes::EaseInOutQuad,

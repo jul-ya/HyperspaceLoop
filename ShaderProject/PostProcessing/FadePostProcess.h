@@ -35,7 +35,7 @@ public:
 		glUniform1i(glGetUniformLocation(postProShader->Program, "mask"), 1);
 	}
 
-	virtual void execute(FBuffer* outputBuffer, FBuffer* inputBuffer, Quad* screenQuad, GLfloat maskWeight, GLfloat maskSpread, glm::vec4 maskColor, bool drawToBuffer) {
+	virtual void execute(FBuffer* outputBuffer, FBuffer* inputBuffer, Quad* screenQuad, bool drawToBuffer) {
 		this->outputBuffer = outputBuffer;
 
 		glActiveTexture(GL_TEXTURE0);
@@ -51,7 +51,22 @@ public:
 		render(screenQuad, drawToBuffer);
 	}
 
+	void setMaskWeight(GLfloat maskWeight) {
+		this->maskWeight = maskWeight;
+	}
+
+	void setMaskSpread(GLfloat maskSpread) {
+		this->maskSpread = maskSpread;
+	}
+
+	void setMaskColor(glm::vec4 maskColor) {
+		this->maskColor = maskColor;
+	}
+
 private:
 	GLuint fadeTexture;
 
+	GLfloat maskWeight = 0.0f;
+	GLfloat maskSpread = 0.0f;
+	glm::vec4 maskColor = glm::vec4(1.0f,1.0f,1.0f,1.0f);
 };

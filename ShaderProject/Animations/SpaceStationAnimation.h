@@ -7,7 +7,7 @@ public:
 
 	SpaceStationAnimation(GameObject& spaceStation, GameObject& tunnel, glm::vec3 position, GLfloat startTime) : PathAnimation(startTime), spaceStation(spaceStation), tunnel(tunnel), position(position){
 		//tunnel is not displayed at the beginning
-		distantPosition = position * 4.0f;
+		distantPosition = position * -4.0f;
 		tunnel.getTransform().setPosition(distantPosition);
 		tunnel.getTransform().setRotation(glm::vec3(0, 90, 0));
 

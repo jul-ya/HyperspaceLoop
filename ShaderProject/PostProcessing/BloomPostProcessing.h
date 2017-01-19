@@ -18,7 +18,7 @@ public:
 		glUniform1i(glGetUniformLocation(postProShader->Program, "bloomBlur"), 1);
 	}
 
-	virtual void execute(FBuffer* outputBuffer, GLuint texture, GLuint brightTexture, Quad* screenQuad, float bloom, float exposure, bool drawToBuffer) {
+	virtual void execute(FBuffer* outputBuffer, GLuint texture, GLuint brightTexture, Quad* screenQuad, bool drawToBuffer) {
 		this->outputBuffer = outputBuffer;
 
 
@@ -30,11 +30,16 @@ public:
 
 		// exposure and bloom intensity
 		postProShader->Use();
-		glUniform1f(glGetUniformLocation(postProShader->Program, "bloom"), bloom);
 		glUniform1f(glGetUniformLocation(postProShader->Program, "exposure"), exposure);
 
 		render(screenQuad, drawToBuffer);
 	}
 
+	void setExposure(GLfloat exposure) {
+		this->exposure = exposure;
+	}
+
+private:
+	GLfloat exposure = 2.0;
 
 };

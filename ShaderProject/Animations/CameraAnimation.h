@@ -27,14 +27,16 @@ public:
 		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-90, 0, 0.0f), glm::vec3(-90, 0, 0.0f), glm::vec3(-90, 0, 0.0f)), EaseTypes::EaseInOutQuad, 1.0f));
 		//@27s : turning right
 		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-25, 0, 0.0f), glm::vec3(-25, 0, 0.0f), glm::vec3(-90, 0, 0.0f)), EaseTypes::EaseInOutQuad, 7.0f));
-		//
+		//@34s 
 		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-90, 0, 0.0f), glm::vec3(-90, 0, 0.0f), glm::vec3(-90, 0, 0.0f)), EaseTypes::EaseInOutQuad, 3.0f));
-		//
+		//@37s
 		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-90, 0, 0), glm::vec3(-110, 0, 0.0f), glm::vec3(-180, 0, 0.0f), glm::vec3(-270, 0, 0.0f)), EaseTypes::EaseInOutQuad, 14.0f));
-		//camera rotation with spaceship
+		//@51s
 		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-270, 0, 0), glm::vec3(-360, 0, 0.0f), glm::vec3(-450, 0, 0.0f), glm::vec3(-540, 0, 0.0f)), EaseTypes::EaseInOutQuad, 7.5f));
-		//camera rotation with spaceship
-		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-180, 0, 0), glm::vec3(-180,0 , 0.0f), glm::vec3(-180, 0, 0.0f), glm::vec3(-180, 0, 0.0f)), EaseTypes::EaseInOutQuad, 37.5f));
+		//@58,5
+		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-180, 0, 0), glm::vec3(-180,0 , 0.0f), glm::vec3(-180, 0, 0.0f), glm::vec3(-180, 0, 0.0f)), EaseTypes::EaseInOutQuad, 20.4f));
+		//@72,9
+		animation.push_back(AnimationSequence(Bezier(glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f), glm::vec3(45.0f, 30.0f, 0.0f)), EaseTypes::EaseInOutQuad, Bezier(glm::vec3(-180, 0, 0), glm::vec3(-180, 0, 0.0f), glm::vec3(-180, 0, 0.0f), glm::vec3(-180, 0, 0.0f)), EaseTypes::EaseInOutQuad, 10.0f));
 
 
 		
@@ -43,8 +45,13 @@ public:
 	}
 
 	virtual void animate() {
-		if (currentIndex == 1) {
+		if (currentIndex == 1 && !followShip) {
 			followShip = true;
+		}
+
+		if (currentIndex == sequenceCount - 1 && followShip) {
+			followShip = false;
+			cameraEndPositon = spaceShip.getTransform().getPosition();
 		}
 
 		float easedValue = TweenFunctions::ease(animation[currentIndex].pathEaseType, activeTime, 0.0f, 1.0f, animation[currentIndex].duration);
@@ -58,7 +65,12 @@ public:
 			camera.Zoom = tweenPosition.x;
 		}
 		else {
-			camera.Position = tweenPosition + cameraOffset;
+			if (currentIndex == sequenceCount - 1) {
+				camera.Position = cameraEndPositon + cameraOffset;
+			}
+			else {
+				camera.Position = tweenPosition + cameraOffset;
+			}
 			camera.Position.y = camera.Up.y * 2;
 		}
 
@@ -76,6 +88,7 @@ public:
 private:
 	bool followShip = false;
 	glm::vec3 cameraOffset;
+	glm::vec3 cameraEndPositon;
 	GameObject& spaceShip;
 	Camera& camera;
 };

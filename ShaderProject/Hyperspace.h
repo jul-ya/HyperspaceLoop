@@ -13,7 +13,12 @@
 
 class Hyperspace {
 public:
+	std::vector<GLfloat> directionalIntensity = std::vector<GLfloat>();
+	
 	Hyperspace() {
+		directionalIntensity.push_back(10.0f);
+		directionalIntensity.push_back(10.0f);
+
 		addSceneObjects();
 		addSceneLights();
 	}
@@ -48,11 +53,14 @@ public:
 		return sceneObjects[9];
 	}
 
+	
+
 private:
 	
 	std::vector<PointLight> sceneLights;
 	std::vector<glm::vec3> sceneLightPositions;
 	std::vector<glm::vec3> sceneLightColors;
+
 
 	// contains all gameobjects
 	std::vector<GameObject> sceneObjects;
@@ -74,29 +82,29 @@ private:
 			sceneLights.push_back(PointLight(glm::vec3(-882, 2, -5750 + (i * 20)), glm::vec3(0.0, 1.0, 0.0)));
 		}
 
-		srand(13);
-		for (GLuint i = 0; i < NR_LIGHTS-10; i++)
-		{
-			// calculate slightly random offsets
-			GLfloat xPos = ((rand() % 100) / 100.0) * 9 - 3.0;
-			GLfloat yPos = ((rand() % 100) / 100.0) * 9 - 4.0;
-			GLfloat zPos = ((rand() % 100) / 100.0) * 9 - 3.0;
+		//srand(13);
+		//for (GLuint i = 0; i < NR_LIGHTS-10; i++)
+		//{
+		//	// calculate slightly random offsets
+		//	GLfloat xPos = ((rand() % 100) / 100.0) * 9 - 3.0;
+		//	GLfloat yPos = ((rand() % 100) / 100.0) * 9 - 4.0;
+		//	GLfloat zPos = ((rand() % 100) / 100.0) * 9 - 3.0;
 
-			// also calculate random color
-			GLfloat rColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
-			GLfloat gColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
-			GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
+		//	// also calculate random color
+		//	GLfloat rColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
+		//	GLfloat gColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
+		//	GLfloat bColor = ((rand() % 100) / 200.0f) + 0.5; // between 0.5 and 1.0
 
-			sceneLightPositions.push_back(glm::vec3(xPos, yPos, zPos));
-			if (i == 0) {
-				sceneLightColors.push_back(glm::vec3(255 /255.0f, 208 /255.0f, 120 /255.0f));
-				sceneLights.push_back(PointLight(glm::vec3(xPos, yPos, zPos), glm::vec3(255 / 255.0f, 208 / 255.0f, 120 / 255.0f)));
-			}
-			else {
-				sceneLightColors.push_back(glm::vec3(rColor, gColor, bColor));
-				sceneLights.push_back(PointLight(glm::vec3(xPos, yPos, zPos), glm::vec3(rColor, gColor, bColor)));
-			}
-		}
+		//	sceneLightPositions.push_back(glm::vec3(xPos, yPos, zPos));
+		//	if (i == 0) {
+		//		sceneLightColors.push_back(glm::vec3(255 /255.0f, 208 /255.0f, 120 /255.0f));
+		//		sceneLights.push_back(PointLight(glm::vec3(xPos, yPos, zPos), glm::vec3(255 / 255.0f, 208 / 255.0f, 120 / 255.0f)));
+		//	}
+		//	else {
+		//		sceneLightColors.push_back(glm::vec3(rColor, gColor, bColor));
+		//		sceneLights.push_back(PointLight(glm::vec3(xPos, yPos, zPos), glm::vec3(rColor, gColor, bColor)));
+		//	}
+		//}
 
 		for (int i = 0; i < 10; i++) {
 			sceneLightPositions.push_back(glm::vec3(-882, 2, -5750 + (i*20)));

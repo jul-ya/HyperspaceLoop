@@ -29,6 +29,9 @@
 #include "Animations\LightScatterAnimation.h"
 #include "Animations\MotionBlurAnimation.h"
 #include "Animations\TextAnimation.h"
+#include "Animations\FadeAnimation.h"
+#include "Animations\ExposureAnimation.h"
+#include "Animations\DirectionalLightAnimation.h"
 
 #include "PostProcessing\PostProcessing.h"
 #include "PostProcessing\BlurPostProcess.h"
@@ -127,9 +130,6 @@ GLuint instanceBuffer;
 glm::mat4* modelMatrices;
 Model* asteroid;
 
-// hdr variables
-float exposure = 2.0f;
-bool bloom = true;
 
 // motionblur variables
 glm::mat4 lastProjection = glm::mat4();
@@ -138,21 +138,18 @@ glm::mat4 lastView = glm::mat4();
 // light scattering variables
 glm::vec3 startLightPosition = glm::vec3(1500.0f, 50.0f, -7000.0f);
 glm::vec3 relayStart = glm::vec3(-50, 0, 700);
-glm::vec3 relayEnd = glm::vec3(-1050, 2, -5687);
+glm::vec3 relayEnd = glm::vec3(-1500, 2, -5687);
 
 Model* starLight;
 Model* relay;
 
 float weight = 0.075f;
-float density = 1.8f;
+float density = 1.7f;
 float rayDecay = 0.89f;
 
 // skybox 
 Skybox* skybox;
 
-// fade variables
-float maskWeight = 0.0f;
-float maskSpread = 0.5f;
 
 // postpro objects
 
@@ -300,13 +297,16 @@ void setupScene()
 
 	//global offset -3.0
 	
+	timeline->addAnimation(new DirectionalLightAnimation(*hyperspace, 0.0f));
+	timeline->addAnimation(new FadeAnimation(fadePostPro, 0.0f));
 	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 0.0f));
 	timeline->addAnimation(new TextAnimation(textPostPro, 0.0f));
 
 	timeline->addAnimation(new MotionBlurAnimation(motionBlurPostPro.getPostProShader(), 0.0f));
 	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
+	timeline->addAnimation(new ExposureAnimation(bloomPostPro, 1.0f));
 
-	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f +18.0f));
+	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f +14.0f));
 
 	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], hyperspace->getSceneObjects()[2], glm::vec3(-900, -60, -5750), 1.0f + 22)); /*+ 19.0 offset */
 
@@ -348,7 +348,8 @@ void setupScene()
 		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
 
 
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Intensity").c_str()), (i == 0 || i == 1)? 10.0f: 1.0f);
+		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Intensity").c_str()), (i == 0 || i == 1)? hyperspace->directionalIntensity[i]: 1.0f);
+		cout << hyperspace->directionalIntensity[0] << endl;;
 		//2 directional lights - rest point lights
 		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].IsDirectional").c_str()), (i == 0 || i == 1) ? true : false);
 	}
@@ -540,7 +541,7 @@ void postprocessingStep() {
 	additiveBlendPostPro.execute(swapBuffer2, swapBuffer->fBufferBrightTexture, lightScatterPostPro.getOutputBuffer()->fBufferTexture, screenQuad, true);
 
 	// hdr + bloom
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 3; i++) {
 		// horizontal blur
 		blurPostPro.execute(swapBuffer1, swapBuffer2, screenQuad, true, true);
 
@@ -551,7 +552,7 @@ void postprocessingStep() {
 	antiAliasPostPro.execute(swapBuffer1, swapBuffer, screenQuad, true);
 
 	// blending the bloom and light scatter colours with the original colour output
-	bloomPostPro.execute(swapBuffer2, antiAliasPostPro.getOutputBuffer()->fBufferTexture, blurPostPro.getOutputBuffer()->fBufferTexture, screenQuad, bloom, exposure, true);
+	bloomPostPro.execute(swapBuffer2, antiAliasPostPro.getOutputBuffer()->fBufferTexture, blurPostPro.getOutputBuffer()->fBufferTexture, screenQuad, true);
 
 	// motion blur
 	motionBlurPostPro.execute(swapBuffer, gBuffer->textures[3], bloomPostPro.getOutputBuffer()->fBufferTexture, screenQuad, view, projection, lastView, lastProjection, true);
@@ -561,7 +562,7 @@ void postprocessingStep() {
 	additiveBlendPostPro.execute(swapBuffer2, swapBuffer1->fBufferTexture, swapBuffer->fBufferTexture, screenQuad, true);
 
 	// masked fade
-	fadePostPro.execute(swapBuffer, swapBuffer2, screenQuad, maskWeight, maskSpread, glm::vec4(1.0, 1.0, 1.0, 1.0), false); // currently weight and spread are controlled by keys: UIOP
+	fadePostPro.execute(swapBuffer, swapBuffer2, screenQuad, false); // currently weight and spread are controlled by keys: UIOP
 
 	// stars are rendered forward - so write the depth back into the standard depth buffer
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
@@ -719,23 +720,23 @@ void handleMovement()
 	if (keys[GLFW_KEY_D])
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 
-	// postpro controls
-	if (keys[GLFW_KEY_1]) {
-		exposure += 0.025f;
-		std::cout << "exposure: " << exposure << std::endl;
-	}
-	if (keys[GLFW_KEY_2]) {
-		exposure -= 0.025f;
-		std::cout << "exposure: " << exposure << std::endl;
-	}
-	if (keys[GLFW_KEY_B]) {
-		bloom = true;
-		std::cout << "bloom turned on" << std::endl;
-	}
-	if (keys[GLFW_KEY_N]) {
-		bloom = false;
-		std::cout << "bloom turned off" << std::endl;
-	}
+	//// postpro controls
+	//if (keys[GLFW_KEY_1]) {
+	//	exposure += 0.025f;
+	//	std::cout << "exposure: " << exposure << std::endl;
+	//}
+	//if (keys[GLFW_KEY_2]) {
+	//	exposure -= 0.025f;
+	//	std::cout << "exposure: " << exposure << std::endl;
+	//}
+	//if (keys[GLFW_KEY_B]) {
+	//	bloom = true;
+	//	std::cout << "bloom turned on" << std::endl;
+	//}
+	//if (keys[GLFW_KEY_N]) {
+	//	bloom = false;
+	//	std::cout << "bloom turned off" << std::endl;
+	//}
 	if (keys[GLFW_KEY_3]) {
 		weight += 0.025f;
 		std::cout << "weight: " << weight << std::endl;
@@ -767,23 +768,7 @@ void handleMovement()
 	if (keys[GLFW_KEY_0]) {
 		fadeOutDistance -= 1.0f;
 		std::cout << "fadeOutDistance: " << fadeOutDistance << std::endl;
-	}
-	if (keys[GLFW_KEY_U]) {
-		maskWeight += 0.01f;
-		std::cout << "maskWeight: " << maskWeight << std::endl;
-	}
-	if (keys[GLFW_KEY_I]) {
-		maskWeight -= 0.01f;
-		std::cout << "maskWeight: " << maskWeight << std::endl;
-	}
-	if (keys[GLFW_KEY_O]) {
-		maskSpread += 0.01f;
-		std::cout << "maskSpread " << maskSpread << std::endl;
-	}
-	if (keys[GLFW_KEY_P]) {
-		maskSpread -= 0.01f;
-		std::cout << "maskSpread " << maskSpread << std::endl;
-	}
+	}	
 }
 
 /**

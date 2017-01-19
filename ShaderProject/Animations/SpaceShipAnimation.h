@@ -78,10 +78,11 @@ public:
 		sequenceCount = animation.size();
 		//@62.9s
 		animation.push_back(AnimationSequence(
-			Bezier(glm::vec3(-897, 2, -5687), glm::vec3(-942, 2, -5687), glm::vec3(-1000, 2, -5687), glm::vec3(-1050, 2, -5687)),
+			Bezier(glm::vec3(-897, 2, -5687), glm::vec3(-942, 2, -5687), glm::vec3(-1200, 2, -5687), glm::vec3(-1500, 2, -5687)),
 			EaseTypes::Linear,
 			Bezier(glm::vec3(0, 90, 0), glm::vec3(0, 90, 0), glm::vec3(0, 90, 0), glm::vec3(0, 90, 0)),
-			EaseTypes::EaseInOutQuad, 10.0f));
+			EaseTypes::EaseInOutQuad, 14.0f));
+		//@72.9s
 		sequenceCount = animation.size();
 	}
 
