@@ -61,8 +61,7 @@ void main()
     }      
 
 	float brightness =  (lighting.r * 0.2126)+ (lighting.g * 0.7152) + (lighting.b * 0.0722);
-	if(brightness > 1.0)
-		BrightColor = vec4(lighting, 1.0) * brightness * brightness;
+	BrightColor = vec4(lighting, 1.0) * brightness * brightness;
 
     FragColor = vec4(lighting, 1.0);
 }
