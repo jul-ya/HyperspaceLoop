@@ -9,7 +9,7 @@ public:
 		specificReset();
 
 		//wait time
-		animation.push_back(AnimationSequence(47.0f));
+		animation.push_back(AnimationSequence(58.5f));
 		//change draw status
 		animation.push_back(AnimationSequence(1.0f));
 
