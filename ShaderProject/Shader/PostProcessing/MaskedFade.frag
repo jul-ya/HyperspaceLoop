@@ -3,7 +3,9 @@ out vec4 FragColor;
 in vec2 TexCoords;
 
 uniform sampler2D scene;
-uniform sampler2D mask;
+uniform sampler2D maskEnd;
+uniform sampler2D maskStart;
+uniform bool firstMask;
 uniform float maskWeight;
 uniform float maskSpread;
 uniform vec4 maskColor;
@@ -11,7 +13,12 @@ uniform vec4 maskColor;
 void main()
 {
 	vec4 color = texture(scene, TexCoords);
-	vec4 masked = texture(mask, TexCoords);
+	vec4 masked;
+
+	if(firstMask)
+		masked = texture(maskStart, TexCoords);
+	else
+		masked = texture(maskEnd, TexCoords);
 
 	// scale alpha to 0...254
 	float alpha = masked.r * (1.0 - 1.0/255.0);
