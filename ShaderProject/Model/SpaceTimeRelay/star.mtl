@@ -1,5 +1,5 @@
 # 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
-# File Created: 04.01.2017 19:44:38
+# File Created: 18.01.2017 22:19:17
 
 newmtl mat
 	Ns 10.0000
@@ -12,5 +12,5 @@ newmtl mat
 	Kd 0.2157 0.8392 0.9333
 	Ks 0.0000 0.0000 0.0000
 	Ke 0.0000 0.0000 0.0000
-	map_Ka texture_diffuse_scatter.png
-	map_Kd texture_diffuse_scatter.png
+	map_Ka relay_diffuse.jpg
+	map_Kd relay_diffuse.jpg

@@ -5,6 +5,7 @@ in vec3 FragPos;
 in vec3 Normal;
 
 uniform sampler2D texture_diffuse1;
+uniform float alpha;
 
 out vec4 FragColor;
 
@@ -101,6 +102,6 @@ float heightMap( vec3 coord ) {
 void main()
 {
 	float noise = heightMap(FragPos*0.2);
-
 	FragColor = vec4(mix(vec4(1.5-noise, 1.0-noise, 0.5-noise, 1.0-noise), vec4(0.0 ,0.0, 0.0, 0.0), TexCoords.y));
+	FragColor.a = mix(0.0, FragColor.a, alpha);
 }
