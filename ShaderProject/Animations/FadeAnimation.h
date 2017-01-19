@@ -7,8 +7,8 @@ public:
 
 	FadeAnimation(FadePostProcess& fadePostProcess, GLfloat startTime) : PathAnimation(startTime), fadePostProcess(fadePostProcess) {
 
-		//fadePostProcess.setMaskColor(glm::vec4(154/255.0f, 241/ 255.0f, 249/ 255.0f, 1.0f));
-		fadePostProcess.setMaskColor(glm::vec4(0 / 255.0f, 0 / 255.0f, 0 / 255.0f, 1.0f));
+		fadePostProcess.setMaskColor(glm::vec4(154/255.0f, 241/ 255.0f, 249/ 255.0f, 1.0f));
+		//fadePostProcess.setMaskColor(glm::vec4(0 / 255.0f, 0 / 255.0f, 0 / 255.0f, 1.0f));
 
 		fadePostProcess.setMaskSpread(0.6f);
 
@@ -20,10 +20,10 @@ public:
 			EaseTypes::EaseInOutQuad, 1.6f));*/
 
 		animation.push_back(AnimationSequence(
-			Bezier(glm::vec3(1.0, 1.0, 0), glm::vec3(0.67, 0.7, 0), glm::vec3(0.34, 0.8, 0), glm::vec3(0.0, 1.0, 0)),
+			Bezier(glm::vec3(1.2, 0.2, 0), glm::vec3(0.2, 0.2, 0), glm::vec3(0.01, 0.1, 0), glm::vec3(0.0, 0.0, 0)),
 			EaseTypes::EaseOutQuad,
 			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
-			EaseTypes::EaseInOutQuad, 1.6f)); 
+			EaseTypes::EaseInOutQuad, 1.0f)); 
 
 		animation.push_back(AnimationSequence(50.0f));
 

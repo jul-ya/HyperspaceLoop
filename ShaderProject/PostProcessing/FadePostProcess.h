@@ -16,7 +16,7 @@ public:
 		postProShader->Use();
 		glUniform1i(glGetUniformLocation(postProShader->Program, "scene"), 0);
 
-		std::string filename = std::string("../ShaderProject/Texture/Fade/circular.jpg");
+		std::string filename = std::string("../ShaderProject/Texture/Fade/relay_end.jpg");
 		glGenTextures(1, &fadeTexture);
 		int width, height;
 		unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
@@ -32,7 +32,27 @@ public:
 		glBindTexture(GL_TEXTURE_2D, 0);
 		SOIL_free_image_data(image);
 
-		glUniform1i(glGetUniformLocation(postProShader->Program, "mask"), 1);
+		glUniform1i(glGetUniformLocation(postProShader->Program, "maskEnd"), 1);
+
+		std::string filename2 = std::string("../ShaderProject/Texture/Fade/relay_start.jpg");
+		glGenTextures(1, &fadeTexture2);
+		int width2, height2;
+		unsigned char* image2 = SOIL_load_image(filename2.c_str(), &width2, &height2, 0, SOIL_LOAD_RGB);
+
+		glBindTexture(GL_TEXTURE_2D, fadeTexture2);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width2, height2, 0, GL_RGB, GL_UNSIGNED_BYTE, image2);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		SOIL_free_image_data(image2);
+
+		glUniform1i(glGetUniformLocation(postProShader->Program, "maskStart"), 2);
+
+		glUniform1i(glGetUniformLocation(postProShader->Program, "firstMask"), true);
 	}
 
 	virtual void execute(FBuffer* outputBuffer, FBuffer* inputBuffer, Quad* screenQuad, bool drawToBuffer) {
@@ -42,6 +62,8 @@ public:
 		glBindTexture(GL_TEXTURE_2D, inputBuffer->fBufferTexture);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, fadeTexture);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, fadeTexture2);
 
 		postProShader->Use();
 		glUniform1f(glGetUniformLocation(postProShader->Program, "maskWeight"), maskWeight);
@@ -65,6 +87,7 @@ public:
 
 private:
 	GLuint fadeTexture;
+	GLuint fadeTexture2;
 
 	GLfloat maskWeight = 0.0f;
 	GLfloat maskSpread = 0.0f;

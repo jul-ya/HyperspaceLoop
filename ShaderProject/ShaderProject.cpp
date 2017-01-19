@@ -138,7 +138,7 @@ glm::mat4 lastView = glm::mat4();
 // light scattering variables
 glm::vec3 startLightPosition = glm::vec3(1500.0f, 50.0f, -7000.0f);
 glm::vec3 relayStart = glm::vec3(-50, 0, 700);
-glm::vec3 relayEnd = glm::vec3(-1500, 2, -5687);
+glm::vec3 relayEnd = glm::vec3(-1500, -10, -5687);
 
 Model* starLight;
 Model* relay;
@@ -479,7 +479,7 @@ void geometryStep() {
 
 		model = glm::mat4();
 		model = glm::translate(model, relayEnd);
-		model = glm::scale(model, glm::vec3(2, 2, 2));
+		model = glm::scale(model, glm::vec3(4, 4, 4));
 		model = glm::rotate(model, (glm::mediump_float)90, glm::vec3(0, 1, 0));
 		glUniformMatrix4fv(glGetUniformLocation(geometryShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(geometryShader->Program, "isLightSource"), true);
@@ -563,7 +563,7 @@ void postprocessingStep() {
 	additiveBlendPostPro.execute(swapBuffer2, swapBuffer1->fBufferTexture, swapBuffer->fBufferTexture, screenQuad, true);
 
 	// masked fade
-	fadePostPro.execute(swapBuffer, swapBuffer2, screenQuad, false); // currently weight and spread are controlled by keys: UIOP
+	fadePostPro.execute(swapBuffer, swapBuffer2, screenQuad, false);
 
 	// stars are rendered forward - so write the depth back into the standard depth buffer
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer->gBuffer);
