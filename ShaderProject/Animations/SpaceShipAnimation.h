@@ -59,7 +59,7 @@ public:
 			EaseTypes::EaseInOutQuad, 8.0f));
 		//@53.9s
 		animation.push_back(AnimationSequence(
-			Bezier(glm::vec3(-855, 2, -5780), glm::vec3(-870, 2, -5780), glm::vec3(-882, 2, -5765), glm::vec3(-882, 2, -5750)),
+			Bezier(glm::vec3(-855, 2, -5780), glm::vec3(-870, 2, -5780), glm::vec3(-882, 2, -5755), glm::vec3(-882, 2, -5750)),
 			EaseTypes::Linear,
 			Bezier(glm::vec3(0, 90, 0), glm::vec3(0, 160, 80), glm::vec3(0, 180, 90), glm::vec3(0, 180, 0)),
 			EaseTypes::EaseInOutQuad, 3.0f));

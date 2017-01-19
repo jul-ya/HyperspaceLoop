@@ -32,6 +32,7 @@
 #include "Animations\ExposureAnimation.h"
 #include "Animations\DirectionalLightAnimation.h"
 #include "Animations\ThrustAnimation.h"
+#include "Animations\LightBulbAnimation.h"
 
 #include "PostProcessing\PostProcessing.h"
 #include "PostProcessing\BlurPostProcess.h"
@@ -296,6 +297,7 @@ void setupScene()
 
 	//global offset -3.0
 	
+	timeline->addAnimation(new LightBulbAnimation(lightBulbPostPro, 0.0f));
 	timeline->addAnimation(new ThrustAnimation(thrustPostPro, 0.0f));
 	timeline->addAnimation(new DirectionalLightAnimation(*hyperspace, 0.0f));
 	timeline->addAnimation(new FadeAnimation(fadePostPro, 0.0f));

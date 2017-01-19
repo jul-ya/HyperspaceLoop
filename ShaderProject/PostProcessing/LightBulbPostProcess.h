@@ -22,16 +22,24 @@ public:
 		glUniformMatrix4fv(glGetUniformLocation(postProShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(glGetUniformLocation(postProShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
-		for (int i = 0; i < hyperspace.getSceneLightColors().size(); i++) {
-			glm::mat4 model = glm::mat4();
-			model = glm::translate(model, hyperspace.getSceneLightPositions()[i]);
-			model = glm::scale(model, glm::vec3(0.05f));
-			glUniformMatrix4fv(glGetUniformLocation(postProShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-			glUniform3fv(glGetUniformLocation(postProShader->Program, "lightColor"), 1, &hyperspace.getSceneLightColors()[i][0]);
-			lightBulb->Draw(*postProShader);
+		if (drawThemAll) {
+			for (int i = 0; i < hyperspace.getSceneLightColors().size(); i++) {
+				glm::mat4 model = glm::mat4();
+				model = glm::translate(model, hyperspace.getSceneLightPositions()[i]);
+				model = glm::scale(model, glm::vec3(0.05f));
+				glUniformMatrix4fv(glGetUniformLocation(postProShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+				glUniform3fv(glGetUniformLocation(postProShader->Program, "lightColor"), 1, &hyperspace.getSceneLightColors()[i][0]);
+				lightBulb->Draw(*postProShader);
+			}
 		}
 	}
 
+	void setDraw(bool drawThemAll) {
+		this->drawThemAll = drawThemAll;
+	}
+
 private:
+
+	bool drawThemAll = false;;
 	Model* lightBulb;
 };

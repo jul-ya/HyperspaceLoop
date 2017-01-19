@@ -80,12 +80,12 @@ private:
 
 		//second tunnel segment left row lights
 		for (int i = 0; i < 10; i++) {
-			sceneLightPositions.push_back(glm::vec3(-880.0f - (i*30), 3.0f, -5690));
+			sceneLightPositions.push_back(glm::vec3(-880.0f - (i*30), -1.5f, -5690));
 			sceneLightColors.push_back(glm::vec3(1.0 -(i *0.05f), 0.0, 0.0));
 		}
 		//second tunnel segment right row lights
 		for (int i = 0; i < 10; i++) {
-			sceneLightPositions.push_back(glm::vec3(-880.0f - (i * 30), 3.0f, -5690));
+			sceneLightPositions.push_back(glm::vec3(-870.0f - (i * 30), 1.5f, -5690));
 			sceneLightColors.push_back(glm::vec3(1.0 - (i *0.05f), 0.0, 0.0));
 		}
 	}
