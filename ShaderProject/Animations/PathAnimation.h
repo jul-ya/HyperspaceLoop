@@ -57,7 +57,14 @@ public:
 		}
 	}
 
+	virtual void reset() {
+		activeTime = 0.0f;
+		currentIndex = 0;
+		isDone = false;
+		specificReset();
+	}
 
+	virtual void specificReset(){}
 
 	virtual void animate() {}
 protected:

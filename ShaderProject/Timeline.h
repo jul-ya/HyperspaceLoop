@@ -19,13 +19,17 @@ public:
 		isPaused = true;
 	}
 
-	void stop(){
-		activeAnimations.clear();
+	void reset(){
+		if (isPaused) {
+			activeAnimations.clear();
+			currentAnimationTime = 0.0f;
+			currentIndex = 0;
+		}
 	}
 
 	void addAnimation(Animation* animation) {
 		if (isPaused) {
-			animationQueue.push(animation);
+			animationVector.push_back(animation);
 		}
 	}
 
@@ -55,13 +59,13 @@ private:
 	bool isPaused = true;
 
 	std::list<Animation*> activeAnimations;
-	std::queue<Animation*> animationQueue;
-
+	std::vector<Animation*> animationVector;
+	int currentIndex = 0;
 
 	void checkAnimationTimes() {
-		while (animationQueue.size()!=0 && animationQueue.front()->getStartTime()<= currentAnimationTime) {
-			activeAnimations.push_back(animationQueue.front());
-			animationQueue.pop();
+		while (currentIndex < animationVector.size() && animationVector.size()!=0 && animationVector[currentIndex]->getStartTime()<= currentAnimationTime) {
+			activeAnimations.push_back(animationVector[currentIndex]);
+			currentIndex++;
 		}
 	}
 

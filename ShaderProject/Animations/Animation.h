@@ -11,7 +11,7 @@ public:
 	}
 
 	virtual void reset() {
-
+		isDone = false;
 	}
 
 	GLfloat getStartTime() {

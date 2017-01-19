@@ -7,10 +7,7 @@ public:
 
 	FadeAnimation(FadePostProcess& fadePostProcess, GLfloat startTime) : PathAnimation(startTime), fadePostProcess(fadePostProcess) {
 
-		fadePostProcess.setMaskColor(glm::vec4(154/255.0f, 241/ 255.0f, 249/ 255.0f, 1.0f));
-		fadePostProcess.setMaskSpread(0.8f);
-		fadePostProcess.setMaskOneActive(true);
-		maskChanged = false;
+		specificReset();
 
 		animation.push_back(AnimationSequence(
 			Bezier(glm::vec3(1.2, 0.5, 0), glm::vec3(0.2, 0.5, 0), glm::vec3(0.01, 0.25, 0), glm::vec3(0.0, 0.0, 0)),
@@ -39,6 +36,12 @@ public:
 		fadePostProcess.setMaskSpread(tweenPosition.y);
 	}
 
+	virtual void specificReset() {
+		fadePostProcess.setMaskColor(glm::vec4(154 / 255.0f, 241 / 255.0f, 249 / 255.0f, 1.0f));
+		fadePostProcess.setMaskSpread(0.8f);
+		fadePostProcess.setMaskOneActive(true);
+		maskChanged = false;
+	}
 
 private:
 	bool maskChanged = false;
