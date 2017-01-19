@@ -73,8 +73,8 @@ private:
 		sceneLightPositions.push_back(glm::vec3(15.0f, 0.5f, -70.0f));
 
 		// blueish directional light, index 1
-		sceneLightColors.push_back(glm::vec3(182 / 255.0f, 233 / 255.0f, 255 / 255.0f));
-		sceneLightPositions.push_back(glm::vec3(-15.0f, 0.5f, -70.0f));
+		sceneLightColors.push_back(glm::vec3(66 / 255.0f, 238 / 255.0f, 244 / 255.0f));
+		sceneLightPositions.push_back(glm::vec3(-25.0f, 0.5f, 70.0f));
 
 		for (int i = 0; i < 10; i++) {
 			sceneLightPositions.push_back(glm::vec3(-882, 2, -5750 + (i * 20)));
@@ -106,11 +106,11 @@ private:
 		//	}
 		//}
 
-		for (int i = 0; i < 10; i++) {
+	/*	for (int i = 0; i < 10; i++) {
 			sceneLightPositions.push_back(glm::vec3(-882, 2, -5750 + (i*20)));
 			sceneLightColors.push_back(glm::vec3(0.0, 1.0, 0.0));
 			sceneLights.push_back(PointLight(glm::vec3(-882, 2, -5750 + (i * 20)), glm::vec3(0.0, 1.0, 0.0)));
-		}
+		}*/
 	}
 
 	void addSceneObjects() {

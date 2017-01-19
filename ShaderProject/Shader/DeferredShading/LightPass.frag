@@ -19,7 +19,7 @@ struct Light {
     float Intensity;
 	bool IsDirectional;
 };
-const int NR_LIGHTS = 24;
+const int NR_LIGHTS = 10;
 uniform Light lights[NR_LIGHTS];
 uniform vec3 viewPos;
 
@@ -31,8 +31,8 @@ void main()
     vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;
     float Specular = texture(gAlbedoSpec, TexCoords).a;
 
-	float Depth = texture(gDepth, TexCoords).r;
-	gl_FragDepth = Depth;
+	//float Depth = texture(gDepth, TexCoords).r;
+	//gl_FragDepth = Depth;
     
     // calculate lighting
     vec3 lighting  = Diffuse * 0.075; // hard-coded ambient component
