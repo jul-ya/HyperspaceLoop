@@ -42,6 +42,7 @@
 #include "PostProcessing\AntiAliasingPostProcessing.h"
 #include "PostProcessing\TextPostProcessing.h"
 #include "PostProcessing\FadePostProcess.h"
+#include "PostProcessing\ThrustPostProcessing.h"
 
 // GLM
 #include <glm/glm.hpp>
@@ -88,7 +89,6 @@ GLfloat lastFrame = 0.0f;
 
 // shader
 Shader* geometryShader;
-Shader* alphaThrustShader;
 Shader* lightingShader;
 Shader* starShader;
 Shader* instancingShader;
@@ -161,6 +161,7 @@ BloomPostProcessing bloomPostPro = BloomPostProcessing();
 AntiAliasingPostProcessing antiAliasPostPro = AntiAliasingPostProcessing();
 TextPostProcessing textPostPro = TextPostProcessing();
 FadePostProcess fadePostPro = FadePostProcess();
+ThrustPostProcessing thrustPostPro = ThrustPostProcessing();
 
 //light model
 Model* lightBulb;
@@ -244,20 +245,12 @@ void initShaders()
 	geometryShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/DeferredShading/GeometryPass.frag");
 	lightingShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/DeferredShading/LightPass.frag");
 
-	// engine exhaust = thrust
-	alphaThrustShader = new Shader("../ShaderProject/Shader/DeferredShading/GeometryPass.vert", "../ShaderProject/Shader/Thrust/AlphaThrust.frag");
-
 	// set the position, normal and albedo samplers
 	lightingShader->Use();
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gPosition"), 0);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gNormal"), 1);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gAlbedoSpec"), 2);
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gDepth"), 3);
-
-
-	
-
-
 
 	// asteroid instancing shader
 	instancingShader = new Shader("../ShaderProject/Shader/DeferredShading/InstancingGeometryPass.vert", "../ShaderProject/Shader/DeferredShading/InstancingGeometryPass.frag");
@@ -285,6 +278,7 @@ void initShaders()
 	antiAliasPostPro.setup();
 	textPostPro.setup();
 	fadePostPro.setup();
+	thrustPostPro.setup();
 }
 
 /**
@@ -385,7 +379,7 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 		model = glm::translate(model, glm::vec3(x+200, y+70, z-5300));
 
 		// scale: scale 
-		GLfloat scale = (rand() % 8) / 10.0f + 0.05;
+		GLfloat scale = (rand() % 3) / 100.0f + 0.05;
 		model = glm::scale(model, glm::vec3(scale));
 
 		// rotation: add random rotation around a (semi)randomly picked rotation axis vector
@@ -618,14 +612,9 @@ void postprocessingStep() {
 		lightBulb->Draw(*lightBoxShader);
 	}
 
-	// draw the last model (thrust) with alpha
-	alphaThrustShader->Use();
-	glUniformMatrix4fv(glGetUniformLocation(alphaThrustShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(alphaThrustShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniform1f(glGetUniformLocation(alphaThrustShader->Program, "alpha"), 1.0);
-	// use ship model matrix (cheating here)
-	glUniformMatrix4fv(glGetUniformLocation(alphaThrustShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(hyperspace->getSceneObjects()[0].getTransform().getModelMatrix()));
-	hyperspace->getSceneObjects()[hyperspace->getSceneObjects().size() - 1].getModel().Draw(*alphaThrustShader);
+	//thrust
+	thrustPostPro.execute(*hyperspace, projection, view);
+
 	glDisable(GL_BLEND);
 
 	// save the view and projection for the motion blur calculation next frame

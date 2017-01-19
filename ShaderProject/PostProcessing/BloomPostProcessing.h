@@ -21,7 +21,6 @@ public:
 	virtual void execute(FBuffer* outputBuffer, GLuint texture, GLuint brightTexture, Quad* screenQuad, bool drawToBuffer) {
 		this->outputBuffer = outputBuffer;
 
-
 		// set color texture and bright color texture
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);

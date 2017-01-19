@@ -156,6 +156,7 @@
     <ClInclude Include="PostProcessing\LightScatterPostPro.h" />
     <ClInclude Include="PostProcessing\MotionBlurPostProcessing.h" />
     <ClInclude Include="PostProcessing\PostProcessing.h" />
+    <ClInclude Include="PostProcessing\ThrustPostProcessing.h" />
     <ClInclude Include="Quad.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="PostProcessing\TextPostProcessing.h" />
