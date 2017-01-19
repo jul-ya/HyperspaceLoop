@@ -22,7 +22,10 @@ public:
 			Bezier(glm::vec3(0, 80, 0), glm::vec3(0,83,0), glm::vec3(0,86,0), glm::vec3(0, 90, 0)),
 			EaseTypes::EaseInOutQuad, 12.0f));
 		//waiting for the ship to reach the station
-		animation.push_back(AnimationSequence( 22.0f));
+		//animation.push_back(AnimationSequence( 22.0f));
+		animation.push_back(AnimationSequence(18.0f));
+
+		
 		//entry point for the tunnel - station switch
 		animation.push_back(AnimationSequence( 2.0f));
 		sequenceCount = animation.size();

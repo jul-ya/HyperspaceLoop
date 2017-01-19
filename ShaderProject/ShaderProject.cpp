@@ -10,7 +10,6 @@
 #include "Model.h"
 #include "GBuffer.h"
 #include "FBuffer.h"
-#include "PointLight.h"
 #include "Camera.h"
 #include "Skybox.h"
 #include "Quad.h"
@@ -44,6 +43,7 @@
 #include "PostProcessing\TextPostProcessing.h"
 #include "PostProcessing\FadePostProcess.h"
 #include "PostProcessing\ThrustPostProcessing.h"
+#include "PostProcessing\LightBulbPostProcess.h"
 
 // GLM
 #include <glm/glm.hpp>
@@ -163,6 +163,7 @@ AntiAliasingPostProcessing antiAliasPostPro = AntiAliasingPostProcessing();
 TextPostProcessing textPostPro = TextPostProcessing();
 FadePostProcess fadePostPro = FadePostProcess();
 ThrustPostProcessing thrustPostPro = ThrustPostProcessing();
+LightBulbPostProcess lightBulbPostPro = LightBulbPostProcess();
 
 //light model
 Model* lightBulb;
@@ -267,9 +268,6 @@ void initShaders()
 	glUniform1i(glGetUniformLocation(starShader->Program, "size"), 3);
 	glUniform1i(glGetUniformLocation(starShader->Program, "cameraPosition"), 4);
 
-	// lightbox shader
-	lightBoxShader = new Shader("../ShaderProject/Shader/LightBox/LightBox.vert", "../ShaderProject/Shader/LightBox/LightBox.frag");
-
 	// set up postpro effects
 	blurPostPro.setup();
 	lightScatterPostPro.setup();
@@ -280,6 +278,7 @@ void initShaders()
 	textPostPro.setup();
 	fadePostPro.setup();
 	thrustPostPro.setup();
+	lightBulbPostPro.setup();
 }
 
 /**
@@ -320,7 +319,6 @@ void setupScene()
 
 	starLight = new Model("../ShaderProject/Model/Star/Star.obj");
 	relay = new Model("../ShaderProject/Model/SpaceTimeRelay/Star.obj");
-	lightBulb = new Model("../ShaderProject/Model/Star/Star.obj"); // Light/Light.obj is the cube
 
 	skybox = new Skybox(skyboxShader);
 
@@ -330,8 +328,8 @@ void setupScene()
 		starVector.push_back(star);
 	}
 
-	Stars* star = new Stars(300, glm::vec3(0, 0, -5000));
-	star->setupStarMesh(SpherePointGenerator(1000, false));
+	Stars* star = new Stars(350, glm::vec3(0, 0, -5000));
+	star->setupStarMesh(SpherePointGenerator(1300, false));
 	starVector.push_back(star);
 
 
@@ -352,7 +350,7 @@ void setupScene()
 		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
 
 
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Intensity").c_str()), /*(i == 0 || i == 1)? hyperspace->directionalIntensity[i]:*/ GLfloat(10.0f));
+		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Intensity").c_str()), (i == 0 || i == 1)? hyperspace->directionalIntensity[i]: GLfloat(10.0f));
 		////2 directional lights - rest point lights
 		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].IsDirectional").c_str()), (i == 0 || i == 1) ? true : false);
 	}
@@ -595,20 +593,9 @@ void postprocessingStep() {
 	}
 	glDepthMask(GL_TRUE);
 
-	// light geometry
-	lightBoxShader->Use();
-	glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
-	
-	for (int i = 0; i < sceneLightPositions.size(); i++) {
-		glm::mat4 model = glm::mat4();
-		model = glm::translate(model, sceneLightPositions[i]);
-		model = glm::scale(model, glm::vec3(0.05f));
-		glUniformMatrix4fv(glGetUniformLocation(lightBoxShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		glUniform3fv(glGetUniformLocation(lightBoxShader->Program, "lightColor"), 1, &sceneLightColors[i][0]);
-		lightBulb->Draw(*lightBoxShader);
-	}
+	// light geometry
+	lightBulbPostPro.execute(*hyperspace, projection, view);
 
 	//thrust
 	thrustPostPro.execute(*hyperspace, projection, view);

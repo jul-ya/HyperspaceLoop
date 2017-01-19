@@ -15,10 +15,7 @@ uniform mat4 projection;
 uniform mat4 view;
 
 uniform float intensity;
-/*
-	basic screen-space motion-blur technique from Nvidia GPUGems3:
-	http://http.developer.nvidia.com/GPUGems3/gpugems3_ch27.html
-*/
+
 void main()
 {
     float depth = texture(gDepth, TexCoords).r;

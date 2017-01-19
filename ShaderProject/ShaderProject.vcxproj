@@ -153,6 +153,7 @@
     <ClInclude Include="PostProcessing\BloomPostProcessing.h" />
     <ClInclude Include="PostProcessing\BlurPostProcess.h" />
     <ClInclude Include="PostProcessing\FadePostProcess.h" />
+    <ClInclude Include="PostProcessing\LightBulbPostProcess.h" />
     <ClInclude Include="PostProcessing\LightScatterPostPro.h" />
     <ClInclude Include="PostProcessing\MotionBlurPostProcessing.h" />
     <ClInclude Include="PostProcessing\PostProcessing.h" />

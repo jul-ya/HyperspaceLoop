@@ -11,11 +11,7 @@ public:
 		//camera offset so the camera is located at the back of the spaceship
 		cameraOffset = glm::vec3(-camera.Front * 8.0f + camera.Up * 2.0f);
 		
-		//camera start position
-		camera.Position = glm::vec3(15, 0, 0) + cameraOffset;
-		camera.Position.y = camera.Up.y * 2;
-		camera.Yaw = -240;
-		camera.updateCameraVectors();
+		specificReset();
 	
 		//@1s : initial rotation - spaceship flys by - camera follows with rotation and position adjustment;
 		animation.push_back(AnimationSequence(/*path*/ Bezier(glm::vec3(15, 0, 0), glm::vec3(15, 0, 0), glm::vec3(15, 0, 0), glm::vec3(0, 0, 0)), /*ease*/ EaseTypes::EaseInOutQuad, /*rotation*/ Bezier(glm::vec3(-240, 0, 0), glm::vec3(-160, 0, 0), glm::vec3(-130, 0, 0), glm::vec3(-90, 0, 0)), /*ease and duration*/ EaseTypes::EaseInOutQuad, 4.0f));
@@ -81,6 +77,14 @@ public:
 		camera.Pitch = rotation.y;
 		camera.Yaw = rotation.x;
 		
+		camera.updateCameraVectors();
+	}
+
+	virtual void specificReset() {
+		//camera start position
+		camera.Position = glm::vec3(15, 0, 0) + cameraOffset;
+		camera.Position.y = camera.Up.y * 2;
+		camera.Yaw = -240;
 		camera.updateCameraVectors();
 	}
 

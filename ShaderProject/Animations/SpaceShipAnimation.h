@@ -8,7 +8,7 @@ public:
 
 	SpaceShipAnimation(GameObject& spaceShip, GLfloat startTime) : PathAnimation(startTime), spaceShip(spaceShip) {
 
-		spaceShip.getTransform().setPosition(glm::vec3(0, 0, 300));
+		specificReset();
 		//@0s: spaceship slows down from spacetime jump
 		animation.push_back(AnimationSequence(/*path*/Bezier(glm::vec3(-50, 0, 700), glm::vec3(0, 0, 8), glm::vec3(0, 0, 5), glm::vec3(0, 0, 0)),/*ease*/EaseTypes::EaseOutQuad, /*rotation*/Bezier(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)), /*ease and duration*/EaseTypes::EaseInOutQuad, 4.0f));
 		//@4s : waiting 
@@ -97,6 +97,10 @@ public:
 		easedValue = TweenFunctions::ease(animation[currentIndex].rotationEaseType, activeTime, 0.0f, 1.0f, animation[currentIndex].duration);
 		glm::vec3 rotation = MathUtils::calculateBezierPoint(easedValue, animation[currentIndex].rotation.p0, animation[currentIndex].rotation.p1, animation[currentIndex].rotation.p2, animation[currentIndex].rotation.p3);
 		spaceShip.getTransform().setRotation(rotation);
+	}
+
+	virtual void specificReset() {
+		spaceShip.getTransform().setPosition(glm::vec3(0, 0, 300));
 	}
 
 
