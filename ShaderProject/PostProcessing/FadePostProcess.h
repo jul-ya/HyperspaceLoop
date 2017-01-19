@@ -69,6 +69,7 @@ public:
 		glUniform1f(glGetUniformLocation(postProShader->Program, "maskWeight"), maskWeight);
 		glUniform1f(glGetUniformLocation(postProShader->Program, "maskSpread"), maskSpread);
 		glUniform4fv(glGetUniformLocation(postProShader->Program, "maskColor"), 1, &maskColor[0]);
+		glUniform1i(glGetUniformLocation(postProShader->Program, "firstMask"), firstActive);
 
 		render(screenQuad, drawToBuffer);
 	}
@@ -85,10 +86,15 @@ public:
 		this->maskColor = maskColor;
 	}
 
+	void setMaskOneActive(bool firstActive) {
+		this->firstActive = firstActive;
+	}
+
 private:
 	GLuint fadeTexture;
 	GLuint fadeTexture2;
 
+	bool firstActive = true;
 	GLfloat maskWeight = 0.0f;
 	GLfloat maskSpread = 0.0f;
 	glm::vec4 maskColor = glm::vec4(1.0f,1.0f,1.0f,1.0f);

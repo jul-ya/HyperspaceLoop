@@ -119,19 +119,19 @@ private:
 		sceneObjects.push_back(GameObject(tunnelEntrance, Transform(glm::vec3(-900, -60, -5750), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0, 90, 0))));
 
 		// animated asteroids
+		
 		Model asteroid1 = Model("../ShaderProject/Model/Asteroids/big_asteroid01.obj");
+		GameObject a1 = GameObject(asteroid1, Transform(glm::vec3(-300 , -60, -5300), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0, 90, 0)));
+		sceneObjects.push_back(a1);
+
 		Model asteroid2 = Model("../ShaderProject/Model/Asteroids/big_asteroid02.obj");
+		GameObject a2 = GameObject(asteroid2, Transform(glm::vec3(-300, -60, -5350), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0, 90, 0)));
+		sceneObjects.push_back(a2);
+
 		Model asteroid3 = Model("../ShaderProject/Model/Asteroids/big_asteroid03.obj");
-		for (int i = 0; i < 2; i++) {
-			GameObject a1 = GameObject(asteroid1, Transform(glm::vec3(-400 +(i*100) , -60, -5300), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0, 90, 0)));
-			sceneObjects.push_back(a1);
-
-			GameObject a2 = GameObject(asteroid2, Transform(glm::vec3(-400 + (i * 100), -60, -5350), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0, 90, 0)));
-			sceneObjects.push_back(a2);
-
-			GameObject a3 = GameObject(asteroid3, Transform(glm::vec3(-400 + (i * 100), -60, -5400), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0, 90, 0)));
-			sceneObjects.push_back(a3);
-		}
+		GameObject a3 = GameObject(asteroid3, Transform(glm::vec3(-300, -60, -5400), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0, 90, 0)));
+		sceneObjects.push_back(a3);
+	
 
 		// the aircraft thrust
 		//Model model0 = Model("../ShaderProject/Model/Spaceship/thrust.obj");
