@@ -25,9 +25,6 @@ public:
 
 	~Hyperspace() {}
 
-	std::vector<PointLight> getSceneLights() {
-		return sceneLights;
-	}
 
 	std::vector<glm::vec3> getSceneLightPositions() {
 		return sceneLightPositions;
@@ -57,7 +54,6 @@ public:
 
 private:
 	
-	std::vector<PointLight> sceneLights;
 	std::vector<glm::vec3> sceneLightPositions;
 	std::vector<glm::vec3> sceneLightColors;
 
@@ -76,11 +72,10 @@ private:
 		sceneLightColors.push_back(glm::vec3(66 / 255.0f, 238 / 255.0f, 244 / 255.0f));
 		sceneLightPositions.push_back(glm::vec3(-25.0f, 0.5f, 70.0f));
 
-		for (int i = 0; i < 10; i++) {
-			sceneLightPositions.push_back(glm::vec3(-882, 2, -5750 + (i * 20)));
+		/*for (int i = 0; i < 10; i++) {
+			sceneLightPositions.push_back(glm::vec3(-0, 2, -50 + (i * 20)));
 			sceneLightColors.push_back(glm::vec3(0.0, 1.0, 0.0));
-			sceneLights.push_back(PointLight(glm::vec3(-882, 2, -5750 + (i * 20)), glm::vec3(0.0, 1.0, 0.0)));
-		}
+		}*/
 
 		//srand(13);
 		//for (GLuint i = 0; i < NR_LIGHTS-10; i++)
@@ -98,18 +93,15 @@ private:
 		//	sceneLightPositions.push_back(glm::vec3(xPos, yPos, zPos));
 		//	if (i == 0) {
 		//		sceneLightColors.push_back(glm::vec3(255 /255.0f, 208 /255.0f, 120 /255.0f));
-		//		sceneLights.push_back(PointLight(glm::vec3(xPos, yPos, zPos), glm::vec3(255 / 255.0f, 208 / 255.0f, 120 / 255.0f)));
 		//	}
 		//	else {
 		//		sceneLightColors.push_back(glm::vec3(rColor, gColor, bColor));
-		//		sceneLights.push_back(PointLight(glm::vec3(xPos, yPos, zPos), glm::vec3(rColor, gColor, bColor)));
 		//	}
 		//}
 
-	/*	for (int i = 0; i < 10; i++) {
+		/*for (int i = 0; i < 10; i++) {
 			sceneLightPositions.push_back(glm::vec3(-882, 2, -5750 + (i*20)));
 			sceneLightColors.push_back(glm::vec3(0.0, 1.0, 0.0));
-			sceneLights.push_back(PointLight(glm::vec3(-882, 2, -5750 + (i * 20)), glm::vec3(0.0, 1.0, 0.0)));
 		}*/
 	}
 

@@ -9,6 +9,10 @@ public:
 		isDone = true;
 	}
 
+	virtual void reset() {
+
+	}
+
 	GLfloat getStartTime() {
 		return startTime;
 	}
@@ -16,6 +20,7 @@ public:
 	bool animationDone() {
 		return isDone;
 	}
+
 
 
 protected:

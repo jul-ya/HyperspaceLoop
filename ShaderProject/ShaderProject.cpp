@@ -255,26 +255,7 @@ void initShaders()
 	glUniform1i(glGetUniformLocation(lightingShader->Program, "gDepth"), 3);
 
 
-	//pass in the lights
-	lightingShader->Use();
-	for (GLuint i = 0; i < sceneLightPositions.size(); i++)
-	{
-		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLightPositions[i][0]);
-		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLightColors[i][0]);
-
-		// Update attenuation parameters and calculate radius
-		const GLfloat constant = 1.0; // Note that we don't send this to the shader, we assume it is always 1.0 (in our case)
-		const GLfloat linear = 0.7;
-		const GLfloat quadratic = 1.8;
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Linear").c_str()), linear);
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
-
-
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Intensity").c_str()), (i == 0 || i == 1) ? hyperspace->directionalIntensity[i] : 10.0f);
-		cout << hyperspace->directionalIntensity[0] << endl;;
-		//2 directional lights - rest point lights
-		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].IsDirectional").c_str()), (i == 0 || i == 1) ? true : false);
-	}
+	
 
 
 
@@ -334,8 +315,8 @@ void setupScene()
 
 	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], hyperspace->getSceneObjects()[2], glm::vec3(-900, -60, -5750), 1.0f + 22)); /*+ 19.0 offset */
 
-	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f + 22, glm::vec3(400, 50, -5520), glm::vec3(-580, -20, -4980), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
-	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f + 22 /2, glm::vec3(400, 50, -5520)*2.0f, glm::vec3(-580, -20, -4980)*2.0f, glm::vec3(450, 550, 660)*2.0f));  /* + 19.0 offset*/
+	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f + 22, glm::vec3(400, 50, -5520), glm::vec3(-580, -20, -4980), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
+	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f + 22 /2, glm::vec3(400, 50, -5520)*2.0f, glm::vec3(-580, -20, -4980)*2.0f, glm::vec3(450, 550, 660)*2.0f));  /* + 19.0 offset*/
 
 	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(2), 1.2f + 22, glm::vec3(300, -160, -5820), glm::vec3(450, 160, -5940), glm::vec3(300, -80, 80)));  /* + 19.0 offset*/
 	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(1), 7.9f + 22, glm::vec3(-300, -250, -5820), glm::vec3(300, 250, -5650), glm::vec3(-45, 55, -60)));  /* + 19.0 offset*/
@@ -366,17 +347,17 @@ void setupScene()
 		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLightPositions[i][0]);
 		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLightColors[i][0]);
 
+		cout << sceneLightPositions[i].x << "   " << sceneLightPositions[i].y << "   " << sceneLightPositions[i].z << "   " << endl;
+
 		// Update attenuation parameters and calculate radius
-		const GLfloat constant = 1.0; // Note that we don't send this to the shader, we assume it is always 1.0 (in our case)
 		const GLfloat linear = 0.7;
 		const GLfloat quadratic = 1.8;
 		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Linear").c_str()), linear);
 		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
 
 
-		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Intensity").c_str()), (i == 0 || i == 1)? hyperspace->directionalIntensity[i]: 10.0f);
-		cout << hyperspace->directionalIntensity[0] << endl;;
-		//2 directional lights - rest point lights
+		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Intensity").c_str()), /*(i == 0 || i == 1)? hyperspace->directionalIntensity[i]:*/ GLfloat(10.0f));
+		////2 directional lights - rest point lights
 		glUniform1i(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].IsDirectional").c_str()), (i == 0 || i == 1) ? true : false);
 	}
 }
@@ -388,7 +369,7 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 	glm::mat4* modelMatrices;
 	modelMatrices = new glm::mat4[amount];
 	srand(glfwGetTime()); // initialize random seed	
-	GLfloat radius = 100.0f;
+	GLfloat radius = 150.0f;
 	GLfloat offset = 300.0f;
 	for (GLuint i = 0; i < amount; i++)
 	{
@@ -401,10 +382,10 @@ glm::mat4* setupInstanceMatrices(GLuint amount) {
 		GLfloat y = -2.5f + displacement * 0.4f; // keep height of asteroid field smaller compared to width of x and z
 		displacement = (rand() % (GLint)(2 * offset * 100)) / 100.0f - offset;
 		GLfloat z = cos(angle) * radius + displacement;
-		model = glm::translate(model, glm::vec3(x, y+50, z-5300));
+		model = glm::translate(model, glm::vec3(x+200, y+70, z-5300));
 
-		// scale: scale between 0.05 and 0.25f
-		GLfloat scale = (rand() % 3) / 100.0f + 0.05;
+		// scale: scale 
+		GLfloat scale = (rand() % 8) / 10.0f + 0.05;
 		model = glm::scale(model, glm::vec3(scale));
 
 		// rotation: add random rotation around a (semi)randomly picked rotation axis vector

@@ -137,6 +137,7 @@
     <ClInclude Include="Animations\SpaceShipAnimation.h" />
     <ClInclude Include="Animations\SpaceStationAnimation.h" />
     <ClInclude Include="Animations\TextAnimation.h" />
+    <ClInclude Include="Animations\ThrustAnimation.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FBuffer.h" />
     <ClInclude Include="GameObject.h" />
