@@ -33,6 +33,7 @@
 #include "Animations\DirectionalLightAnimation.h"
 #include "Animations\ThrustAnimation.h"
 #include "Animations\LightBulbAnimation.h"
+#include "Animations\TimelineReset.h"
 
 #include "PostProcessing\PostProcessing.h"
 #include "PostProcessing\BlurPostProcess.h"
@@ -296,14 +297,14 @@ void setupScene()
 	timeline = new Timeline();
 
 	//global offset -3.0
-	
+	timeline->addAnimation(new TimelineReset(*timeline, 0.0f));
 	timeline->addAnimation(new LightBulbAnimation(lightBulbPostPro, 0.0f));
 	timeline->addAnimation(new ThrustAnimation(thrustPostPro, 0.0f));
 	timeline->addAnimation(new DirectionalLightAnimation(*hyperspace, 0.0f));
 	timeline->addAnimation(new FadeAnimation(fadePostPro, 0.0f));
 	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 0.0f));
 	timeline->addAnimation(new TextAnimation(textPostPro, 0.0f));
-	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], hyperspace->getSceneObjects()[2], glm::vec3(-900, -60, -5750), 0.0f)); /*+ 19.0 offset */
+	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], hyperspace->getSceneObjects()[2], relayEnd, glm::vec3(-900, -60, -5750), 0.0f)); /*+ 19.0 offset */
 
 	timeline->addAnimation(new MotionBlurAnimation(motionBlurPostPro.getPostProShader(), 0.0f));
 	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
@@ -342,14 +343,11 @@ void setupScene()
 		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Position").c_str()), 1, &sceneLightPositions[i][0]);
 		glUniform3fv(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Color").c_str()), 1, &sceneLightColors[i][0]);
 
-		cout << sceneLightPositions[i].x << "   " << sceneLightPositions[i].y << "   " << sceneLightPositions[i].z << "   " << endl;
-
 		// Update attenuation parameters and calculate radius
 		const GLfloat linear = 0.7;
 		const GLfloat quadratic = 1.8;
 		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Linear").c_str()), linear);
 		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Quadratic").c_str()), quadratic);
-
 
 		glUniform1f(glGetUniformLocation(lightingShader->Program, ("lights[" + std::to_string(i) + "].Intensity").c_str()), (i == 0 || i == 1)? hyperspace->directionalIntensity[i]: GLfloat(10.0f));
 		////2 directional lights - rest point lights

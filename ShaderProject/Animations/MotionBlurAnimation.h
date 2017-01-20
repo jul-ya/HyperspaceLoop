@@ -8,8 +8,7 @@ public:
 
 	MotionBlurAnimation(Shader* motionBlurShader, GLfloat startTime) : PathAnimation(startTime), motionBlurShader(motionBlurShader) {
 
-		motionBlurShader->Use();
-		glUniform1f(glGetUniformLocation(motionBlurShader->Program, "intensity"), 1.0f);
+		specificReset();
 
 		animation.push_back(AnimationSequence(
 			Bezier(glm::vec3(1.0, 0.0, 0), glm::vec3(1.0, 0.0, 0), glm::vec3(1.0, 0.0, 0), glm::vec3(0.15, 0.0, 0)),
@@ -25,6 +24,11 @@ public:
 
 		motionBlurShader->Use();
 		glUniform1f(glGetUniformLocation(motionBlurShader->Program, "intensity"), tweenedPosition.x);
+	}
+
+	virtual void specificReset() {
+		motionBlurShader->Use();
+		glUniform1f(glGetUniformLocation(motionBlurShader->Program, "intensity"), 1.0f);
 	}
 
 

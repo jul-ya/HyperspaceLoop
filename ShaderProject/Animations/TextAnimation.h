@@ -6,9 +6,7 @@ class TextAnimation : public PathAnimation {
 public:
 
 	TextAnimation(TextPostProcessing& textProcessingPostPro, GLfloat startTime) : PathAnimation(startTime), textProcessingPostPro(textProcessingPostPro){
-		//tunnel is not displayed at the beginning
-		textProcessingPostPro.setId(0.2f);
-		textProcessingPostPro.setRenderStatus(true);
+		specificReset();
 
 		//index 0 = screen space motion blur text
 		animation.push_back(AnimationSequence(5.0f));
@@ -58,6 +56,12 @@ public:
 			case 14: textProcessingPostPro.setRenderStatus(true); textProcessingPostPro.setId(0.0f); break;
 			default: break;
 		}
+	}
+
+	virtual void specificReset() {
+		//tunnel is not displayed at the beginning
+		textProcessingPostPro.setId(0.2f);
+		textProcessingPostPro.setRenderStatus(true);
 	}
 
 

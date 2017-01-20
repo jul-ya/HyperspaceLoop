@@ -24,8 +24,10 @@ public:
 			activeAnimations.clear();
 			currentAnimationTime = 0.0f;
 			currentIndex = 0;
+			resetAnimations();
 		}
 	}
+
 
 	void addAnimation(Animation* animation) {
 		if (isPaused) {
@@ -58,9 +60,15 @@ private:
 
 	bool isPaused = true;
 
-	std::list<Animation*> activeAnimations;
+	std::vector<Animation*> activeAnimations;
 	std::vector<Animation*> animationVector;
 	int currentIndex = 0;
+
+	void resetAnimations() {
+		for (int i = 0; i < animationVector.size(); i++) {
+			animationVector[i]->reset();
+		}
+	}
 
 	void checkAnimationTimes() {
 		while (currentIndex < animationVector.size() && animationVector.size()!=0 && animationVector[currentIndex]->getStartTime()<= currentAnimationTime) {
@@ -70,18 +78,12 @@ private:
 	}
 
 	void updateActiveAnimations() {
-		std::list<Animation*>::iterator i = activeAnimations.begin();
-		
-		while (i != activeAnimations.end())
-		{
-			if ((*i)->animationDone())
-			{
-				i = activeAnimations.erase(i);
-			}
-			else
-			{
-				(*i)->update(deltaTime);
-				i++;
+		if (activeAnimations.size() != 0) {
+			for (int i = 0; i < activeAnimations.size(); i++) {
+
+				if (!activeAnimations[i]->animationDone()) {
+					activeAnimations[i]->update(deltaTime);
+				}
 			}
 		}
 	}

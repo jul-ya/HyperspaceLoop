@@ -31,7 +31,6 @@ void main()
 
 	dir = min(vec2(FXAA_SPAN_MAX, FXAA_SPAN_MAX), max( vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX), dir* inverseDirectionAdjustment)) * offsetVector;
 
-
 	vec3 result1 = (1.0/2.0) * (
 		texture(screenTexture, TexCoords + (dir * vec2(1.0/3.0 -0.5))).xyz +
 		texture(screenTexture, TexCoords + (dir * vec2(2.0/3.0 -0.5))).xyz );

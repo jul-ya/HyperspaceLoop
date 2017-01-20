@@ -32,6 +32,7 @@ public:
 
 	virtual void specificReset() {
 		asteroid.getTransform().setPosition(start);
+		asteroid.getTransform().setRotation(glm::vec3(0, 0, 0));
 	}
 	
 private:

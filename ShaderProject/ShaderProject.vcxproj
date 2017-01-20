@@ -131,6 +131,7 @@
     <ClInclude Include="Animations\DirectionalLightAnimation.h" />
     <ClInclude Include="Animations\ExposureAnimation.h" />
     <ClInclude Include="Animations\FadeAnimation.h" />
+    <ClInclude Include="Animations\TimelineReset.h" />
     <ClInclude Include="Animations\LightBulbAnimation.h" />
     <ClInclude Include="Animations\LightScatterAnimation.h" />
     <ClInclude Include="Animations\MotionBlurAnimation.h" />

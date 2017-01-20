@@ -8,8 +8,7 @@ class CameraAnimation : public PathAnimation {
 public:
 
 	CameraAnimation(Camera& camera, GameObject& spaceShip, GLfloat startTime): PathAnimation(startTime), camera(camera), spaceShip(spaceShip) {
-		//camera offset so the camera is located at the back of the spaceship
-		cameraOffset = glm::vec3(-camera.Front * 8.0f + camera.Up * 2.0f);
+		
 		
 		specificReset();
 	
@@ -86,6 +85,9 @@ public:
 		camera.Position.y = camera.Up.y * 2;
 		camera.Yaw = -240;
 		camera.updateCameraVectors();
+
+		//camera offset so the camera is located at the back of the spaceship
+		cameraOffset = glm::vec3(-camera.Front * 8.0f + camera.Up * 2.0f);
 	}
 
 

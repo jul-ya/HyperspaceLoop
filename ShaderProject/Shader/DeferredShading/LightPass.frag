@@ -19,7 +19,7 @@ struct Light {
     float Intensity;
 	bool IsDirectional;
 };
-const int NR_LIGHTS = 30;
+const int NR_LIGHTS = 28;
 uniform Light lights[NR_LIGHTS];
 uniform vec3 viewPos;
 

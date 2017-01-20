@@ -40,7 +40,7 @@ public:
 			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
 			EaseTypes::EaseInOutQuad, 5.0f));
 		animation.push_back(AnimationSequence(
-			Bezier(glm::vec3(1.0, 0.9, 0), glm::vec3(1.0, 0.9, 0), glm::vec3(0.0, 0.0, 0), glm::vec3(0.0, 0.0, 0)),
+			Bezier(glm::vec3(1.0, 0.9, 0), glm::vec3(1.0, 0.9, 0), glm::vec3(1.0, 0.9, 0), glm::vec3(1.0, 0.9, 0)),
 			EaseTypes::EaseInOutQuad,
 			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
 			EaseTypes::EaseInOutQuad, 5.0f));
@@ -67,7 +67,7 @@ public:
 
 		if (currentIndex >= 6 && lowDensity) {
 			cout << "done" << endl;
-			glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 1.65f);
+			glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 1.0f);
 		}
 		glUniform2fv(glGetUniformLocation(lightScatterShader->Program, "scatterOrigin"), 1, &position[0]);
 	}
