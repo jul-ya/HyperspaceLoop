@@ -11,6 +11,9 @@ using namespace std;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+/*	author: Joey de Vries
+	https://learnopengl.com/
+*/
 
 
 struct Vertex {

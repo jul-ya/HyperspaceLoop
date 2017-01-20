@@ -15,7 +15,7 @@ public:
 		postProShader = new Shader("../ShaderProject/Shader/DeferredShading/PassThrough.vert", "../ShaderProject/Shader/PostProcessing/FXAA.frag");
 
 		postProShader->Use();
-		glUniform3fv(glGetUniformLocation(postProShader->Program, "inverseFilterTextureSize"), 1, &glm::vec3(1.0f/1280, 1.0f/720, 0.0f)[0]);	// TODO: resolution hardcoded -> change this later
+		glUniform3fv(glGetUniformLocation(postProShader->Program, "inverseFilterTextureSize"), 1, &glm::vec3(1.0f/1280, 1.0f/720, 0.0f)[0]);
 	}
 
 	virtual void execute(FBuffer* outputBuffer, FBuffer* inputBuffer, Quad* screenQuad, bool drawToBuffer) {

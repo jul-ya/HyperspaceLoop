@@ -24,6 +24,8 @@ public:
 			activeAnimations.clear();
 			currentAnimationTime = 0.0f;
 			currentIndex = 0;
+			lastFrameTime = -1.0f;
+			currentFrame = 0.0f;
 			resetAnimations();
 		}
 	}

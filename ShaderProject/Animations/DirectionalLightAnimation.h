@@ -7,8 +7,6 @@ public:
 
 	DirectionalLightAnimation(Hyperspace& hyperspace, GLfloat startTime) : PathAnimation(startTime), hyperspace(hyperspace){
 		
-		//specificReset();
-
 		//blue directional light fade out
 		animation.push_back(AnimationSequence(/*path*/ Bezier(glm::vec3(0.42f, 0.67f, 0), glm::vec3(0.42f, 0.43f, 0), glm::vec3(0.42f, 0.36f, 0), glm::vec3(0.42f, 0.33f, 0)), /*ease*/ EaseTypes::Linear, /*rotation*/ Bezier(glm::vec3(-240, 0, 0), glm::vec3(-160, 0, 0), glm::vec3(-130, 0, 0), glm::vec3(-90, 0, 0)), /*ease and duration*/ EaseTypes::EaseInOutQuad, 7.5f));
 		//increasing the yellow directional light intensity
@@ -28,11 +26,6 @@ public:
 		hyperspace.directionalIntensity[0] = tweenPosition.x;
 		hyperspace.directionalIntensity[1] = tweenPosition.y;
 	}
-
-	/*virtual void specificReset() {
-		hyperspace.directionalIntensity[0] = 0.0f;
-		hyperspace.directionalIntensity[1] = 1.0f;
-	}*/
 
 
 private:

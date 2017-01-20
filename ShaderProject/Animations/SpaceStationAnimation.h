@@ -41,7 +41,6 @@ public:
 			changed = true;
 		}
 		else if (currentIndex == 3 && changed) {
-			cout << "wörks" << endl;
 			spaceStation.getTransform().setPosition(distantPosition);
 			relayEnd = relayOrigin;
 			changed = false;

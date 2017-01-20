@@ -19,6 +19,10 @@ using namespace std;
 #include "Mesh.h"
 #include "Shader.h"
 
+/*	author: Joey de Vries
+	https://learnopengl.com/
+*/
+
 GLint TextureFromFile(const char* path, string directory, bool gamma = false);
 
 class Model

@@ -66,7 +66,6 @@ public:
 		}
 
 		if (currentIndex >= 6 && lowDensity) {
-			cout << "done" << endl;
 			glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 1.0f);
 		}
 		glUniform2fv(glGetUniformLocation(lightScatterShader->Program, "scatterOrigin"), 1, &position[0]);

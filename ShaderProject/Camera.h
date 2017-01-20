@@ -118,4 +118,14 @@ public:
 		this->Right = glm::normalize(glm::cross(this->Front, this->WorldUp));
 		this->Up = glm::normalize(glm::cross(this->Right, this->Front));
 	}
+
+	void setToDefault() {
+		Yaw = YAW;
+		Pitch = PITCH;
+		MovementSpeed = SPEED;
+		MouseSensitivity = SENSITIVTY;
+		Zoom = ZOOM;
+
+		updateCameraVectors();
+	}
 };

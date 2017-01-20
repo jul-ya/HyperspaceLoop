@@ -623,7 +623,7 @@ void update()
 		glfwPollEvents();
 
 		// update movement
-		handleMovement();
+		//handleMovement();
 
 		// update animations
 		timeline->update();
@@ -678,7 +678,6 @@ int main()
 	// perform scene setup
 	setupScene();
 
-
 	// init framebuffers
 	initBuffers();
 
@@ -709,23 +708,7 @@ void handleMovement()
 	if (keys[GLFW_KEY_D])
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 
-	//// postpro controls
-	//if (keys[GLFW_KEY_1]) {
-	//	exposure += 0.025f;
-	//	std::cout << "exposure: " << exposure << std::endl;
-	//}
-	//if (keys[GLFW_KEY_2]) {
-	//	exposure -= 0.025f;
-	//	std::cout << "exposure: " << exposure << std::endl;
-	//}
-	//if (keys[GLFW_KEY_B]) {
-	//	bloom = true;
-	//	std::cout << "bloom turned on" << std::endl;
-	//}
-	//if (keys[GLFW_KEY_N]) {
-	//	bloom = false;
-	//	std::cout << "bloom turned off" << std::endl;
-	//}
+	
 	if (keys[GLFW_KEY_3]) {
 		weight += 0.025f;
 		std::cout << "weight: " << weight << std::endl;
@@ -794,7 +777,7 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos)
 	lastX = xpos;
 	lastY = ypos;
 
-	camera.ProcessMouseMovement(xoffset, yoffset);
+	//camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
 /**

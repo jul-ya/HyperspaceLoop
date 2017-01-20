@@ -19,7 +19,7 @@ struct Light {
     float Intensity;
 	bool IsDirectional;
 };
-const int NR_LIGHTS = 28;
+const int NR_LIGHTS = 26;
 uniform Light lights[NR_LIGHTS];
 uniform vec3 viewPos;
 
@@ -31,9 +31,6 @@ void main()
     vec3 Diffuse = texture(gAlbedoSpec, TexCoords).rgb;
     float Specular = texture(gAlbedoSpec, TexCoords).a;
 
-	//float Depth = texture(gDepth, TexCoords).r;
-	//gl_FragDepth = Depth;
-    
     // calculate lighting
     vec3 lighting  = Diffuse * 0.075; // hard-coded ambient component
     vec3 viewDir  = normalize(viewPos - FragPos);
@@ -41,23 +38,23 @@ void main()
     {
         // calculate distance between light source and current fragment
         float dist = length(lights[i].Position - FragPos);
-            // diffuse
-            vec3 lightDir = normalize(lights[i].Position - FragPos);
-			if(lights[i].IsDirectional){
-				lightDir = normalize(lights[i].Position);
-			}
-            vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color;
-            // specular
-            vec3 halfwayDir = normalize(lightDir + viewDir);  
-            float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-            vec3 specular = lights[i].Color * spec * Specular;
-            // attenuation
-            float attenuation = 1.0 / (1.0 + lights[i].Linear * dist + lights[i].Quadratic * dist * dist);
-			if(!lights[i].IsDirectional){
-				diffuse *= attenuation;
-				specular *= attenuation;
-			}
-            lighting += (diffuse + specular) * lights[i].Intensity;
+        // diffuse
+        vec3 lightDir = normalize(lights[i].Position - FragPos);
+		if(lights[i].IsDirectional){
+			lightDir = normalize(lights[i].Position);
+		}
+        vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * lights[i].Color;
+        // specular
+        vec3 halfwayDir = normalize(lightDir + viewDir);  
+        float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
+        vec3 specular = lights[i].Color * spec * Specular;
+        // attenuation
+        float attenuation = 1.0 / (1.0 + lights[i].Linear * dist + lights[i].Quadratic * dist * dist);
+		if(!lights[i].IsDirectional){
+			diffuse *= attenuation;
+			specular *= attenuation;
+		}
+        lighting += (diffuse + specular) * lights[i].Intensity;
     }      
 
 	float brightness =  (lighting.r * 0.2126)+ (lighting.g * 0.7152) + (lighting.b * 0.0722);
