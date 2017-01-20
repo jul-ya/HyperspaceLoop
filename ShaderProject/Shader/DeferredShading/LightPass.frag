@@ -19,7 +19,7 @@ struct Light {
     float Intensity;
 	bool IsDirectional;
 };
-const int NR_LIGHTS = 10;
+const int NR_LIGHTS = 30;
 uniform Light lights[NR_LIGHTS];
 uniform vec3 viewPos;
 
@@ -61,7 +61,7 @@ void main()
     }      
 
 	float brightness =  (lighting.r * 0.2126)+ (lighting.g * 0.7152) + (lighting.b * 0.0722);
-	BrightColor = vec4(lighting, 1.0) * brightness * brightness;
+	BrightColor = vec4(lighting, 1.0) * brightness * brightness * brightness;
 
     FragColor = vec4(lighting, 1.0);
 }

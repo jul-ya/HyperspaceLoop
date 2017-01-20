@@ -8,6 +8,8 @@ public:
 	AsteroidAnimation(GameObject& asteroid, GLfloat startTime, glm::vec3 start, glm::vec3 end, glm::vec3 rotation) : PathAnimation(startTime), asteroid(asteroid), start(start), end(end), rotation(rotation) {
 		glm::vec3 onethird = (end - start) / 3.0f;
 		glm::vec3 rotationthird = rotation / 3.0f;
+		
+		specificReset();
 
 		//asteroid fly by
 		animation.push_back(AnimationSequence(
@@ -26,6 +28,10 @@ public:
 		easedValue = TweenFunctions::ease(animation[currentIndex].rotationEaseType, activeTime, 0.0f, 1.0f, animation[currentIndex].duration);
 		glm::vec3 rot = MathUtils::calculateBezierPoint(easedValue, animation[currentIndex].rotation.p0, animation[currentIndex].rotation.p1, animation[currentIndex].rotation.p2, animation[currentIndex].rotation.p3);
 		asteroid.getTransform().setRotation(rot);
+	}
+
+	virtual void specificReset() {
+		asteroid.getTransform().setPosition(start);
 	}
 	
 private:

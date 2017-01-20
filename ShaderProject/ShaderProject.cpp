@@ -303,6 +303,7 @@ void setupScene()
 	timeline->addAnimation(new FadeAnimation(fadePostPro, 0.0f));
 	timeline->addAnimation(new SpaceShipAnimation(hyperspace->getSpaceShipObject(), 0.0f));
 	timeline->addAnimation(new TextAnimation(textPostPro, 0.0f));
+	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], hyperspace->getSceneObjects()[2], glm::vec3(-900, -60, -5750), 0.0f)); /*+ 19.0 offset */
 
 	timeline->addAnimation(new MotionBlurAnimation(motionBlurPostPro.getPostProShader(), 0.0f));
 	timeline->addAnimation(new CameraAnimation(camera, hyperspace->getSpaceShipObject(), 1.0f));
@@ -310,10 +311,8 @@ void setupScene()
 
 	timeline->addAnimation(new LightScatterAnimation(lightScatterPostPro.getPostProShader(), 1.0f +14.0f));
 
-	timeline->addAnimation(new SpaceStationAnimation(hyperspace->getSceneObjects()[1], hyperspace->getSceneObjects()[2], glm::vec3(-900, -60, -5750), 1.0f + 22)); /*+ 19.0 offset */
 
-	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f + 22, glm::vec3(400, 50, -5520), glm::vec3(-580, -20, -4980), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
-	//timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f + 22 /2, glm::vec3(400, 50, -5520)*2.0f, glm::vec3(-580, -20, -4980)*2.0f, glm::vec3(450, 550, 660)*2.0f));  /* + 19.0 offset*/
+	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(0), 0.0f + 23, glm::vec3(400, 50, -5520), glm::vec3(-580, -20, -4980), glm::vec3(450, 550, 660)));  /* + 19.0 offset*/
 
 	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(2), 1.2f + 22, glm::vec3(300, -160, -5820), glm::vec3(450, 160, -5940), glm::vec3(300, -80, 80)));  /* + 19.0 offset*/
 	timeline->addAnimation(new AsteroidAnimation(hyperspace->getAsteroid(1), 7.9f + 22, glm::vec3(-300, -250, -5820), glm::vec3(300, 250, -5650), glm::vec3(-45, 55, -60)));  /* + 19.0 offset*/
@@ -673,7 +672,7 @@ int main()
 	glEnable(GL_FRAMEBUFFER_SRGB);
 
 	// perform instancing setup
-	modelMatrices = setupInstanceMatrices(250);
+	modelMatrices = setupInstanceMatrices(100);
 
 	// init shaders
 	initShaders();

@@ -11,13 +11,13 @@ public:
 
 
 		//blue directional light fade out
-		animation.push_back(AnimationSequence(/*path*/ Bezier(glm::vec3(0.83f, 0.67f, 0), glm::vec3(0.73f, 0.43f, 0), glm::vec3(0.83f, 0.36f, 0), glm::vec3(0.83f, 0.33f, 0)), /*ease*/ EaseTypes::Linear, /*rotation*/ Bezier(glm::vec3(-240, 0, 0), glm::vec3(-160, 0, 0), glm::vec3(-130, 0, 0), glm::vec3(-90, 0, 0)), /*ease and duration*/ EaseTypes::EaseInOutQuad, 7.5f));
+		animation.push_back(AnimationSequence(/*path*/ Bezier(glm::vec3(0.42f, 0.67f, 0), glm::vec3(0.42f, 0.43f, 0), glm::vec3(0.42f, 0.36f, 0), glm::vec3(0.42f, 0.33f, 0)), /*ease*/ EaseTypes::Linear, /*rotation*/ Bezier(glm::vec3(-240, 0, 0), glm::vec3(-160, 0, 0), glm::vec3(-130, 0, 0), glm::vec3(-90, 0, 0)), /*ease and duration*/ EaseTypes::EaseInOutQuad, 7.5f));
 		//increasing the yellow directional light intensity
-		animation.push_back(AnimationSequence(/*path*/ Bezier(glm::vec3(0.83f, 0.33f, 0), glm::vec3(1.76f, 0.26f, 0), glm::vec3(2.58f, 0.1f, 0), glm::vec3(3.3f, 0.0f, 0)), /*ease*/ EaseTypes::Linear, /*rotation*/ Bezier(glm::vec3(-240, 0, 0), glm::vec3(-160, 0, 0), glm::vec3(-130, 0, 0), glm::vec3(-90, 0, 0)), /*ease and duration*/ EaseTypes::EaseInOutQuad, 7.5f));
+		animation.push_back(AnimationSequence(/*path*/ Bezier(glm::vec3(0.42f, 0.33f, 0), glm::vec3(0.6f, 0.26f, 0), glm::vec3(0.8f, 0.1f, 0), glm::vec3(1.0f, 0.0f, 0)), /*ease*/ EaseTypes::Linear, /*rotation*/ Bezier(glm::vec3(-240, 0, 0), glm::vec3(-160, 0, 0), glm::vec3(-130, 0, 0), glm::vec3(-90, 0, 0)), /*ease and duration*/ EaseTypes::EaseInOutQuad, 7.5f));
 		//waiting 
-		animation.push_back(AnimationSequence(/*path*/ Bezier(glm::vec3(3.3f, 0.0f, 0), glm::vec3(3.3f, 0.0f, 0), glm::vec3(3.3f, 0.0f, 0), glm::vec3(3.3f, 0.0f, 0)), /*ease*/ EaseTypes::Linear, /*rotation*/ Bezier(glm::vec3(-240, 0, 0), glm::vec3(-160, 0, 0), glm::vec3(-130, 0, 0), glm::vec3(-90, 0, 0)), /*ease and duration*/ EaseTypes::EaseInOutQuad, 43.5f));
+		animation.push_back(AnimationSequence(/*path*/ Bezier(glm::vec3(1.0f, 0.0f, 0), glm::vec3(1.0f, 0.0f, 0), glm::vec3(1.0f, 0.0f, 0), glm::vec3(1.0f, 0.0f, 0)), /*ease*/ EaseTypes::Linear, /*rotation*/ Bezier(glm::vec3(-240, 0, 0), glm::vec3(-160, 0, 0), glm::vec3(-130, 0, 0), glm::vec3(-90, 0, 0)), /*ease and duration*/ EaseTypes::EaseInOutQuad, 43.5f));
 		//yellow directional fade out when entering the spacestation tunnel
-		animation.push_back(AnimationSequence(/*path*/ Bezier(glm::vec3(3.3f, 0.0f, 0), glm::vec3(0.0f, 0.0f, 0), glm::vec3(0.0f, 0.0f, 0), glm::vec3(0.0f, 0.0f, 0)), /*ease*/ EaseTypes::Linear, /*rotation*/ Bezier(glm::vec3(-240, 0, 0), glm::vec3(-160, 0, 0), glm::vec3(-130, 0, 0), glm::vec3(-90, 0, 0)), /*ease and duration*/ EaseTypes::EaseInOutQuad, 1.5f));
+		animation.push_back(AnimationSequence(/*path*/ Bezier(glm::vec3(1.0f, 0.0f, 0), glm::vec3(0.0f, 0.0f, 0), glm::vec3(0.0f, 0.0f, 0), glm::vec3(0.0f, 0.0f, 0)), /*ease*/ EaseTypes::Linear, /*rotation*/ Bezier(glm::vec3(-240, 0, 0), glm::vec3(-160, 0, 0), glm::vec3(-130, 0, 0), glm::vec3(-90, 0, 0)), /*ease and duration*/ EaseTypes::EaseInOutQuad, 1.5f));
 
 
 		sequenceCount = animation.size();

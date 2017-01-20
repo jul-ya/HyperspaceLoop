@@ -33,7 +33,7 @@ public:
 		//index 10 = fxaa
 		animation.push_back(AnimationSequence(5.0f));
 		//index 11 = text render off
-		animation.push_back(AnimationSequence(1.0f));
+		animation.push_back(AnimationSequence(3.0f));
 		//index 12 = deferred
 		animation.push_back(AnimationSequence(5.0f));
 		//index 13 = text render off

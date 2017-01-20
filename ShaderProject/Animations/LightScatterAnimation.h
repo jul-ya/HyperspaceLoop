@@ -7,10 +7,7 @@ public:
 
 	LightScatterAnimation(Shader* lightScatterShader, GLfloat startTime) : PathAnimation(startTime), lightScatterShader(lightScatterShader) {
 
-		lightScatterShader->Use();
-		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 1.65f);
-		position = glm::vec2(0.0, 0.5);
-		glUniform2fv(glGetUniformLocation(lightScatterShader->Program, "scatterOrigin"), 1, &position[0]);
+		specificReset();
 
 		animation.push_back(AnimationSequence(
 			Bezier(glm::vec3(0.0, 0.5, 0), glm::vec3(0.4, 0.6, 0), glm::vec3(0.7, 0.7, 0), glm::vec3(1.0, 0.9, 0)),
@@ -43,12 +40,12 @@ public:
 			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
 			EaseTypes::EaseInOutQuad, 5.0f));
 		animation.push_back(AnimationSequence(
-			Bezier(glm::vec3(1.0, 0.9, 0), glm::vec3(1.0, 0.9, 0), glm::vec3(1.0, 0.9, 0), glm::vec3(1.0, 0.9, 0)),
+			Bezier(glm::vec3(1.0, 0.9, 0), glm::vec3(1.0, 0.9, 0), glm::vec3(0.0, 0.0, 0), glm::vec3(0.0, 0.0, 0)),
 			EaseTypes::EaseInOutQuad,
 			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
 			EaseTypes::EaseInOutQuad, 5.0f));
 		animation.push_back(AnimationSequence(
-			Bezier(glm::vec3(0, 0.3, 0), glm::vec3(0, 0.3, 0), glm::vec3(0, 0.3, 0), glm::vec3(0, 0.3, 0)),
+			Bezier(glm::vec3(0.0, 0.0, 0), glm::vec3(0, 0.0, 0), glm::vec3(0, 0.0, 0), glm::vec3(0, 0.0, 0)),
 			EaseTypes::EaseInOutQuad,
 			Bezier(glm::vec3(), glm::vec3(), glm::vec3(), glm::vec3()),
 			EaseTypes::EaseInOutQuad, 5.0f));
@@ -63,14 +60,28 @@ public:
 		position.y = tweenedPosition.y;
 
 		lightScatterShader->Use();
-		if (currentIndex >= 4) {
+		if (currentIndex >= 4 && !lowDensity) {
+			lowDensity = true;
 			glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 1.2f);
 		}
+
+		if (currentIndex >= 6 && lowDensity) {
+			cout << "done" << endl;
+			glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 1.65f);
+		}
+		glUniform2fv(glGetUniformLocation(lightScatterShader->Program, "scatterOrigin"), 1, &position[0]);
+	}
+
+	virtual void specificReset() {
+		lightScatterShader->Use();
+		glUniform1f(glGetUniformLocation(lightScatterShader->Program, "density"), 1.65f);
+		position = glm::vec2(0.0, 0.5);
 		glUniform2fv(glGetUniformLocation(lightScatterShader->Program, "scatterOrigin"), 1, &position[0]);
 	}
 
 
 private:
+	bool lowDensity = false;
 	glm::vec2 position;
 	Shader* lightScatterShader;
 
