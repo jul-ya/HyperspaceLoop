@@ -7,8 +7,11 @@ uniform samplerCube texture_diffuse1;
 
 void main()
 {
+	//sample color
 	vec3 color = texture(texture_diffuse1, TexCoords).rgb;
-	float brightness =  (color.r * 0.2126)+ (color.g * 0.7152) + (color.b * 0.0722);
+
+	//make bright spots appear a bit brighter
+ 	float brightness =  (color.r * 0.2126)+ (color.g * 0.7152) + (color.b * 0.0722);
     gAlbedoSpec.rgb = color + color * brightness *2.0;
 
 }

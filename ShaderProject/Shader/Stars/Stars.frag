@@ -11,7 +11,10 @@ uniform float fadeOutDistance;
 
 void main()
 { 
+	// distance between point pos and camera pos 
+	// factor to change alpha
 	float distFactor = distance(cameraPosition, pointWorldPos.xyz) / fadeOutDistance;
+	// distance between point coordinate and the fragment
 	float distToCenter = length(gl_PointCoord - 0.5) * 2.0;
 	if(distToCenter > 0.8 || pointSize < 3.0 || distFactor > 1.0) // if brightness is almost zero or points are super small
 		discard;

@@ -8,7 +8,6 @@ out vec3 FragPos;
 out vec2 TexCoords;
 out vec3 Normal;
 out float Noise;
-out vec3 TexCoords3D;
 
 uniform mat4 projection;
 uniform mat4 view;
@@ -106,15 +105,19 @@ float heightMap( vec3 coord ) {
 
 void main()
 {
+	//calculate world pos using the current index matrix
     vec4 worldPos = instanceMatrix * vec4(position, 1.0f);
+	//store texture coordinates
     TexCoords = texCoords;
+	//ensure that normals stay perpendicular 
     mat3 normalMatrix = transpose(inverse(mat3(instanceMatrix)));
+	//store normals
     Normal = normalMatrix * normal;
+	//vertex displacement using noise and world pos
     Noise = heightMap(worldPos.xyz);
-	TexCoords3D = worldPos.xyz;
     float dispFactor = 3.6 /* = displacement scale factor*/ * Noise + 1.8 /* = displacement bias*/;
     vec4 dispPos = vec4( normal.x, normal.y, normal.z, 0)*dispFactor + worldPos;
-	
     FragPos = dispPos.xyz;
+
     gl_Position = projection * view * dispPos;
 }

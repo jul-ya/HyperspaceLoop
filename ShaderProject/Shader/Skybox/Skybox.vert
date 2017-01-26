@@ -1,5 +1,6 @@
 
 #version 330 core
+// position = skybox position + camera position (so the skybox is not "moving")
 layout (location = 0) in vec3 position;
 out vec3 TexCoords;
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include "PointLight.h"
 #include "GameObject.h"
 #include "Model.h"
 #include "GameObject.h"

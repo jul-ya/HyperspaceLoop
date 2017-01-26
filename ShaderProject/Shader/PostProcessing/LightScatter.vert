@@ -12,5 +12,6 @@ void main()
     gl_Position = vec4(position, 1.0f);
     TexCoords = texCoords;
 
+	// screenspace pos 
 	screenSpacePos = vec2((1.0 - gl_Position.x/gl_Position.w) / 2.0, (1.0 - gl_Position.y/gl_Position.w) / 2.0);
 }

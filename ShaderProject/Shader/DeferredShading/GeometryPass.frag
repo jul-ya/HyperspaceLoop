@@ -24,8 +24,10 @@ void main()
     gAlbedoSpec.a = texture(texture_specular1, TexCoords).r;
 
 	if(isLightSource){
+		// store the light color unchanged for light sacttering
 		gBlackColor = gAlbedoSpec;
 	}else{
+		//store black for light scattering if object is not a light scatter light source
 		gBlackColor = vec4(0.0,0.0,0.0,1.0);
 	}
 }

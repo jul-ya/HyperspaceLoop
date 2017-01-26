@@ -13,11 +13,16 @@ uniform mat4 projection;
 
 void main()
 {
+	//calculate world pos
     vec4 worldPos = model * vec4(position, 1.0f);
+	//store world pos 
     FragPos = worldPos.xyz;
-    gl_Position = projection * view * worldPos;
+    //store texture coordinates 
     TexCoords = texCoords;
-
+	//ensure that normals stay perpendicular 
     mat3 normalMatrix = transpose(inverse(mat3(model)));
+	//store normals
     Normal = normalMatrix * normal;
+	
+	gl_Position = projection * view * worldPos;
 }

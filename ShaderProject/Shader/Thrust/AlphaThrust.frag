@@ -101,7 +101,10 @@ float heightMap( vec3 coord ) {
 
 void main()
 {
+	//using the worldpos for sampling noise
 	float noise = heightMap(FragPos*0.2);
+	// mix colored noise value along texture y axis to get more red color near to the exhaust and more black color and alpha at the end 
 	FragColor = vec4(mix(vec4(1.5-noise, 1.0-noise, 0.5-noise, 1.0-noise), vec4(0.0 ,0.0, 0.0, 0.0), TexCoords.y));
+	// for animating the effect
 	FragColor.a = mix(0.0, FragColor.a, alpha);
 }

@@ -149,7 +149,6 @@
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="PointGenerator.h" />
-    <ClInclude Include="PointLight.h" />
     <ClInclude Include="PostProcessing\AdditiveBlendPostProcess.h" />
     <ClInclude Include="PostProcessing\AntiAliasingPostProcessing.h" />
     <ClInclude Include="PostProcessing\BloomPostProcessing.h" />

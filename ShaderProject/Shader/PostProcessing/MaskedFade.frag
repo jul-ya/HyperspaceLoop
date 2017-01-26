@@ -12,6 +12,7 @@ uniform vec4 maskColor;
 
 void main()
 {
+	// sample color
 	vec4 color = texture(scene, TexCoords);
 	vec4 masked;
 
@@ -24,6 +25,7 @@ void main()
 	float alpha = masked.r * (1.0 - 1.0/255.0);
 	
 	// if mask value > alpha we draw the mask
+	// interpolate between values
 	float weight = smoothstep(maskWeight - maskSpread, maskWeight, alpha);
 
 	// blend in mask color depending on weight & apply a blend between mask and scene
